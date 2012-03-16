@@ -1,14 +1,37 @@
-\documentclass[a4paper,11pt]{article}
+\documentclass[a4paper,11pt]{report}
 \usepackage[portuguese,brazilian]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{latexsym}
+\pagestyle{headings}
 \author{Leandro Ferro Luzia}
-\title{Execução remota de goroutines}
+\title{Uma infraestrutura para o desenvolvimento de sistemas distruídos escaláveis}
 \begin{document}
+\date{2012}
 \maketitle
+\section*{Resumo}
+Os sistemas computacionais são utilizados, desde do surgimento dos computadores, para criar e manipular dados de forma sistemática e rápida. Porém, a capacidade de um único computador há muito foi extrapolada , exigindo a distribuição dos dados entre vários computadores ***melhorar isso...
+
+Este trabalho apresenta um paradigma diferente para a construção de sistemas distribuídos escalavéis que propõe que a comunicação entre os componentes do sistema distribuído - feita em geral por troca de mensagens na rede - seja abstraída para a criação e utilização de estruturas de dados no código do sistema. Assim, os desenvolvedores podem passar a se preocupar com a modelagem e a manipulação de estruturas de dados para resolver o problema em questão, enquanto que uma infraestrutura adequada se encarrega de gerenciar estes dados de forma distribuída entre várias máquinas.
+
+Esta infraestrutura provê uma primitiva de programação que permite acessar de forma atômica e condicionalmente modificar dados espalhados entre as máquinas que compõe o sistema. Desta forma, as estruturas de dados podem ser armazenadas de forma distribuída e estarem disponíveis para qualquer elemento do sistema de forma consistente.
+
+Será construída esta infraestrutura e algumas aplicações para ilustrar sua utilização. ***completar aqui também
 \tableofcontents
-\section{Introdução}
-Neste trabalho vamos criar uma biblioteca para permitir a criação e execução remota de goroutines
-na linguagem Go.
+\listoftables
+\listoffigures
+\chapter{Histórico}
+\chapter{Mini-transações}
+\chapter{Estruturas de dados como abstração}
+\chapter{Implementação}
+\chapter{Análise}
+\chapter{Trabalhos relacionados}
+\chapter{Conclusão}
+
+\begin{thebibliography}{99}
+
+\bibitem{sinfonia} Aguilera, M.K., Merchant, A., Shah, M., Veitch, A., Karamanolis, C.: \emph{Sinfonia}: a new paradigm for building scalable distributed systems. Em SOSP, páginas 159-174 (2007)
+
+\end{thebibliography}
+
 \end{document}
