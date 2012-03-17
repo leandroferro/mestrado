@@ -1,26 +1,31 @@
-\documentclass[a4paper,11pt]{report}
+\documentclass[a4paper,12pt]{report}
 \usepackage[portuguese,brazilian]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{latexsym}
-\pagestyle{headings}
-\author{Leandro Ferro Luzia}
 \title{Uma infraestrutura para o desenvolvimento de sistemas distruídos escaláveis}
-\begin{document}
+\author{Leandro Ferro Luzia}
 \date{2012}
+\begin{document}
+\pagestyle{headings}
 \maketitle
 \section*{Resumo}
+TODO: fazer o resumo mesmo depois de escrever o texto :S
+
 Os sistemas computacionais são utilizados, desde do surgimento dos computadores, para criar e manipular dados de forma sistemática e rápida. Porém, a capacidade de um único computador há muito foi extrapolada , exigindo a distribuição dos dados entre vários computadores ***melhorar isso...
 
 Este trabalho apresenta um paradigma diferente para a construção de sistemas distribuídos escalavéis que propõe que a comunicação entre os componentes do sistema distribuído - feita em geral por troca de mensagens na rede - seja abstraída para a criação e utilização de estruturas de dados no código do sistema. Assim, os desenvolvedores podem passar a se preocupar com a modelagem e a manipulação de estruturas de dados para resolver o problema em questão, enquanto que uma infraestrutura adequada se encarrega de gerenciar estes dados de forma distribuída entre várias máquinas.
 
-Esta infraestrutura provê uma primitiva de programação que permite acessar de forma atômica e condicionalmente modificar dados espalhados entre as máquinas que compõe o sistema. Desta forma, as estruturas de dados podem ser armazenadas de forma distribuída e estarem disponíveis para qualquer elemento do sistema de forma consistente.
+Esta infraestrutura provê uma primitiva de programação que permite acessar de forma atômica e condicionalmente modificar dados espalhados entre as máquinas que compõe o sistema. Desta forma, as estruturas de dados podem ser armazenadas de forma distribuída e estar disponíveis para qualquer elemento do sistema de forma consistente.
 
 Será construída esta infraestrutura e algumas aplicações para ilustrar sua utilização. ***completar aqui também
 \tableofcontents
 \listoftables
 \listoffigures
-\chapter{Histórico}
+\chapter{Sistemas distribuídos e escalabilidade}
+Baseado na definição dada em \cite{ds-tanenbaum}, um sistema distribuído é um conjunto de elementos computacionais independentes que passam a impressão, para quem utiliza o sistema, de ser um único elemento computacional.
+
+Com a popularização das redes de computadores, e de forma especial a Internet, os sistemas computacionais tem sido expostos à um número cada vez maior de usuários - tanto humanos quanto computacionais. Desta forma diversos tipos de sistemas, como comércio eletrônico, busca e redes sociais precisam suportar este número crescente de usuários de forma transparente e 
 \chapter{Mini-transações}
 \chapter{Estruturas de dados como abstração}
 \chapter{Implementação}
@@ -30,7 +35,11 @@ Será construída esta infraestrutura e algumas aplicações para ilustrar sua u
 
 \begin{thebibliography}{99}
 
-\bibitem{sinfonia} Aguilera, M.K., Merchant, A., Shah, M., Veitch, A., Karamanolis, C.: \emph{Sinfonia}: a new paradigm for building scalable distributed systems. Em SOSP, páginas 159-174 (2007)
+\bibtem{ds-tanenbaum} Tanenbaum, A.S., van Steen, M.: Distributed Systems: Principles and Paradigms, 2nd Edition (2006)
+
+\bibitem{evaluating-scalability} Jogalekar, P., Woodside, M.: Evaluating the scalability of distributed systems. In IEEE Transactions on Parallel and Distributed Systems, Volume 11, Issue 6 (2000)
+
+\bibitem{sinfonia} Aguilera, M.K., Merchant, A., Shah, M., Veitch, A., Karamanolis, C.: Sinfonia: a new paradigm for building scalable distributed systems. Em SOSP, páginas 159-174 (2007)
 
 \end{thebibliography}
 
