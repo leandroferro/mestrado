@@ -6,6 +6,7 @@
 \title{Uma infraestrutura para o desenvolvimento de sistemas distruídos escaláveis}
 \author{Leandro Ferro Luzia}
 \date{2012}
+
 \begin{document}
 \pagestyle{headings}
 \maketitle
@@ -22,7 +23,8 @@ Será construída esta infraestrutura e algumas aplicações para ilustrar sua u
 \tableofcontents
 \listoftables
 \listoffigures
-\chapter{Sistemas distribuídos e escalabilidade}
+
+\chapter{Introdução}
 Com a popularização dos computadores, das redes de computadores e, de forma especial, da Internet, os sistemas computacionais tem sido expostos a um número cada vez maior de usuários - tanto humanos quanto computacionais. Desta forma diversos tipos de sistemas (como comércio eletrônico, motores de busca ou redes sociais, por exemplo) precisam suportar uma ampla variação, em termos de números de usuários atendidos e serviços oferecidos, quantidade de dados armazenados e manipulados, requerimentos em relação à taxa de processamento, número de elementos computaticionais que compõem o sistema, distribuição geográfica e tamanho das redes e dispositivos de armazenamento. 
 
 Uma das maneiras de construir sistemas computacionais que atendam aos requisitos apresentados anteriormente é na forma de um sistema distribuído, que é um conjunto de elementos computacionais independentes que passa a impressão, para quem utiliza este sistema, de ser um único elemento computacional \cite{ds-tanenbaum}. Ao construir um sistema computacional de forma distribuída podemos aproveitar de forma mais eficiente os recursos computacionais disponíveis; a disponibilidade do sistema pode ser aumentada pois, com mais elementos computacionais disponíveis para execução, diminui a chance de que o sistema esteja indisponível; e o crescimento do sistema pode ser tratado de forma gradual e sobre demanda. Porém, devido à natureza distribuída destes sistemas problemas podem ser encontrados, que poderiam não existir caso o sistema fosse centralizado, como questões de segurança, falhas de comunicação devido a problemas nas redes de conexão e a chance de falhas, pois agora temos um número maior de componentes no sistema.
@@ -32,22 +34,24 @@ A capacidade de um sistema de operar de forma eficiente e com qualidade em rela�
 A maneira tradicional de escalar os sistemas era baseada na {\em escalabilidade vertical}, que se refere à capacidade de aumentar a eficiência da execução do sistema ao melhorar o hardware em que o sistema é executado, como por exemplo utilizar processadores com mais núcleos, maior quantidade de memória, discos mais rápidos e confiáveis, etc... Em geral, Sistemas Gerenciadores de Banco de Dados (SGBD's) são escalados utilizando essa abordagem.
 
 Empresas com sistemas voltados à Internet (como Google, eBay, Amazon, Facebook) tem adotado a abordagem da {\em escalabilidade horizontal}, que se refere à capacidade de aumentar a eficiência da execução do sistema ao adicionar mais elementos computacionais ao sistema, permitindo distribuição de carga e aumento da disponibilidade do sistema.
-\chapter{Mini-transações}
-\chapter{Estruturas de dados como abstração}
-\chapter{Implementação}
-\chapter{Análise}
-\chapter{Trabalhos relacionados}
+
+\chapter{Descrição da infraestrutura}
+Este trabalho pretende apresentar e construir uma infraestrutura para facilitar o desenvolvimento de sistemas distruídos escaláveis. Esta infraestrutura é baseada no trabalho desenvolvido em \cite{sinfonia} em que os autores apresentam {\em Sinfonia}, um sistema que cria um espaço linear de memória global distribuído entre diversos elementos de memória (memory nodes) e disponibiliza como primitiva de programação central uma {\em minitransação}, que permite acesso eficiente e consistente aos dados distribuídos entre os elementos de memória, enquanto que encapsula os complexos tratamentos em relação ao acesso concorrente e falhas. Desta forma, este sistema permite que o desenvolvimento de sistemas distribuídos seja vista do ponto de vista da modelagem e manipulação de estruturas de dados ao invés dos protocolos de comunicação entre os elementos do sistema.
+
+Em \cite{sinfonia}, os autores assumem que o sistema distribuído executará no ambiente de uma central de dados (data center), um local que pode conter até milhares de máquinas, conectados através de redes cuja latência é baixa e nas quais particionamentos sejam raros de ocorrer. Estes pressupostos não são verdadeiros em outros ambientes, como redes de longa distância (Wide Area Network - WAN), sistemas ponto a ponto ou a Internet. Estes ambientes apresentam uma alta taxa de erros de comunicação, uma maior latência (junto com uma maior variação da mesma) de comunicação, e uma complexidade extra em relação à configuração e gerenciamento.
+
+A intenção da nossa infraestrutura é prover os serviços que {\em Sinfonia} oferece, porém em um ambiente mais genérico, como a Internet. Para isso, será construído um cluster de elementos de memória e uma biblioteca (inicialmente em Java) que permite o uso da infraestrutura.
 \chapter{Conclusão}
 
 \begin{thebibliography}{99}
 
-\bibitem{ds-tanenbaum} Tanenbaum, A.S., van Steen, M.: Distributed Systems: Principles and Paradigms, 2nd Edition (2006)
+\bibitem{ds-tanenbaum} Tanenbaum, A.S., van Steen, M.: {\em Distributed Systems: Principles and Paradigms, 2nd Edition} (2006)
 
-\bibitem{evaluating-scalability} Jogalekar, P., Woodside, M.: Evaluating the scalability of distributed systems. In IEEE Transactions on Parallel and Distributed Systems, Volume 11, Issue 6 (2000)
+\bibitem{evaluating-scalability} Jogalekar, P., Woodside, M.: {\em Evaluating the scalability of distributed systems}. In IEEE Transactions on Parallel and Distributed Systems, Volume 11, Issue 6 (2000)
 
-\bibitem{scale-up-vs-down} Michael, M., Moreira, J.E., Shiloach, D., Wisniewski, R.W.:Scale-up x Scale-out: A Case Study using Nutch/Lucene. In IEEE Parallel and Distributed Processing Symposium (2007)
+\bibitem{scale-up-vs-down} Michael, M., Moreira, J.E., Shiloach, D., Wisniewski, R.W.: {\em Scale-up x Scale-out: A Case Study using Nutch/Lucene}. In IEEE Parallel and Distributed Processing Symposium (2007)
 
-\bibitem{sinfonia} Aguilera, M.K., Merchant, A., Shah, M., Veitch, A., Karamanolis, C.: Sinfonia: a new paradigm for building scalable distributed systems. Em SOSP, páginas 159-174 (2007)
+\bibitem{sinfonia} Aguilera, M.K., Merchant, A., Shah, M., Veitch, A., Karamanolis, C.: {\em Sinfonia: a new paradigm for building scalable distributed systems}. Em SOSP, páginas 159-174 (2007)
 
 \end{thebibliography}
 
