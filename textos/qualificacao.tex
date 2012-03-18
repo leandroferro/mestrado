@@ -23,11 +23,15 @@ Será construída esta infraestrutura e algumas aplicações para ilustrar sua u
 \listoftables
 \listoffigures
 \chapter{Sistemas distribuídos e escalabilidade}
-Baseado na definição dada em \cite{ds-tanenbaum}, um sistema distribuído é um conjunto de elementos computacionais independentes que passam a impressão, para quem utiliza o sistema, de ser um único elemento computacional.
+Com a popularização dos computadores, das redes de computadores e, de forma especial, da Internet, os sistemas computacionais tem sido expostos a um número cada vez maior de usuários - tanto humanos quanto computacionais. Desta forma diversos tipos de sistemas (como comércio eletrônico, motores de busca ou redes sociais, por exemplo) precisam suportar uma ampla variação, em termos de números de usuários atendidos e serviços oferecidos, quantidade de dados armazenados e manipulados, requerimentos em relação à taxa de processamento, número de elementos computaticionais que compõem o sistema, distribuição geográfica e tamanho das redes e dispositivos de armazenamento. 
 
-Com a popularização das redes de computadores, e de forma especial a Internet, os sistemas computacionais tem sido expostos à um número cada vez maior de usuários - tanto humanos quanto computacionais. Desta forma diversos tipos de sistemas - comércio eletrônico, motores de busca ou redes sociais - precisam suportar uma ampla variação, em termos de números de usuários e serviços, quantidade de dados armazenadas e manipulados, taxas de processamento (?), número de elementos computaticionais que compõem o sistema, distribuição geográfica e tamanho das redes e dispositivos de armazenamento. Esta capacidade de operar de forma eficiente e com qualidade é chamada de escalabilidade \cite{evaluating-scalability}.
+Uma das maneiras de construir sistemas computacionais que atendam aos requisitos apresentados anteriormente é na forma de um sistema distribuído, que é um conjunto de elementos computacionais independentes que passa a impressão, para quem utiliza este sistema, de ser um único elemento computacional \cite{ds-tanenbaum}. Ao construir um sistema computacional de forma distribuída podemos aproveitar de forma mais eficiente os recursos computacionais disponíveis; a disponibilidade do sistema pode ser aumentada pois, com mais elementos computacionais disponíveis para execução, diminui a chance de que o sistema esteja indisponível; e o crescimento do sistema pode ser tratado de forma gradual e sobre demanda. Porém, devido à natureza distribuída destes sistemas problemas podem ser encontrados, que poderiam não existir caso o sistema fosse centralizado, como questões de segurança, falhas de comunicação devido a problemas nas redes de conexão e a chance de falhas, pois agora temos um número maior de componentes no sistema.
 
+A capacidade de um sistema de operar de forma eficiente e com qualidade em relação à variação dos requisitos apresentados anteriormente é chamada de escalabilidade \cite{evaluating-scalability}. A escalabilidade de um sistema pode ser classificada de duas formas \cite{scale-up-vs-down}: escalabilidade {\em vertical} ou {\em horizontal}.
 
+A maneira tradicional de escalar os sistemas era baseada na {\em escalabilidade vertical}, que se refere à capacidade de aumentar a eficiência da execução do sistema ao melhorar o hardware em que o sistema é executado, como por exemplo utilizar processadores com mais núcleos, maior quantidade de memória, discos mais rápidos e confiáveis, etc... Em geral, Sistemas Gerenciadores de Banco de Dados (SGBD's) são escalados utilizando essa abordagem.
+
+Empresas com sistemas voltados à Internet (como Google, eBay, Amazon, Facebook) tem adotado a abordagem da {\em escalabilidade horizontal}, que se refere à capacidade de aumentar a eficiência da execução do sistema ao adicionar mais elementos computacionais ao sistema, permitindo distribuição de carga e aumento da disponibilidade do sistema.
 \chapter{Mini-transações}
 \chapter{Estruturas de dados como abstração}
 \chapter{Implementação}
@@ -37,9 +41,11 @@ Com a popularização das redes de computadores, e de forma especial a Internet,
 
 \begin{thebibliography}{99}
 
-\bibtem{ds-tanenbaum} Tanenbaum, A.S., van Steen, M.: Distributed Systems: Principles and Paradigms, 2nd Edition (2006)
+\bibitem{ds-tanenbaum} Tanenbaum, A.S., van Steen, M.: Distributed Systems: Principles and Paradigms, 2nd Edition (2006)
 
 \bibitem{evaluating-scalability} Jogalekar, P., Woodside, M.: Evaluating the scalability of distributed systems. In IEEE Transactions on Parallel and Distributed Systems, Volume 11, Issue 6 (2000)
+
+\bibitem{scale-up-vs-down} Michael, M., Moreira, J.E., Shiloach, D., Wisniewski, R.W.:Scale-up x Scale-out: A Case Study using Nutch/Lucene. In IEEE Parallel and Distributed Processing Symposium (2007)
 
 \bibitem{sinfonia} Aguilera, M.K., Merchant, A., Shah, M., Veitch, A., Karamanolis, C.: Sinfonia: a new paradigm for building scalable distributed systems. Em SOSP, páginas 159-174 (2007)
 
