@@ -3,7 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{latexsym}
-\title{Uma infraestrutura para o desenvolvimento de sistemas distruídos escaláveis}
+\title{Uma infraestrutura para o desenvolvimento de aplicações distribuídas baseada em minitransações}
 \author{Leandro Ferro Luzia}
 \date{2012}
 
@@ -11,15 +11,13 @@
 \pagestyle{headings}
 \maketitle
 \section*{Resumo}
-TODO: fazer o resumo mesmo depois de escrever o texto :S
+O desenvolvimento de aplicações distribuídas envolve lidar, em geral, com a troca de mensagens entre os computadores que compõem o sistema para o compartilhamento de estado. Esta abordagem é complicada e requer o uso de protocolos para gerenciar o estado compartilhado entre o sistema.
 
-Os sistemas computacionais são utilizados, desde do surgimento dos computadores, para criar e manipular dados de forma sistemática e rápida. Porém, a capacidade de um único computador há muito foi extrapolada , exigindo a distribuição dos dados entre vários computadores ***melhorar isso...
+Uma forma comum de compartilhar o estado entre os componentes do sistema é utilizar um banco de dados relacional como ponto de integração. Esta abordagem para construir aplicações distribuídas não herda somente os benefícios do SGBD (sistema gerenciador de banco de dados) utilizado, como as propriedades ACID (Atomicidade, Consistência, Isolamento e Durabilidade), mas também alguns inconvenientes, em especial em relação à escalabilidade, uma vez que o banco pode se tornar um gargalo e ser um ponto único de falhas.
 
-Este trabalho apresenta um paradigma diferente para a construção de sistemas distribuídos escalavéis que propõe que a comunicação entre os componentes do sistema distribuído - feita em geral por troca de mensagens na rede - seja abstraída para a criação e utilização de estruturas de dados no código do sistema. Assim, os desenvolvedores podem passar a se preocupar com a modelagem e a manipulação de estruturas de dados para resolver o problema em questão, enquanto que uma infraestrutura adequada se encarrega de gerenciar estes dados de forma distribuída entre várias máquinas.
+Enquanto queremos tirar proveito das propriedades ACID das transações oferecidas por SGBD's, também queremos que as aplicações possam escalar para atender a um número crescente de usuários. Assim, neste trabalho buscamos desenvolver uma infraestrutura que possibilite as aplicações compartilharem estado de forma escalável e mantendo as propriedades ACID, fazendo uso de {\em minitransações}, uma modificação no conhecido protocolo 2PC (Two-Phase Commit - efetivação em duas fases) que permite acessar atomicamente ou modificar condicionalmente dados distribuídos em várias máquinas.
 
-Esta infraestrutura provê uma primitiva de programação que permite acessar de forma atômica e condicionalmente modificar dados espalhados entre as máquinas que compõe o sistema. Desta forma, as estruturas de dados podem ser armazenadas de forma distribuída e estar disponíveis para qualquer elemento do sistema de forma consistente.
-
-Será construída esta infraestrutura e algumas aplicações para ilustrar sua utilização. ***completar aqui também
+Estas {\em minitransações} são disponibilizadas como uma primitiva de programação aos desenvolvedores de aplicação, e permitem que o desenvolvedor passe a tratar o compartilhamento de estado entre o sistema como a criação e manipulação de estruturas de dados compartilhadas, e não precise mais lidar com protocolos e mecanismos de troca de mensagens explicitamente.
 \tableofcontents
 \listoftables
 \listoffigures
