@@ -1,0 +1,11 @@
+package node;
+
+public class Controller {
+
+	private byte[] buffer = new byte[1024];
+	
+	public void write(byte[] data, int position) {
+		System.arraycopy(data, 0, buffer, position, data.length);
+	}
+	
+}

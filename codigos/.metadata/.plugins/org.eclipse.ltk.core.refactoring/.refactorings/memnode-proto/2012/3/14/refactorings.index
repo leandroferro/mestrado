@@ -1,0 +1,5 @@
+1332908672031	Extract method 'validatePosition'
+1332910097356	Rename local variable 'start'
+1332910618268	Extract local variable 'thread'
+1332910664900	Inline local variable 'thread'
+1332910688859	Extract local variable 'thread'

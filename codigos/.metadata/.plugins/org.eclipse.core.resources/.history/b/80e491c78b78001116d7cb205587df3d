@@ -1,0 +1,28 @@
+package node;
+
+import junit.framework.Assert;
+
+import org.junit.Before;
+import org.junit.Test;
+
+
+public class ControllerTest {
+
+	private Controller controller;
+	
+	@Before
+	public void setUp() {
+		this.controller = new Controller();
+	}
+	
+	@Test
+	public void checkWriteAndRead() {
+		
+		byte data[] = {1, 2, 3, 4, 5};
+		
+		controller.write(data, 15);
+		
+		Assert.assertEquals(data, controller.read(15, data.length));
+	}
+	
+}

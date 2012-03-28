@@ -1,0 +1,20 @@
+package net;
+
+import java.net.ServerSocket;
+
+import node.Controller;
+
+public class Server {
+
+	private final Controller controller;
+	private final ServerSocket socket;
+
+	public Server(Controller controller, ServerSocket socket) {
+		super();
+		this.controller = controller;
+		this.socket = socket;
+	}
+	
+	
+	
+}
