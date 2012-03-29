@@ -1,0 +1,70 @@
+\documentclass[11pt]{article}
+\usepackage[brazil]{babel}
+\usepackage[latin1]{inputenc}
+\input{epsf}
+
+\pagestyle{empty}
+\setlength{\topmargin}{-1in}
+\setlength{\textheight}{9in}
+\setlength{\oddsidemargin}{-.125in}
+\setlength{\evensidemargin}{-.125in}
+\setlength{\textwidth}{6.8in}
+ 
+\newcommand{\proof}{\noindent\bf Proof : \rm }
+ 
+\newcommand{\comb}[2]   %%    to be used in math mode
+{\left( \begin{array}{c} #1 \\ #2 \end{array} \right) }
+ 
+\def\ni{\noindent}
+\def\ida{\makebox[0.5cm]{}}
+\def\idab{\makebox[0.75cm]{}}
+\def\idb{\makebox[1cm]{}}
+\def\idc{\makebox[1.5cm]{}}
+\def\idcd{\makebox[1.75cm]{}}
+\def\idd{\makebox[2cm]{}}
+\def\idde{\makebox[2.25cm]{}}
+\def\ide{\makebox[2.5cm]{}}
+\def\idf{\makebox[3.0cm]{}}
+\def\idg{\makebox[3.5cm]{}}
+\def\idh{\makebox[4.0cm]{}}
+\def\idi{\makebox[4.5cm]{}}
+ 
+\def\ua{\uparrow}
+ 
+\def\pule{\vspace{0.2cm}}
+\def\pulao{\vspace{0.5cm}}
+\def\pulaozao{\vspace{1cm}}
+
+\def\espaco{\makebox[5mm]{}}
+ 
+\newcommand{\primeira}[1]
+{$#1^{\mbox{\scriptsize\b{a}}}$}
+ 
+\newcommand{\primeiro}[1]
+{#1$^{\mbox{\scriptsize\b{o}}}$}
+ 
+\newcommand{\question}[2]{\subsection*{Questão #1 \hfill 
+                                      \begin{normalsize}
+                                          \textsf{\textmd{(#2 pontos)}}
+                                      \end{normalsize}}}
+\begin{document}
+\large
+\title{Uma Infraestrutura para Desenvolvimento de Aplicações Distribuídas Baseada em Minitransações}
+\author{Leandro Ferro Luzia\\
+\mbox{\ \ }\\
+Orientador: Francisco C.\ R.\ Reverbel}
+\date{}
+\maketitle
+\thispagestyle{empty}
+
+O desenvolvimento de aplicações distribuídas envolve lidar, em geral, com a troca de mensagens na rede entre os computadores para que os dados relevantes à execução --- o estado do sistema --- possa ser compartilhado e conhecido por todos os computadores envolvidos. Esta abordagem é complexa e requer o uso de protocolos para gerenciar e manter consistente entre todas as máquinas o estado compartilhado.
+
+Uma forma comum de compartilhar o estado entre os componentes do sistema é utilizar como ponto de integração algum tipo de armazenamento de dados como, por exemplo, um banco de dados relacional. A abordagem que utiliza um banco de dados relacional é interessante devido ao alto grau de controle que estes bancos oferecem, como integridade referencial e a execução de comandos que alteram múltiplos ítens de dados de forma atômica (transações). Esta utilização consistente dos dados é altamente desejável pois torna o desenvolvimento de aplicações mais simples, sem a necessidade de tratamentos complexos de controle de consistência por parte do desenvolvedor da aplicação. Porém, bancos de dados relacionais apresentam problemas de escalabilidade quando empregados em aplicações que fazem uso de quantidades cada vez maiores de dados, como comércio eletrônico em escala global ou redes sociais. A grande quantidade de dados passa a exigir que o armazenamento seja particionado entre diferentes máquinas o que, por sua vez, torna o controle de consistência mais complexo.
+
+% Dessa forma, a maneira usual com que os bancos de dados relacionais podem atender um número crescente de dados é por meio da melhora no hardware em que eles são executados, conhecida como escala de forma vertical. Enquanto é desejável que o sistema ofereça a consistência dos dados como um banco de dados relacional oferece, também se torna necessário que o sistema possa escalar de forma horizontal, permitindo particionar e armazenar os dados em máquinas distintas. 
+
+%Neste trabalho buscamos desenvolver uma infraestrutura que permite aplicações compartilharem estado de forma escalável horizontalmente e fazendo uso de minitransações para garantir a consistência dos dados em operações que envolvem a alteração de dados que estejam em diferentes máquinas. As minitransações são uma extensão do protocolo de transação distribuída de duas fases (Two-Phase Commit Protocol - 2PC) que permite acessar atomicamente ou modificar condicionalmente dados distribuídos em várias máquinas. Uma primitiva de programação é disponibilizada aos desenvolvedores de aplicação permitindo que passem a tratar o compartilhamento de estado entre o sistema como a criação e manipulação de estruturas de dados compartilhadas, excluindo a necessidade de lidar com protocolos e mecanismos de troca de mensagens explicitamente.
+
+Neste trabalho buscamos desenvolver uma infraestrutura que permite aplicações compartilharem estado de forma escalável, fazendo uso de minitransações para garantir a consistência dos dados e a atomicidade das operações que envolvem dados distribuídos em diferentes máquinas. As minitransações são baseadas numa variação otimizada do protocolo de efetivação em duas fases (\emph{two-phase commit}) que permite acesso atômico ou modificação condicional de dados distribuídos em várias máquinas. Uma primitiva de programação é disponibilizada aos desenvolvedores de aplicações, permitindo que o compartilhamento de dados seja feito apenas via criação e manipulação de estruturas de dados, sem que os desenvolvedores tenham de lidar explicitamente com protocolos e mecanismos de troca de mensagens.
+
+\end{document}

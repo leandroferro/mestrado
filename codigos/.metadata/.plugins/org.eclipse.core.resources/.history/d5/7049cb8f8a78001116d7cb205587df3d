@@ -1,7 +1,0 @@
-package node;
-
-public class Controller {
-
-	private byte[] buffer = new byte[1024];
-	
-}

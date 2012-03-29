@@ -23,16 +23,7 @@ public class Main {
 		
 		Controller controller = new Controller();
 		
-		Server server = new Server(controller, socket);
-		
-		Thread thread = new Thread(server);
-		thread.start();
-		
-		System.out.println("Pressione qualquer tecla para terminar...");
-		System.in.read();
-		
-		server.stop();
-		thread.join();
+		new Server(controller, socket).run();
 		
 	}
 }

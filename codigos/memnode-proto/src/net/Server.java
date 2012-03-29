@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.util.logging.Logger;
 
 import node.Controller;
+import node.ExecutionResult;
+import node.Minitransaction;
 
 public class Server implements Runnable{
 
@@ -41,35 +43,15 @@ public class Server implements Runnable{
 				
 				logger.info("Aceitou conexao de " + client);
 				
-				InputStream inputStream = client.getInputStream();
-				OutputStream outputStream = client.getOutputStream();
+				InputStreamMinitransactionFactory factory = new InputStreamMinitransactionFactory( client.getInputStream() );
 				
-				int command = inputStream.read();
-				logger.info("  Leu comando " + command);
-				int position;
-				int length;
-				switch((char)command) {
-				case 'e': // echo
-					length = inputStream.read() - '0';
-					for(int b = inputStream.read(); b != -1 && length-- > 0; b = inputStream.read()) {
-						outputStream.write(b);
-					}
-					break;
-				case 'w': // write
-					position = inputStream.read() - '0'; 
-					length = inputStream.read() - '0';
-					ByteArrayOutputStream baos = new ByteArrayOutputStream(length);
-					for(int b = inputStream.read(); b != -1 && length-- > 0; b = inputStream.read())
-						baos.write(b);
-					byte[] data = baos.toByteArray();
-					controller.write(data, position);
-					outputStream.write(data);
-					break;
-				case 'r': // read
-					position = inputStream.read() - '0';
-					length = inputStream.read() - '0';
-					outputStream.write(controller.read(position, length));
-					break;
+				for(Minitransaction minitransaction = factory.create(); minitransaction != null; minitransaction = factory.create()) {
+					logger.info("Vai executar " + minitransaction);
+					ExecutionResult result = controller.execute( minitransaction );
+					logger.info("Execucao resultou em " + result);
+					SocketExecutionResultOutput output = new SocketExecutionResultOutput(client.getOutputStream());
+					
+					output.send(result);
 				}
 				
 			} catch (Exception e) {
