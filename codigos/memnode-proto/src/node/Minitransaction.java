@@ -15,6 +15,8 @@ public class Minitransaction {
 	private final List<WriteItem> writeList = new ArrayList<WriteItem>();
 	private final List<ReadItem> allReadList = new ArrayList<ReadItem>();
 	private WaitItem waitItem;
+	private boolean abort = false;
+	private boolean commit = false;
 	
 	public Minitransaction(String id) {
 		this.id = id;
@@ -118,5 +120,20 @@ public class Minitransaction {
 		return waitItem;
 	}
 
+	public void setAbort() {
+		this.abort = true;
+	}
+
+	public void setCommit() {
+		this.commit = true;
+	}
+
+	public boolean isAbort() {
+		return abort;
+	}
+	
+	public boolean isCommit() {
+		return commit;
+	}
 	
 }

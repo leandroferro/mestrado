@@ -3,8 +3,10 @@ package node;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import node.ExecutionResult.Outcome;
@@ -16,8 +18,9 @@ public class Controller {
 	private static final Logger logger = Logger.getLogger("Controller");
 	private byte[] buffer = new byte[1024];
 	private final LockManager lockManager = new LockManager();
+	private final Map<String, List<WriteItem>> writeLog = new HashMap<String, List<WriteItem>>();
 	
-	public void write(byte[] data, int position) {
+	void write(byte[] data, int position) {
 		validatePosition(position);
 		
 		if( position + data.length <= buffer.length )
@@ -31,7 +34,7 @@ public class Controller {
 			throw new InvalidPosition();
 	}
 	
-	public byte[] read(int position, int length) {
+	byte[] read(int position, int length) {
 		validatePosition(position);
 		return Arrays.copyOfRange(buffer, position, Math.min(position + length, buffer.length));
 	}
@@ -39,6 +42,23 @@ public class Controller {
 	public ExecutionResult execute(Minitransaction minitransaction) {
 		
 		try {
+			
+			if( minitransaction.isAbort() ) {
+				lockManager.unlock(minitransaction.getId());
+				writeLog.remove(minitransaction.getId());
+				return new ExecutionResult(Outcome.ABORT, minitransaction.getId(), Collections.<ReadResult>emptyList());
+			}
+			
+			if( minitransaction.isCommit() ) {
+				List<WriteItem> list = writeLog.get(minitransaction.getId());
+				for (WriteItem writeItem : list) {
+					write(writeItem.getData(), writeItem.getAddress());
+				}
+				lockManager.unlock(minitransaction.getId());
+				writeLog.remove(minitransaction.getId());
+				return new ExecutionResult(Outcome.COMMIT, minitransaction.getId(), Collections.<ReadResult>emptyList());
+			}
+			
 			if( !lockManager.tryLock(minitransaction.getId(), minitransaction.getAllReads()) )
 				return new ExecutionResult(Outcome.BAD_LOCK, minitransaction.getId(), Collections.<ReadResult>emptyList());
 			
@@ -78,15 +98,17 @@ public class Controller {
 				readResultList.add(new ReadResult(readItem.getAddress(), data));
 			}
 
-			Iterator<WriteItem> writeIterator = minitransaction.getWriteIterator();
+//			Iterator<WriteItem> writeIterator = minitransaction.getWriteIterator();
+//			
+//			while( writeIterator.hasNext() ) {
+//				WriteItem writeItem = writeIterator.next();
+//				write(writeItem.getData(), writeItem.getAddress());
+//			}
 			
-			while( writeIterator.hasNext() ) {
-				WriteItem writeItem = writeIterator.next();
-				write(writeItem.getData(), writeItem.getAddress());
-			}
+			writeLog.put(minitransaction.getId(), minitransaction.getWrites());
 			
-			lockManager.releaseLocks(minitransaction.getId(),minitransaction.getAllReads());
-			lockManager.releaseWriteLocks(minitransaction.getId(),minitransaction.getWrites());
+//			lockManager.releaseLocks(minitransaction.getId(),minitransaction.getAllReads());
+//			lockManager.releaseWriteLocks(minitransaction.getId(),minitransaction.getWrites());
 			
 			return new ExecutionResult(Outcome.COMMIT, minitransaction.getId(), readResultList);
 		} catch (Exception e) {

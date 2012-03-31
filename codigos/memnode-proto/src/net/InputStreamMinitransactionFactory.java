@@ -46,7 +46,13 @@ public class InputStreamMinitransactionFactory implements MinitransactionFactory
 				while( tokenizer.hasMoreTokens() ) {
 					String token = tokenizer.nextToken();
 					
-					if( "COMPARE".equals(token) ) {
+					if( "ABORT".equals(token) ) {
+						minitransaction.setAbort();
+					}
+					else if( "COMMIT".equals(token) ) {
+						minitransaction.setCommit();
+					}
+					else if( "COMPARE".equals(token) ) {
 						minitransaction.add(new CompareItem(Integer.parseInt(tokenizer.nextToken()), Integer.parseInt(tokenizer.nextToken()), tokenizer.nextToken().getBytes()));
 					}
 					else if( "READ".equals(token) ) {
