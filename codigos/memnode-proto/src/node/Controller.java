@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import node.ExecutionResult.Outcome;
 
@@ -12,6 +13,7 @@ import server.ReadResult;
 
 public class Controller {
 
+	private static final Logger logger = Logger.getLogger("Controller");
 	private byte[] buffer = new byte[1024];
 	private final LockManager lockManager = new LockManager();
 	
@@ -37,36 +39,60 @@ public class Controller {
 	public ExecutionResult execute(Minitransaction minitransaction) {
 		
 		try {
-			if( !lockManager.tryLock(minitransaction.getAllReads()) )
-				return new ExecutionResult(Outcome.ABORT, minitransaction.getId(), Collections.<ReadResult>emptyList());
+			if( !lockManager.tryLock(minitransaction.getId(), minitransaction.getAllReads()) )
+				return new ExecutionResult(Outcome.BAD_LOCK, minitransaction.getId(), Collections.<ReadResult>emptyList());
+			
+			if( !lockManager.tryLockToWrite(minitransaction.getId(),minitransaction.getWrites()) ) {
+				lockManager.releaseLocks(minitransaction.getId(),minitransaction.getAllReads());
+				return new ExecutionResult(Outcome.BAD_LOCK, minitransaction.getId(), Collections.<ReadResult>emptyList());
+			}
+			
+			WaitItem waitItem = minitransaction.getWaitItem();
+			
+			if( waitItem != null ) {
+				logger.info(minitransaction.getId() + " indo dormir por " + waitItem.getSeconds() + " segundos...");
+				Thread.sleep(waitItem.getSeconds() * 1000);
+				logger.info(minitransaction.getId() + " acordou!!!!");
+			}
 			
 			Iterator<CompareItem> compareIterator = minitransaction.getCompareIterator();
+			while (compareIterator.hasNext()) {
+				CompareItem compareItem = compareIterator.next();
+				
+				byte[] data = read(compareItem.getAddress(), compareItem.getLength());
+				
+				if( !Arrays.equals(data, compareItem.getData()) ) {
+					lockManager.releaseLocks(minitransaction.getId(),minitransaction.getAllReads());
+					lockManager.releaseWriteLocks(minitransaction.getId(),minitransaction.getWrites());
+					return new ExecutionResult(Outcome.ABORT, minitransaction.getId(), Collections.<ReadResult>emptyList());
+				}
+			}
+			
+			List<ReadResult> readResultList = new ArrayList<ReadResult>();
 			Iterator<ReadItem> readIterator = minitransaction.getReadIterator();
+			while (readIterator.hasNext()) {
+				ReadItem readItem = readIterator.next();
+				
+				byte[] data = read(readItem.getAddress(), readItem.getLength());
+				
+				readResultList.add(new ReadResult(readItem.getAddress(), data));
+			}
 
-			
-			
 			Iterator<WriteItem> writeIterator = minitransaction.getWriteIterator();
-			
 			
 			while( writeIterator.hasNext() ) {
 				WriteItem writeItem = writeIterator.next();
 				write(writeItem.getData(), writeItem.getAddress());
 			}
 			
-			
-			List<ReadResult> readResultList = new ArrayList<ReadResult>();
-			
-			while( readIterator.hasNext() ) {
-				ReadItem readItem = readIterator.next();
-				byte[] data = read( readItem.getAddress(), readItem.getLength() );
-				readResultList.add(new ReadResult(readItem.getAddress(), data));
-			}
+			lockManager.releaseLocks(minitransaction.getId(),minitransaction.getAllReads());
+			lockManager.releaseWriteLocks(minitransaction.getId(),minitransaction.getWrites());
 			
 			return new ExecutionResult(Outcome.COMMIT, minitransaction.getId(), readResultList);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return new ExecutionResult(Outcome.ABORT, minitransaction.getId(), Collections.<ReadResult>emptyList());
+			return new ExecutionResult(Outcome.ERROR, minitransaction.getId(), Collections.<ReadResult>emptyList());
 		}
 	}
 	

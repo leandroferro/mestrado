@@ -1,43 +1,72 @@
 package node;
 
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import node.Lock.Type;
 
 public class LockManager {
 
-	private final Set<Lock> locks = new HashSet<Lock>();
+	private final Map<Integer, Lock> locks = new HashMap<Integer, Lock>();
+//	private final Set<Lock> locks = new HashSet<Lock>();
 	
-	private void lock(int start, int length, Type type) {
+	private void lock(String transactionId, int start, int length, Type type) {
 		for( int i = start; i < start+length; i++ )
-			locks.add(new Lock(start, type));
+			locks.put(i, new Lock(transactionId, i, type));
 	}
 	
-	private boolean isLocked(int start, int length, Type type) {
-		for( int i = start; i < start+length; i++ )
-			if( locks.contains(new Lock(start, type == Type.WRITE ? Type.READ : Type.WRITE)) )
+	private boolean isLocked(String transactionId, int start, int length, Type type) {
+		for( int i = start; i < start+length; i++ ) {
+			Lock lock = locks.get( i );
+			if( lock != null && !lock.getOwnerTransactionId().equals(transactionId) && ( type == Type.EXCLUSIVE || lock.getType() == Type.EXCLUSIVE ) )
 				return true;
-		
+		}
 		return false;
 	}
 	
-	public synchronized void unlock(int start, int length, Type type) {
-		for( int i = start; i < start+length; i++ )
-			locks.remove(new Lock(start, type));
+	public synchronized void unlock(String transactionId, int start, int length, Type type) {
+		for( int i = start; i < start+length; i++ ) {
+			Lock lock = locks.get(i);
+			
+			if( lock.getOwnerTransactionId().equals(transactionId) )
+				locks.remove(i);
+		}
 	}
 
-	public synchronized boolean tryLock(List<ReadItem> readsIterator) {
-		for (ReadItem readItem : readsIterator) {
-			if( isLocked(readItem.getAddress(), readItem.getLength(), Type.READ) )
+	public synchronized boolean tryLock(String transactionId, List<ReadItem> items) {
+		for (ReadItem readItem : items) {
+			if( isLocked(transactionId, readItem.getAddress(), readItem.getLength(), Type.SHARED) )
 				return false;
 		}
-		for (ReadItem readItem : readsIterator) {
-			lock(readItem.getAddress(), readItem.getLength(), Type.READ);
+		for (ReadItem readItem : items) {
+			lock(transactionId, readItem.getAddress(), readItem.getLength(), Type.SHARED);
 		}
 		return true;
+	}
+
+	public synchronized void releaseLocks(String transactionId, List<ReadItem> items) {
+		for (ReadItem readItem : items) {
+			unlock(transactionId, readItem.getAddress(), readItem.getLength(), Type.SHARED);
+		}
+	}
+
+	public synchronized boolean tryLockToWrite(String transactionId, List<WriteItem> writes) {
+		for (WriteItem writeItem : writes) {
+			if( isLocked(transactionId, writeItem.getAddress(), writeItem.getData().length, Type.EXCLUSIVE) )
+				return false;
+		}
+		for (WriteItem writeItem : writes) {
+			lock(transactionId, writeItem.getAddress(), writeItem.getData().length, Type.EXCLUSIVE);
+		}
+		return true;
+	}
+
+	public void releaseWriteLocks(String transactionId, List<WriteItem> writes) {
+		for (WriteItem writeItem : writes) {
+			unlock(transactionId, writeItem.getAddress(), writeItem.getData().length, Type.EXCLUSIVE);
+		}
 	}
 }

@@ -14,6 +14,7 @@ public class Minitransaction {
 	private final List<ReadItem> readList = new ArrayList<ReadItem>();
 	private final List<WriteItem> writeList = new ArrayList<WriteItem>();
 	private final List<ReadItem> allReadList = new ArrayList<ReadItem>();
+	private WaitItem waitItem;
 	
 	public Minitransaction(String id) {
 		this.id = id;
@@ -103,6 +104,18 @@ public class Minitransaction {
 
 	public List<ReadItem> getAllReads() {
 		return Collections.unmodifiableList(allReadList);
+	}
+
+	public List<WriteItem> getWrites() {
+		return Collections.unmodifiableList(writeList);
+	}
+
+	public void add(WaitItem waitItem) {
+		this.waitItem = waitItem;		
+	}
+
+	public WaitItem getWaitItem() {
+		return waitItem;
 	}
 
 	

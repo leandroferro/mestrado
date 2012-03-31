@@ -10,6 +10,7 @@ import node.CompareItem;
 import node.Minitransaction;
 import node.MinitransactionFactory;
 import node.ReadItem;
+import node.WaitItem;
 import node.WriteItem;
 
 public class InputStreamMinitransactionFactory implements MinitransactionFactory {
@@ -53,6 +54,9 @@ public class InputStreamMinitransactionFactory implements MinitransactionFactory
 					}
 					else if( "WRITE".equals(token) ) {
 						minitransaction.add(new WriteItem(Integer.parseInt(tokenizer.nextToken()), Integer.parseInt(tokenizer.nextToken()), tokenizer.nextToken().getBytes()));
+					}
+					else if( "WAIT".equals(token) ) {
+						minitransaction.add(new WaitItem(Integer.parseInt(tokenizer.nextToken())));
 					}
 					else if( "END".equals(token) ) {
 						break forread;

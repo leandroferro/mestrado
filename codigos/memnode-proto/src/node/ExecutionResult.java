@@ -9,7 +9,7 @@ import server.ReadResult;
 public class ExecutionResult {
 
 	public enum Outcome {
-		ABORT, COMMIT
+		ABORT, COMMIT, BAD_LOCK, ERROR
 	}
 	
 	private final Outcome outcome;

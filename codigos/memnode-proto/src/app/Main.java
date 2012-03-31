@@ -19,7 +19,7 @@ public class Main {
 		
 		String port = getOr(args, 0, "8069");
 		
-		ServerSocket socket = new ServerSocket(Integer.parseInt(port));
+		ServerSocket socket = new ServerSocket(Integer.parseInt(port), 1);
 		
 		Controller controller = new Controller();
 		

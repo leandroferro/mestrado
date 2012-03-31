@@ -3,16 +3,21 @@ package node;
 public class Lock {
 
 	public static enum Type {
-		READ, WRITE
+		SHARED, EXCLUSIVE
 	};
 
+	private final String ownerTransactionId;
 	private final int address;
 	private final Type type;
 
-	public Lock(int address, Type type) {
-		super();
+	public Lock(String ownerTransactionId, int address, Type type) {
+		this.ownerTransactionId = ownerTransactionId;
 		this.address = address;
 		this.type = type;
+	}
+
+	public String getOwnerTransactionId() {
+		return ownerTransactionId;
 	}
 
 	public int getAddress() {
@@ -25,7 +30,8 @@ public class Lock {
 
 	@Override
 	public String toString() {
-		return "Lock [address=" + address + ", type=" + type + "]";
+		return "Lock [ownerTransactionId=" + ownerTransactionId + ", address="
+				+ address + ", type=" + type + "]";
 	}
 
 	@Override
@@ -33,6 +39,10 @@ public class Lock {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + address;
+		result = prime
+				* result
+				+ ((ownerTransactionId == null) ? 0 : ownerTransactionId
+						.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
@@ -47,6 +57,11 @@ public class Lock {
 			return false;
 		Lock other = (Lock) obj;
 		if (address != other.address)
+			return false;
+		if (ownerTransactionId == null) {
+			if (other.ownerTransactionId != null)
+				return false;
+		} else if (!ownerTransactionId.equals(other.ownerTransactionId))
 			return false;
 		if (type != other.type)
 			return false;
