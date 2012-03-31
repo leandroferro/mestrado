@@ -17,7 +17,7 @@ public class LockManager {
 	private void lock(String transactionId, int start, int length, Type type) {
 		for( int i = start; i < start+length; i++ ) {
 			locks.put(i, new Lock(transactionId, i, type));
-			if( tLocks.containsKey(transactionId) )
+			if( !tLocks.containsKey(transactionId) )
 				tLocks.put(transactionId, new ArrayList<Integer>());
 			tLocks.get(transactionId).add(i);
 		}
