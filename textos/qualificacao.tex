@@ -109,10 +109,8 @@ framexrightmargin=10pt
     
     \vskip 1.5cm
     Programa: Ciências da Computação\\
-    Orientador: Prof. Dr. Francisco C. R. Reverbel\\
-    Coorientador: Prof. Dr. ??
-
-   	\vskip 1cm
+    Orientador: Prof. Dr. Francisco C. R. Reverbel
+    \vskip 1cm
     
     \vskip 0.5cm
     \normalsize{São Paulo, Abril de 2012}
@@ -201,7 +199,8 @@ text text text.
 
 \chapter{Lista de Abreviaturas}
 \begin{tabular}{ll}
-	ACID		& Atomicidade, Consistência, Isolamento e Durabilidade (\emph{Atomicity, Consistency, Isolation and Durability})\\
+	ACID		& Atomicidade, Consistência, Isolamento e Durabilidade \\
+			& (\emph{Atomicity, Consistency, Isolation and Durability})\\
         SGBD	& Sistema Gerenciador de Banco de Dados\\
 	2PC		& Efetivação em Duas Fases (\emph{Two-Phase Commit})\\
 \end{tabular}
@@ -217,20 +216,43 @@ text text text.
 \singlespacing              % espaçamento simples
 
 \chapter{Introdução}
-A proposta deste trabalho é implementar uma infraestrutura baseada em minitransações e avaliar o impacto da utilização desta infraestrutura no desenvolvimento de aplicações distribuídas. As minitransações são uma extensão do protocolo 2PC que permite acessar atomicamente ou modificar condicionalmente dados distribuídos em várias máquinas, permitindo assim o compartilhamento de estado de forma consistente entre as máquinas que compõem o sistema distribuído.
+\label{chap:introducao}
+Há diversos motivos para construir uma aplicação que execute de forma distribuída em diferentes computadores --- tolerância a falhas (adicionando mais máquinas ao sistema aumenta a chance de que, a qualquer momento, haja pelo menos uma máquina capaz de responder pelo sistema) e escalabilidade (particionar e distribuir a carga de processamento do sistema permite que este suporte um número crescente de usuários e informações) são alguns deles.
 
-\subsection{Motivação}
-Há diversos motivos para se construir uma aplicação que execute de forma distribuída em diferentes computadores --- tolerância a falha (adicionando mais máquinas ao sistema aumenta a chance de que, a qualquer momento, haja pelo menos uma máquina capaz de responder pelo sistema); escalabilidade (particionar e distribuir a carga de processamento do sistema permite que o sistema suporte um número crescente de usuários/informações); etc.
+Uma vez que cada um dos computadores só tem uma visão parcial do que está acontecendo no sistema, é preciso que haja comunicação entre eles para que esse estado parcial seja compartilhado com as outras máquinas. Em geral essa comunicação ocorre através da troca de mensagens na rede entre os computadores para que os dados relevantes à execução --- o estado do sistema --- possa ser compartilhado e conhecido por todos. Esta abordagem é complexa e requer o uso de protocolos para gerenciar o estado e mantê-lo consistente entre todas as máquinas do sistema.
 
-Uma vez que cada um dos computadores só tem uma visão parcial do que está acontecendo no sistema, é preciso que haja comunicação entre eles para que esse estado parcial seja expandido. Em geral essa comunicação ocorre através da troca de mensagens na rede entre os computadores para que os dados relevantes à execução - o estado do sistema - possa ser compartilhado e conhecido por todos. Esta abordagem é complexa e requer o uso de protocolos para gerenciar e manter consistente entre todas as máquinas o estado compartilhado entre o sistema.
+Muitas aplicações distribuídas utilizam um SGBD (Sistema Gerenciador de Banco de Dados) relacional (como Oracle, MySQL, SQL Server, etc...) como forma de compartilhamento de estado, pois estes sistemas mantém a integridade e a consistência dos dados através da garantia das propriedades ACID (Atomicidade, Consistência, Integridade e Durabilidade) das transações que executam. Essas propriedades facilitam o desenvolvimento da aplicação uma vez que expõem para o desenvolvedor uma interface que:
+\begin{enumerate}
+	\item Garante que a execução de todas as operações na transação foram efetuadas, ou que nenhuma operação foi feita (Atomicidade)
+	\item Garante que os dados estão de acordo com restrições estabelecidas (Consistência)
+	\item Garante que duas transações executando de forma concorrente não interfiram no resultado uma da outra (Isolamento)
+	\item Garante que as alterações efetuadas por uma transação finalizada com sucesso nunca serão perdidos (Durabilidade)
+\end{enumerate}
 
+Há a possibilidade de utilizar mais de um banco de dados para o compartilhamento do estado, e para efetuar o controle transacional entre todos os bancos envolvidos em geral é utilizado o protocolo 2PC (\emph{Two Phase Commit} --- Efetivação em Duas Fases). Este protocolo estabelece que uma máquina seja designada como coordenador da transação, e esta então emite comandos aos participantes da transação, solicitando leituras e escritas. Para concluir a transação, o coordenador solicita que todos os participantes digam se é possível efetivar a transação. Caso algum deles diga que não é possível, a transação é desfeita em todos os participantes. Caso contrário, o coordenador envia um comando de efetivação para todos.
 
-%Aplicações como redes sociais ou comércio eletrônico tem armazenado e utilizado um número crescente de informação, chegando a números tão grandes que excedem a capacidade de armazenamento de um único computador.
+\section{Objetivo}
+\label{sec:objetivo}
+As minitransações \cite{Aguilera:07} são uma variação do 2PC, em que os comandos da transação são embutidos nas mensagens do protocolo de efetivação. Assim, na primeira mensagem do protocolo de efetivação, o coordenador envia os comandos da transação. Estes comandos podem ser de comparação (por igualdade), leitura ou escrita. Os comandos de comparação determinam se o participante irá votar para que a transação seja efetivada (caso a comparação resulte em igualdade) ou cancelada (caso a comparação falhe). Os comandos de leitura e escrita só são executados caso o voto seja de efetivação, e o resultado da escrita é armazenado de forma separada para aguardar que o coordenador colete todos os votos e verifique que realmente todos os participantes podem efetivar a transação.
 
-\subsection{Organização do texto}
+A proposta deste trabalho é implementar uma infraestrutura para sistemas distribuídos que possibilite o compartilhamento de estado entre as máquinas do sistema utilizando minitransações. Ao invés de trocarem mensagens explicitamente, as máquinas verão um repositório que pode crescer de forma a acomodar grandes quantidades de dados e que permite que todas as máquinas tenham sempre acesso a dados consistentes. Assim, esperamos que o desenvolvimento da aplicação distribuída seja mais simples e ajude o desenvolvedor a focar nas necessidades reais da aplicação.
+
+\section{Organização do texto}
+\label{sec:organizacao_do_texto}
+Este texto é composto, além desta introdução, pelo capítulo \ref{chap:conceitos}, de conceitos e pelo capítulo \ref{chap:conclusoes}, conclusões.
 
 \chapter{Conceitos}
+\label{chap:conceitos}
+
+\section{Gerenciamento de Transações}
+\label{sec:gerenciamento_de_transacoes}
+O gerenciamento de transações tem o objetivo de garantir o isolamento entre comandos concorrentes de diversas aplicações para que os recursos sejam utilizados de forma mais eficiente --- seria possível forçar a execução sequencial dos comandos das aplicações, mas isso desperdiçaria ciclos de processador, enquanto aguarda por leituras ou escritas no disco, e diminuiria a vazão (\emph{throughput}) das respostas.
+
+\section{Minitransações}
+\label{sec:minitransacoes}
+
 \chapter{Conclusões}
+\label{chap:conclusoes}
 
 % cabeçalho para os apêndices
 \renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{\appendixname\ \thechapter}} {\MakeUppercase{#1}} }
@@ -246,12 +268,11 @@ Uma vez que cada um dos computadores só tem uma visão parcial do que está aco
 
 % ---------------------------------------------------------------------------- %
 % Índice remissivo
-\index{TBP|see{periodicidade região codificante}}
-\index{DSP|see{processamento digital de sinais}}
-\index{STFT|see{transformada de Fourier de tempo reduzido}}
-\index{DFT|see{transformada discreta de Fourier}}
-\index{Fourier!transformada|see{transformada de Fourier}}
-
-\printindex   % imprime o índice remissivo no documento 
+%\index{TBP|see{periodicidade região codificante}}
+%\index{DSP|see{processamento digital de sinais}}
+%\index{STFT|see{transformada de Fourier de tempo reduzido}}
+%\index{DFT|see{transformada discreta de Fourier}}
+%\index{Fourier!transformada|see{transformada de Fourier}}
+%\printindex   % imprime o índice remissivo no documento 
 
 \end{document}
