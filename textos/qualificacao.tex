@@ -223,17 +223,11 @@ Há diversos motivos para construir uma aplicação de forma distribuída --- co
 
 Um sistema distribuído é composto por diversas máquinas conectadas por uma rede de comunicação \cite{tanenbaum}. Cada processador tem acesso somente ao seu próprio sistema de armazenamento (memória e disco), e a única forma de compartilharem informação é através da troca de dados pela rede de comunicação. Esta troca de dados é feita através da utilização de protocolos de comunicação, como por exemplo os protocolos da família TCP/IP (TODO colocar referência).
 
-Cada máquina no sistema distribuído pode falhar de modo independente, fazendo com que sua parte do estado do sistema fique momentanea ou permanentemente indisponível e que operações no sistema que involvam esta máquina falhem. Se considerarmos o exemplo clássico de um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e uma solicitação de transferência entre contas que estão em duas máquinas diferentes seja feita, é esperado que esta transferência subtraia uma certa quantia da conta de origem e adicione esta quantia na conta de destino. Se a máquina em que a conta de destino estiver falhar, a quantia subtraída da conta de origem deve ser reposta.
+Implementar o compartilhamento de informações sobre o estado da aplicação utilizando a troca de dados na rede não é trivial, em especial quando os dados possuem restrições semânticas que precisam ser mantidas e garantidas como válidas. Se considerarmos o exemplo clássico de um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e uma solicitação de transferência entre contas que estão em duas máquinas diferentes seja feita, é esperado que esta transferência subtraia uma certa quantia da conta de origem e adicione esta quantia na conta de destino. Se a máquina em que a conta de destino estiver falhar, a quantia subtraída da conta de origem deve ser reposta.
 
-TODO Parei aqui... Muitas aplicações distribuídas utilizam um SGBD (Sistema Gerenciador de Banco de Dados) relacional (como Oracle, MySQL, SQL Server, etc...) como forma de compartilhamento de estado, pois estes sistemas mantém a integridade e a consistência dos dados através da garantia das propriedades ACID (Atomicidade, Consistência, Integridade e Durabilidade) das transações que executam. Essas propriedades facilitam o desenvolvimento da aplicação uma vez que expõem para o desenvolvedor uma interface que:
-\begin{enumerate}
-	\item Garante que a execução de todas as operações na transação foram efetuadas, ou que nenhuma operação foi feita (Atomicidade)
-	\item Garante que os dados estão de acordo com restrições estabelecidas (Consistência)
-	\item Garante que duas transações executando de forma concorrente não interfiram no resultado uma da outra (Isolamento)
-	\item Garante que as alterações efetuadas por uma transação finalizada com sucesso nunca serão perdidos (Durabilidade)
-\end{enumerate}
+O problema descrito acima exige que as operações efetuadas em cada máquina --- subtrair uma quantia da conta de origem e adicionar essa quantia na conta de destino --- sejam consideradas como uma operação única em que ou as duas operações são bem sucedidas, ou nenhuma das duas irá ocorrer. Uma maneira de se garantir esta execução é através da utilização do protocolo 2PC. Este protocolo permite a coordenação da execução de operações em diversas máquinas e garante que todas as operações em todas as máquinas serão efetivadas somente se todas as máquinas concordarem em efetivar. Ele basicamente efetua uma rodada de votação entre as máquinas para verificar a possibilidade da efetivação das operações, e uma rodada de notificação, em que as máquinas são notificadas do resultado da votação (este protocolo será detalhado na seção \ref{transacoes_distribuidas}).
 
-Há a possibilidade de utilizar mais de um banco de dados para o compartilhamento do estado, e para efetuar o controle transacional entre todos os bancos envolvidos em geral é utilizado o protocolo 2PC (\emph{Two Phase Commit} --- Efetivação em Duas Fases). Este protocolo estabelece que uma máquina seja designada como coordenador da transação, e esta então emite comandos aos participantes da transação, solicitando leituras e escritas. Para concluir a transação, o coordenador solicita que todos os participantes digam se é possível efetivar a transação. Caso algum deles diga que não é possível, a transação é desfeita em todos os participantes. Caso contrário, o coordenador envia um comando de efetivação para todos.
+O protocolo 2PC é executado após os comandos das operações que as máquinas devem executar e suas rodadas de votação e notificação geram mais mensagens na rede. As minitransações são baseadas no protocolo 2PC, porém as mensagens com os comandos para serem executados são embutidos na própria mensagem da rodada de votação. (Parei aqui...)
 
 \section{Objetivo}
 \label{sec:objetivo}
@@ -252,7 +246,8 @@ Este texto é composto, além desta introdução, pelo capítulo \ref{chap:conce
 \label{sec:gerenciamento_de_transacoes}
 O gerenciamento de transações tem o objetivo de garantir o isolamento entre comandos concorrentes de diversas aplicações para que os recursos sejam utilizados de forma mais eficiente --- seria possível forçar a execução sequencial dos comandos das aplicações, mas isso desperdiçaria ciclos de processador, enquanto aguarda por leituras ou escritas no disco, e diminuiria a vazão (\emph{throughput}) das respostas.
 
-
+\section{Transações distribuídas}
+\label{sec:transacoes_distribuidas}
 
 \section{Minitransações}
 \label{sec:minitransacoes}
