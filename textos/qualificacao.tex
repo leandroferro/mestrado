@@ -90,7 +90,7 @@ framexrightmargin=10pt
 \thispagestyle{empty}
 \begin{center}
     \vspace*{2.3cm}
-    \textbf{\Large{Uma Infraestrutura para Desenvolvimento de Aplicações Distribuídas Baseada em Minitransações}}\\
+    \textbf{\Large{Uma infraestrutura para desenvolvimento de aplicações distribuídas baseada em minitransações}}\\
     
     \vspace*{1.2cm}
     \Large{Leandro Ferro Luzia}
@@ -123,7 +123,7 @@ framexrightmargin=10pt
 \thispagestyle{empty}
     \begin{center}
         \vspace*{2.3 cm}
-        \textbf{\Large{Uma Infraestrutura para Desenvolvimento de Aplicações Distribuídas Baseada em Minitransações}}\\
+        \textbf{\Large{Uma infraestrutura para desenvolvimento de aplicações distribuídas baseada em minitransações}}\\
         \vspace*{2 cm}
     \end{center}
 
@@ -147,7 +147,7 @@ texto texto texto texto. Texto opcional.
 
 \chapter*{Resumo}
 
-\noindent LUZIA, L. F. \textbf{Uma Infraestrutura para Desenvolvimento de Aplicações Distribuídas Baseada em Minitransações}. 
+\noindent LUZIA, L. F. \textbf{Uma infraestrutura para desenvolvimento de aplicações distribuídas baseada em minitransações}. 
 2012. 120 f.
 Dissertação (Mestrado) - Instituto de Matemática e Estatística,
 Universidade de São Paulo, São Paulo, 2012.
@@ -174,7 +174,7 @@ texto texto.
 \noindent \textbf{Palavras-chave:} palavra-chave1, palavra-chave2, palavra-chave3.
 
 \chapter*{Abstract}
-\noindent LUZIA, L. F. \textbf{An Infrastructure for Developing Distributed Applications Based in Minitransactions}. 
+\noindent LUZIA, L. F. \textbf{An infrastructure for developing distributed applications based in minitransactions}. 
 2010. 120 f.
 Dissertação (Mestrado) - Instituto de Matemática e Estatística,
 Universidade de São Paulo, São Paulo, 2012.
@@ -203,6 +203,8 @@ text text text.
 			& (\emph{Atomicity, Consistency, Isolation and Durability})\\
         SGBD	& Sistema Gerenciador de Banco de Dados\\
 	2PC		& Efetivação em Duas Fases (\emph{Two-Phase Commit})\\
+	TCP/IP	& Conjunto de protocolos de comunicação utilizado na Internet\\
+			& (\emph{Transmition Control Protocol} e \emph{Internet Protocol})\\
 \end{tabular}
 
 \listoffigures
@@ -217,11 +219,13 @@ text text text.
 
 \chapter{Introdução}
 \label{chap:introducao}
-Há diversos motivos para construir uma aplicação que execute de forma distribuída em diferentes computadores --- tolerância a falhas (adicionando mais máquinas ao sistema aumenta a chance de que, a qualquer momento, haja pelo menos uma máquina capaz de responder pelo sistema) e escalabilidade (particionar e distribuir a carga de processamento do sistema permite que este suporte um número crescente de usuários e informações) são alguns deles.
+Há diversos motivos para construir uma aplicação de forma distribuída --- compartilhamento de recursos (permitir o acesso a recursos específicos, como impressoras) (TODO coloco essa parte dos recursos??), tolerância a falhas (adicionando mais máquinas ao sistema aumenta a chance de que, a qualquer momento, haja pelo menos uma máquina capaz de responder pelo sistema) (TODO talvez colocar referência a alguma coisa antigona no lamport) e escalabilidade (particionar e distribuir a carga de processamento do sistema permite que este suporte um número crescente de usuários e informações) (TODO ver alguma referencia para escalabilidade tb) são alguns deles.
 
-Uma vez que cada um dos computadores só tem uma visão parcial do que está acontecendo no sistema, é preciso que haja comunicação entre eles para que esse estado parcial seja compartilhado com as outras máquinas. Em geral essa comunicação ocorre através da troca de mensagens na rede entre os computadores para que os dados relevantes à execução --- o estado do sistema --- possa ser compartilhado e conhecido por todos. Esta abordagem é complexa e requer o uso de protocolos para gerenciar o estado e mantê-lo consistente entre todas as máquinas do sistema.
+Um sistema distribuído é composto por diversas máquinas conectadas por uma rede de comunicação \cite{tanenbaum}. Cada processador tem acesso somente ao seu próprio sistema de armazenamento (memória e disco), e a única forma de compartilharem informação é através da troca de dados pela rede de comunicação. Esta troca de dados é feita através da utilização de protocolos de comunicação, como por exemplo os protocolos da família TCP/IP (TODO colocar referência).
 
-Muitas aplicações distribuídas utilizam um SGBD (Sistema Gerenciador de Banco de Dados) relacional (como Oracle, MySQL, SQL Server, etc...) como forma de compartilhamento de estado, pois estes sistemas mantém a integridade e a consistência dos dados através da garantia das propriedades ACID (Atomicidade, Consistência, Integridade e Durabilidade) das transações que executam. Essas propriedades facilitam o desenvolvimento da aplicação uma vez que expõem para o desenvolvedor uma interface que:
+Cada máquina no sistema distribuído pode falhar de modo independente, fazendo com que sua parte do estado do sistema fique momentanea ou permanentemente indisponível e que operações no sistema que involvam esta máquina falhem. Se considerarmos o exemplo clássico de um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e uma solicitação de transferência entre contas que estão em duas máquinas diferentes seja feita, é esperado que esta transferência subtraia uma certa quantia da conta de origem e adicione esta quantia na conta de destino. Se a máquina em que a conta de destino estiver falhar, a quantia subtraída da conta de origem deve ser reposta.
+
+TODO Parei aqui... Muitas aplicações distribuídas utilizam um SGBD (Sistema Gerenciador de Banco de Dados) relacional (como Oracle, MySQL, SQL Server, etc...) como forma de compartilhamento de estado, pois estes sistemas mantém a integridade e a consistência dos dados através da garantia das propriedades ACID (Atomicidade, Consistência, Integridade e Durabilidade) das transações que executam. Essas propriedades facilitam o desenvolvimento da aplicação uma vez que expõem para o desenvolvedor uma interface que:
 \begin{enumerate}
 	\item Garante que a execução de todas as operações na transação foram efetuadas, ou que nenhuma operação foi feita (Atomicidade)
 	\item Garante que os dados estão de acordo com restrições estabelecidas (Consistência)
@@ -233,7 +237,7 @@ Há a possibilidade de utilizar mais de um banco de dados para o compartilhament
 
 \section{Objetivo}
 \label{sec:objetivo}
-As minitransações \cite{Aguilera:07} são uma variação do 2PC, em que os comandos da transação são embutidos nas mensagens do protocolo de efetivação. Assim, na primeira mensagem do protocolo de efetivação, o coordenador envia os comandos da transação. Estes comandos podem ser de comparação (por igualdade), leitura ou escrita. Os comandos de comparação determinam se o participante irá votar para que a transação seja efetivada (caso a comparação resulte em igualdade) ou cancelada (caso a comparação falhe). Os comandos de leitura e escrita só são executados caso o voto seja de efetivação, e o resultado da escrita é armazenado de forma separada para aguardar que o coordenador colete todos os votos e verifique que realmente todos os participantes podem efetivar a transação.
+As minitransações \cite{sinfonia} são uma variação do 2PC, em que os comandos da transação são embutidos nas mensagens do protocolo de efetivação. Assim, na primeira mensagem do protocolo de efetivação, o coordenador envia os comandos da transação. Estes comandos podem ser de comparação (por igualdade), leitura ou escrita. Os comandos de comparação determinam se o participante irá votar para que a transação seja efetivada (caso a comparação resulte em igualdade) ou cancelada (caso a comparação falhe). Os comandos de leitura e escrita só são executados caso o voto seja de efetivação, e o resultado da escrita é armazenado de forma separada para aguardar que o coordenador colete todos os votos e verifique que realmente todos os participantes podem efetivar a transação.
 
 A proposta deste trabalho é implementar uma infraestrutura para sistemas distribuídos que possibilite o compartilhamento de estado entre as máquinas do sistema utilizando minitransações. Ao invés de trocarem mensagens explicitamente, as máquinas verão um repositório que pode crescer de forma a acomodar grandes quantidades de dados e que permite que todas as máquinas tenham sempre acesso a dados consistentes. Assim, esperamos que o desenvolvimento da aplicação distribuída seja mais simples e ajude o desenvolvedor a focar nas necessidades reais da aplicação.
 
@@ -247,6 +251,8 @@ Este texto é composto, além desta introdução, pelo capítulo \ref{chap:conce
 \section{Gerenciamento de Transações}
 \label{sec:gerenciamento_de_transacoes}
 O gerenciamento de transações tem o objetivo de garantir o isolamento entre comandos concorrentes de diversas aplicações para que os recursos sejam utilizados de forma mais eficiente --- seria possível forçar a execução sequencial dos comandos das aplicações, mas isso desperdiçaria ciclos de processador, enquanto aguarda por leituras ou escritas no disco, e diminuiria a vazão (\emph{throughput}) das respostas.
+
+
 
 \section{Minitransações}
 \label{sec:minitransacoes}

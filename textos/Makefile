@@ -1,4 +1,5 @@
 BASE_NAME = qualificacao
+BIB_NAME = bibliografia.bib
 RESUMO = resumo
 
 LATEX     = latex
@@ -8,15 +9,16 @@ MAKEINDEX = makeindex
 PDFVIEWER = evince
 
 pdf: $(BASE_NAME).pdf
-ps: $(BASE_NAME).ps
+
+resumo: $(RESUMO).pdf
 
 view: pdf
-	$(PDFVIEWER) $(BASE_NAME).pdf
+	$(PDFVIEWER) $(BASE_NAME).pdf &
 	
 view-resumo: $(RESUMO).pdf
-	$(PDFVIEWER) $(RESUMO).pdf
+	$(PDFVIEWER) $(RESUMO).pdf &
 
-$(BASE_NAME).pdf: $(BASE_NAME).tex 
+$(BASE_NAME).pdf: $(BASE_NAME).tex $(BIB_NAME)
 	$(PDFLATEX) $<
 	$(BIBTEX) $(BASE_NAME) 
 	$(MAKEINDEX) $(BASE_NAME) 
@@ -24,19 +26,8 @@ $(BASE_NAME).pdf: $(BASE_NAME).tex
 	$(PDFLATEX) $<
 	$(PDFLATEX) $<
 
-$(BASE_NAME).ps: $(BASE_NAME).tex 
-	$(LATEX) $<
-	$(BIBTEX) $(BASE_NAME) 
-	$(MAKEINDEX) $(BASE_NAME) 
-	$(LATEX) $< 
-	$(LATEX) $<
-	$(LATEX) $<
-
 $(RESUMO).pdf: $(RESUMO).tex 
 	$(PDFLATEX) $<
-
-$(RESUMO).ps: $(RESUMO).tex 
-	$(LATEX) $<
 
 clean:
 	rm -f $(BASE_NAME)*.ps $(BASE_NAME)*.dvi *.log \
