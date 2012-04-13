@@ -225,19 +225,19 @@ Um sistema distribuído é composto por diversas máquinas conectadas por uma re
 
 Implementar o compartilhamento de informações sobre o estado da aplicação utilizando a troca de dados na rede não é trivial, em especial quando os dados possuem restrições semânticas que precisam ser mantidas e garantidas como válidas. Se considerarmos o exemplo clássico de um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e uma solicitação de transferência entre contas que estão em duas máquinas diferentes seja feita, é esperado que esta transferência subtraia uma certa quantia da conta de origem e adicione esta quantia na conta de destino. Se a máquina em que a conta de destino estiver falhar, a quantia subtraída da conta de origem deve ser reposta.
 
-O problema descrito acima exige que as operações efetuadas em cada máquina --- subtrair uma quantia da conta de origem e adicionar essa quantia na conta de destino --- sejam consideradas como uma operação única em que ou as duas operações são bem sucedidas, ou nenhuma das duas irá ocorrer. Uma maneira de se garantir esta execução é através da utilização do protocolo 2PC. Este protocolo permite a coordenação da execução de operações em diversas máquinas e garante que todas as operações em todas as máquinas serão efetivadas somente se todas as máquinas concordarem em efetivar. Ele basicamente efetua uma rodada de votação entre as máquinas para verificar a possibilidade da efetivação das operações, e uma rodada de notificação, em que as máquinas são notificadas do resultado da votação (este protocolo será detalhado na seção \ref{transacoes_distribuidas}).
+O problema descrito acima exige que as operações efetuadas em cada máquina --- subtrair uma quantia da conta de origem e adicionar essa quantia na conta de destino --- sejam consideradas como uma operação única em que ou as duas operações são bem sucedidas, ou nenhuma das duas irá ocorrer. Uma maneira de se garantir esta execução é através da utilização do protocolo 2PC. Este protocolo permite a coordenação da execução de operações em diversas máquinas e garante que todas as operações em todas as máquinas serão efetivadas somente se todas as máquinas concordarem com a efetivação. Ele basicamente efetua uma rodada de votação entre as máquinas para verificar a possibilidade da efetivação das operações, e uma rodada de notificação, em que as máquinas são notificadas do resultado da votação. As rodadas de votação e notificação ocorrem após a execução das operações, gerando mais mensagens na rede.
 
-O protocolo 2PC é executado após os comandos das operações que as máquinas devem executar e suas rodadas de votação e notificação geram mais mensagens na rede. As minitransações são baseadas no protocolo 2PC, porém as mensagens com os comandos para serem executados são embutidos na própria mensagem da rodada de votação. (Parei aqui...)
+As minitransações são baseadas no protocolo 2PC --- há duas rodadas de mensagens, porém as operações para serem executadas são embutidas na própria mensagem da rodada de votação. Na primeira rodada, equivalente à votação do 2PC, as mensagens possuem basicamente três tipos de operações: comparação, leitura e escrita. A operação de comparação é essencial para as minitransações, uma vez que elas determinam o voto da máquina em relação à efetivar ou não. Caso a comparação seja bem sucedida, as escritas serão efetuadas e as leituras serão retornadas como resposta, e a máquina votará para efetivar as operações. Caso contrário nenhum dado será retornado, nenhuma escrita será efetuada e a máquina votará pela não efetivação das operações, fazendo que na rodada de notificação, todas as outras máquinas não efetivem as operações.
 
 \section{Objetivo}
 \label{sec:objetivo}
-As minitransações \cite{sinfonia} são uma variação do 2PC, em que os comandos da transação são embutidos nas mensagens do protocolo de efetivação. Assim, na primeira mensagem do protocolo de efetivação, o coordenador envia os comandos da transação. Estes comandos podem ser de comparação (por igualdade), leitura ou escrita. Os comandos de comparação determinam se o participante irá votar para que a transação seja efetivada (caso a comparação resulte em igualdade) ou cancelada (caso a comparação falhe). Os comandos de leitura e escrita só são executados caso o voto seja de efetivação, e o resultado da escrita é armazenado de forma separada para aguardar que o coordenador colete todos os votos e verifique que realmente todos os participantes podem efetivar a transação.
-
 A proposta deste trabalho é implementar uma infraestrutura para sistemas distribuídos que possibilite o compartilhamento de estado entre as máquinas do sistema utilizando minitransações. Ao invés de trocarem mensagens explicitamente, as máquinas verão um repositório que pode crescer de forma a acomodar grandes quantidades de dados e que permite que todas as máquinas tenham sempre acesso a dados consistentes. Assim, esperamos que o desenvolvimento da aplicação distribuída seja mais simples e ajude o desenvolvedor a focar nas necessidades reais da aplicação.
+
+Esta infraestrutura será composta por máquinas que formam o repositório de dados e implementam o protocolo de minitransações. O acesso a essas máquinas será feito pela rede, através da utilização de um protocolo simples da camada de aplicação TCP/IP, de forma a possibilitar que qualquer sistema que implemente o protocolo TCP/IP possa utilizar a infraestrutura.
 
 \section{Organização do texto}
 \label{sec:organizacao_do_texto}
-Este texto é composto, além desta introdução, pelo capítulo \ref{chap:conceitos}, de conceitos e pelo capítulo \ref{chap:conclusoes}, conclusões.
+Esta introdução apresenta o contexto de utilização das minitransações e os objetivos deste trabalho. O capítulo \ref{chap:conceitos} inicia com uma revisão sobre transações e sua utilidade. A seção \ref{sec:gerenciamento_de_transacoes} trata do gerenciamento de transações e dos mecanismos usuais de implementação desse gerenciamento. A seção \ref{sec:transacoes_distribuidas} trata do conceito de transações distribuídas e explica em detalhes o protocolo 2PC, ponto de partida para a derivação do procolo de minitransações, que é apresentado detalhadamente na seção \ref{sec:minitransacoes}. O capítulo \ref{chap:implementacao} detalha a implementação da infraestrutura --- a linguagem utilizada, os mecanismos de controle de falhas e gerenciamento de travas. O capítulo \ref{chap:conclusoes} apresenta as conclusões em relação à utilização da infraestrutura desenvolvida.
 
 \chapter{Conceitos}
 \label{chap:conceitos}
@@ -251,6 +251,9 @@ O gerenciamento de transações tem o objetivo de garantir o isolamento entre co
 
 \section{Minitransações}
 \label{sec:minitransacoes}
+
+\chapter{Implementação}
+\label{chap:implementacao}
 
 \chapter{Conclusões}
 \label{chap:conclusoes}
