@@ -237,23 +237,64 @@ Esta infraestrutura será composta por máquinas que formam o repositório de da
 
 \section{Organização do texto}
 \label{sec:organizacao_do_texto}
-Esta introdução apresenta o contexto de utilização das minitransações e os objetivos deste trabalho. O capítulo \ref{chap:conceitos} inicia com uma revisão sobre transações e sua utilidade. A seção \ref{sec:gerenciamento_de_transacoes} trata do gerenciamento de transações e dos mecanismos usuais de implementação desse gerenciamento. A seção \ref{sec:transacoes_distribuidas} trata do conceito de transações distribuídas e explica em detalhes o protocolo 2PC, ponto de partida para a derivação do procolo de minitransações, que é apresentado detalhadamente na seção \ref{sec:minitransacoes}. O capítulo \ref{chap:implementacao} detalha a implementação da infraestrutura --- a linguagem utilizada, os mecanismos de controle de falhas e gerenciamento de travas. O capítulo \ref{chap:conclusoes} apresenta as conclusões em relação à utilização da infraestrutura desenvolvida.
+Esta introdução apresenta o contexto de utilização das minitransações e os objetivos deste trabalho. O capítulo \ref{chap:conceitos} inicia com uma revisão sobre transações e sua utilidade. A seção \ref{sec:transacoes} trata do conceito de transações. A seção \ref{sec:transacoes_distribuidas} trata do conceito de transações distribuídas e explica em detalhes o protocolo 2PC, ponto de partida para a derivação do procolo de minitransações, que é apresentado detalhadamente na seção \ref{sec:minitransacoes}. O capítulo \ref{chap:implementacao} detalha a implementação da infraestrutura --- a linguagem utilizada, os mecanismos de controle de falhas e gerenciamento de travas. O capítulo \ref{chap:conclusoes} apresenta as conclusões em relação à utilização da infraestrutura desenvolvida.
 
 \chapter{Conceitos}
 \label{chap:conceitos}
+Como as minitransações são uma extensão do protocolo 2PC, este capítulo irá apresentar uma revisão dos conceitos relacionados a transações, transações distribuídas e, por fim, uma detalhada explicação sobre as minitransações.
 
-\section{Gerenciamento de Transações}
-\label{sec:gerenciamento_de_transacoes}
-O gerenciamento de transações tem o objetivo de garantir o isolamento entre comandos concorrentes de diversas aplicações para que os recursos sejam utilizados de forma mais eficiente --- seria possível forçar a execução sequencial dos comandos das aplicações, mas isso desperdiçaria ciclos de processador, enquanto aguarda por leituras ou escritas no disco, e diminuiria a vazão (\emph{throughput}) das respostas.
+\section{Transações}
+\label{sec:transacoes}
+Uma transação, no contexto da disciplina de bancos de dados, é a unidade de execução de operações em um banco de dados \cite{garcia-molina}. Ela é composta por uma sequência de comandos de leitura e escrita de dados \cite{vaca}. Através das transações os aplicativos acessam ou modificam informações em um banco de dados, e é através da execução de transações que o gerenciador permite que diversas aplicações possam interagir de forma concorrente com o banco de dados.
+
+Há quatro propriedades das transações que o gerenciador de banco de dados precisa garantir em um cenário de acessos concorrentes e falhas de sistema:
+\begin{enumerate}
+\item \emph{Atomicidade}: ou todas as operações são executadas com sucesso, ou nenhuma operação é executada. Com isso, o desenvolvedor de aplicações não precisa se preocupar com o efeito de transações incompletas, como quando ocorrem falhas do sistema. Esta propriedade é obtida através do desfazimento de operações já executadas de transações que não foram efetivadas. O gerenciador do banco de dados utiliza uma técnica em que as operações são primeiro escritas para um \emph{log}, para depois serem executadas no banco de dados propriamente dito. Caso a transação não seja efetivada, o \emph{log} é utilizado para desfazer as operações já executadas.
+\item \emph{Consistência}: cada transação deve levar o banco de dados de um estado consistente para outro estado consistente. Esta propriedade depende essencialmente do desenvolvedor de aplicações --- o gerenciador de banco de dados pode auxiliar através de restrições sobre os dados que podem ser configuradas mas, no final, a semântica da consistência fica sob responsabilidade do desenvolvedor. Se retomarmos ao exemplo do sistema bancário, a transferência entre as contas não deve alterar o valor total da soma dos saldos das contas individuais envolvidas na transação.
+\item \emph{Isolamento}: a execução de uma transação não pode interferir na execução de outras transações, garantindo que mesmo que as operações executadas por diferentes transações possam ser intercaladas por questões de performance ou aproveitamento de recursos o resultado final da execução das transações será equivalente ao resultado de alguma execução sequencial de todas as transações.
+\item \emph{Durabilidade}: uma vez que a transação tenha sido efetivada, os efeitos de sua execução devem persistir mesmo em casos de falha. A durabilidade garante que os efeitos gerados por uma transação efetivada sejam permanentes, mesmo que ocorram falhas após a efetivação da transação. Um \emph{log} também é utilizado para a garantir a durabilidade. Uma vez que ocorra uma falha e o sistema se recupere, o gerenciador irá vasculhar o \emph{log} em busca de transações que tenham sido efetivadas mas cujos efeitos não estejam refletidos no banco de dados, para executar novamente os comandos da transação.
+\end{enumerate}
+
+Estas quatro propriedades são conhecidas como propriedades \emph{ACID} das transações.
 
 \section{Transações distribuídas}
 \label{sec:transacoes_distribuidas}
+Em um ambiente distribuído, em que uma transação envolva leituras e escritas de dados contidos em diversas máquinas, esta transação será composta de subtransações executando em cada máquina envolvida. A execução coordenada destas subtransações, garantindo as propriedades \emph{ACID}, fica a cargo de um coordenador. O controle de concorrência, necessário para garantir o isolamento, e a recuperação de erros, responsável por garantir a atomicidade e durabilidade precisam ser considerados com cuidado em um ambiente distribuído.
+
+A maneira usual de efetuar controle de concorrência é através do uso de travas (\emph{locks}) nos dados acessados. Em um sistema não distribuído, o controle de alocação e liberação destas travas fica a cargo de um gerenciador de travas, um único componente que centraliza e sabe sobre todas as travas ativas no banco. Em um sistema distribuído, este gerenciamento de travas pode ser feito de três maneiras:
+\begin{itemize}
+\item \emph{Centralizado}: uma única máquina fica responsável por gerenciar as travas. Esta abordagem é a mais simples, porém deixa o sistema vulnerável --- se a máquina escolhida para o gerenciamento de travas falhar, o sistema ficará indisponível.
+\item \emph{Cópia primária}: Em caso de dados replicados, uma das réplicas é escolhida como a cópia primária. Todas as requisições para obtenção e liberação de travas para acessar um dados devem ser enviadas para a máquina que armazena a cópia primária. Dessa forma, é elimina a dependência de um controlador central, mas as leituras de dados em geral passam a causar a comunicação entre a máquina em que a cópia esta sendo lida e a máquina em que a cópia primária de encontra.
+\item \emph{Totalmente distribuído}: As requisções de trava de uma cópia são manipuladas pelo gerenciador de travas da máquina em que a cópia esta armazenada. Com esta abordagem é eliminada a necessidade de comunicação entre máquinas durante as leituras de dados mas, durante as escritas, todas as máquinas que contém uma cópia do dado sendo escrito precisarão também efetuar uma trava no dado.
+\end{itemize}
+
+A recuperação de falhas em um ambiente distribuído é mais complicado do que em um ambiente centralizado pois, além dos novos erros que podem surgir (como falhas de comunicação ou de máquinas remotas), para efetivar a transação é necessário que todas as subtransações que a compõem sejam bem sucedidas ou que, caso alguma subtransação falhe, a transação seja abortada. Este controle é efetuado através do uso de um protocolo de efetivação.
+
+O protocolo de efetivação mais usado é chamado de protocolo de efetivação de duas fases (\emph{Two-Phase Commit} --- 2PC), e ele será explicado na seção \ref{subsec:2pc}.
+
+\subsection{Protocolo de efetivação de duas fases}
+\label{subsec:2pc}
+Cada máquina no ambiente distribuído mantém um \emph{log}, e as ações de uma subtransação são escritas no \emph{log} da máquina em que estiver executando. Uma das máquinas atua como coordenadora da transação, e após a execução dos comandos de leitura/escrita da transação, o coordenador inicia o protocolo de efetivação:
+
+\begin{enumerate}
+\item O coordenador envia uma mensagem, \emph{PREPARAR}, para cada máquina envolvida na transação.
+\item A máquina subordinada (que executa uma subtransação), ao receber uma mensagem \emph{PREPARAR}, precisa decidir se irá efetivar a transação ou não. A esse decisão é dado o nome de voto, podendo ser \emph{SIM} ou \emph{NÃO}. A máquina subordinada primeiro registra em seu \emph{log} o seu voto, e então envia o seu voto para o coordenador.
+\item O coordenador coleta todos os votos e, caso todas as subordinadas tenham votado \emph{SIM}, ele registra em seu \emph{log} a decisão de efetivar a transação. Se alguma máquina votou \emph{NÃO} ou falhou em responder, o coordenador registra em seu \emph{log} a decisão de abortar a transação. Após o registro no \emph{log}, o coordenador envia para todas as máquinas a sua decisão, podendo ser uma mensagem do tipo \emph{EFETIVAR} ou \emph{ABORTAR}.
+\item Quando a máquina subordinada recebe uma mensagem de decisão, \emph{EFETIVAR} ou \emph{ABORTAR}, ela registra essa decisão em seu \emph{log}, retorna uma mensagem \emph{RECEBIDO} para o coordenador e efetua a ação adequada --- efetiva a transação ou a aborta.
+\item Após o coordenador receber todas as mensagens \emph{RECEBIDO} das máquinas subordinadas, ele registra o fim da transação no \emph{log}.
+\end{enumerate}
+
+O princípio básico do protocolo é que qualquer máquina envolvida na transação pode decidir abortá-la de forma unilateral, exigindo assim unanimidade na decisão pela efetivação da transação. As mensagens enviadas durante a execução do protocolo indicam uma decisão do remetente, e para garantir que essa decisão sobreviva a falhas na máquina que enviou a mensagem, os dados do \emph{log} são forçados para uma forma de armazenamento estável, como um disco rígido, antes da mensagem ser enviada.
+
+A transação é considerada oficialmente efetivada (ou abortada) no momento que o registro de \emph{EFETIVAR} (ou \emph{ABORTAR}) do \emph{log} do coordenador for escrito para a área de armazenamento estável da máquina. Falhas posteriores não podem mudar o resultado da decisão do coordenador resgistrado em seu \emph{log} e salvo em disco.
 
 \section{Minitransações}
 \label{sec:minitransacoes}
 
 \chapter{Implementação}
 \label{chap:implementacao}
+
+Este capítulo irá tratar da implementação da infraestrutura baseada em minitransações e irá apresentar dados comparativos de performance da execução desta infraestrutura.
 
 \chapter{Conclusões}
 \label{chap:conclusoes}
