@@ -296,7 +296,7 @@ As minitransações podem ser vistas como uma otimização do protocolo de efeti
 
 Em \ref{subsec:derivando-minitransacoes} é apresentado como o protocolo 2PC pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações. \ref{subsec:estrutura-minitransacoes} ilustra a estrutura de uma minitransação, e em \ref{subsec:pros-contras-minitransacoes} são apresentados os pontos negativos e positivos da utilização de minitransações.
 
-\subsection{Otimizando o 2PC}
+\subsection{Otimização do 2PC e as minitransações}
 \label{subsec:derivando-minitransacoes}
 A decisão pela efetivação ou cancelamento de uma transação distribuída depende tanto de aspectos operacionais quanto de aspectos semânticos específicos da aplicação. A falha na execução de uma subtransação em alguma máquina do ambiente inviabiliza a efetivação da transação como um todo, e por isso o coordenador é forçado a cancelar a transação. Este tipo de falha operacional não está ligada ao domínio da aplicação, mas sim ao ambiente em que esta aplicação está rodando e está, portanto, fora do controle do coordenador, que pode somente cancelar a transação e, opcionalmente, tentar executá-la novamente. Por outro lado, o aspecto semântico envolvido na decisão pela efetivação ou cancelamento da transação é específico de cada aplicação e depende, direta ou indiretamente, dos dados do sistema.
 
@@ -308,23 +308,25 @@ O aspecto semântico da transação em relação aos dados pode ser tratado nos 
 
 As minitransações surgem no contexto em que todas as operações de uma subtransação podem ser embutidas dentro do protocolo de efetivação, utilizando somente as trocas de mensagens que ocorreriam no protocolo de efetivação, após a execução dos comandos. Para que isso possa ocorrer, as mensagens do protocolo 2PC precisam ser alteradas para incluir informações sobre os dados a serem comparados, como veremos na próxima seção.
 
-\subsection{Estrutura}
+\subsection{Estrutura e protocolo}
 \label{subsec:estrutura-minitransacoes}
 Uma minitransação consiste de um conjunto de itens de comparação, de leitura e de escrita. Todos os itens possuem uma referência a qual dado deve ser utilizado, e os itens de comparação e escrita incluem também dados. 
 
 *** TODO colocar uma imagem com a estrutra da minitransação
 
-Formalmente, uma minitransação pode ser vista como uma tupla na forma \( (T, C, L, E) \). \(T\) é o identificador da minitransação, permitindo aos participantes diferenciar e tratar minitransações simultâneas. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((I, D)\), em que \(I\) é o identificador do dado e cujo domínio é o mesmo do identificador de leitura, e \(D\) é um valor, que é usado para efetuar a comparação com o identificador apresentado ou para escrever no identificador.
+Formalmente, uma minitransação pode ser vista como uma tupla na forma \( (T, C, L, E) \). \(T\) é o identificador da minitransação, permitindo aos participantes diferenciar e tratar minitransações simultâneas. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((Id, Dado)\), em que \(Id\) é o identificador do dado e cujo domínio é o mesmo do identificador de leitura, e \(Dado\) é um valor, que é usado para efetuar a comparação com o identificador apresentado ou para escrever no identificador.
 
-Para executar uma transação o coordenador deve primeiro identificar os participantes da transação para quem as minitransações serão enviadas. Uma minitransação é construída para cada participante, contendo, nos itens de comparação, leitura e escrita, referências a dados contidos somente no participante específico. Ao receber uma minitransação, o participante tenta executá-la da seguinte maneira:
+Para cada máquina \(P_i\) podemos definir \(T_i\) como sendo o conjunto de identificadores de dados armazenados em \(P_i\). Para executar uma transação \(I_t\) o coordenador deve primeiro identificar os participantes \(P_j\) da transação para quem as minitransações serão enviadas. Para cada \(P_j\) é construída uma minitransação \(M_j = (I_t, C_j, L_j, E_j)\), onde \(L_j, Id(C_j) \subseteq T_j\) (\(Id(X)\) indica o conjunto de identificadores \(I\) das tuplas \(X\) no formato \((I,D)\) que representam os itens de comparação e escrita da minitransação) e \(Q(E_j) \supseteq T_j \) (os dados a serem escritos são um super conjunto dos dados armazenados pois uma operação de escrita pode incluir um novo item no conjunto). A minitransação \(M_j\) é executada em \(P_j\) basicamente da seguinte maneira:
 
 \begin{enumerate}
-\item Se o conjunto de comparação não for vazio, efetua uma comparação de igualdade entre os dados enviados e os dados armazenados referenciados pelos itens de comparação
+\item Se \(C_j \neq \emptyset\), irá comparar \(Dado(r), r \in C_j\) com \(Dado(k), k \in T_j\), onde \(Id(r) = Id(k)\).
 \item Se alguma comparação acima falhar, o participante vota por cancelar a transação
-\item Caso contrário, os dados referenciados pelos itens de leitura são retornados e os dados referenciados pelos itens de escrita são trocados pelos dados enviados. O participante vota então por efetivar a transação.
+\item Caso contrário, os dados referenciados por \(l \in L_j\) são retornados e os dados referenciados por \(Id(e), e \in E_j\) são trocados por \(Dado(e)\). O participante vota então por efetivar a transação.
 \end{enumerate}
 
-Os passos apresentados ilustram uma visão geral sobre o protocolo de execução. Maiores detalhes serão descritos no capítulo \ref{chap:implementacao}.
+O coordenador aguarda a execução das minitransações por cada participante \(P_j\) e coleta seus respectivos votos \(V_j\). Se \(\exists v=ABORTAR, v \in V_j\), a transação é então cancelada, e o coordenador precisa notificar cada participante \(P_j\) que a minitransação \(M_j\) precisa ser desfeita. Caso contrário, o coordenador notifica os participantes que a minitransação \(M_j\) deve ser efetivada.
+
+Entre a execução da minitransação e sua efetivação ou cancelamento, os dados escritos não podem ser visíveis a outras minitransações. Para garantir isso, os dados acessados pelas minitransações são travados durante a primeira fase e depois liberados na segunda fase. Para pode efetuar a recuperação de falhas é utilizado um \emph{log} no qual, durante a primeira fase, os dados escritos são escritos neste log e, na segunda fase, esses dados são passados do \emph{log} para o armazenamento real.
 
 As operações de uma minitransação, como apresentadas aqui, incluem o mínimo possível que permite balancear utilidade e performance. Os autores originais (\cite{sinfonia}) executam as operações utilizando como referência aos dados o equivalente a um endereço de memória, e as operações trabalham sobre intervalos de endereços. No referido trabalho, as minitransações são utilizadas como base para a construção de um sistema chamado \emph{Sinfonia} que, assim como o trabalho desenvolvido neste texto, visa facilitar o desenvolvimento de sistemas distribuídos ao oferecer ao desenvolvedor uma alternativa à implementação de protocolos de troca de mensagens na rede. Este sistema \emph{Sinfonia} é composto por um conjunto de máquinas, chamadas nós de memória (\emph{memory nodes}), que armazenam os dados e exportam um intervalo linear de endereços de memória. 
 
