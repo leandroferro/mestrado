@@ -288,11 +288,13 @@ O princípio básico do protocolo é que qualquer máquina envolvida na transaç
 
 A transação é considerada oficialmente efetivada (ou abortada) no momento que o registro de \emph{EFETIVAR} (ou \emph{ABORTAR}) do \emph{log} do coordenador for escrito para a área de armazenamento estável da máquina. Falhas posteriores não podem mudar o resultado da decisão do coordenador resgistrado em seu \emph{log} e salvo em disco.
 
+*** TODO colocar imagem do fluxo de mensagens do 2PC
+
 \section{Minitransações}
 \label{sec:minitransacoes}
 As minitransações podem ser vistas como uma otimização do protocolo de efetivação de duas fases descrito em \ref{subsec:2pc} em relação ao número de mensagens utilizadas. Elas constituem um mecanismo simples para ler e alterar dados em um ambiente distribuído garantindo atomicidade, consistência, isolamento e durabilidade \cite{sinfonia}. Porém, este ganho com a redução do número de mensagens utilizadas é obtido através da imposição de certas restrições em relação ao que pode ser feito com uma minitransação, diminuindo sua aplicabilidade.
 
-Em \ref{subsec:derivando-minitransacoes} é apresentado como o protocolo 2PC pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações. \ref{subsec:estrutura-minitransacoes} ilustra a estrutura de uma mensagem de uma minitransação, e em \ref{subsec:pros-contras-minitransacoes} são apresentados os pontos negativos e positivos da utilização de minitransações.
+Em \ref{subsec:derivando-minitransacoes} é apresentado como o protocolo 2PC pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações. \ref{subsec:estrutura-minitransacoes} ilustra a estrutura de uma minitransação, e em \ref{subsec:pros-contras-minitransacoes} são apresentados os pontos negativos e positivos da utilização de minitransações.
 
 \subsection{Otimizando o 2PC}
 \label{subsec:derivando-minitransacoes}
@@ -306,11 +308,15 @@ O aspecto semântico da transação em relação aos dados pode ser tratado nos 
 
 As minitransações surgem no contexto em que todas as operações de uma subtransação podem ser embutidas dentro do protocolo de efetivação, utilizando somente as trocas de mensagens que ocorreriam no protocolo de efetivação, após a execução dos comandos. Para que isso possa ocorrer, as mensagens do protocolo 2PC precisam ser alteradas para incluir informações sobre os dados a serem comparados, como veremos na próxima seção.
 
-\subsection{As minitransações}
+\subsection{Estrutura}
 \label{subsec:estrutura-minitransacoes}
-Uma minitransação consiste de um conjunto de itens de comparação, de leitura e de escrita. Todos os itens possuem uma referência a qual dado deve ser utilizado, e os itens de comparação e escrita incluem também dados. Estes itens são escolhidos pelo coordenador antes da execução da minitransação, e cada participante efetua os seguintes passos para executar a minitransação recebida:
+Uma minitransação consiste de um conjunto de itens de comparação, de leitura e de escrita. Todos os itens possuem uma referência a qual dado deve ser utilizado, e os itens de comparação e escrita incluem também dados. 
 
 *** TODO colocar uma imagem com a estrutra da minitransação
+
+Formalmente, uma minitransação pode ser vista como uma tupla na forma \( (T, C, L, E) \). \(T\) é o identificador da minitransação, permitindo aos participantes diferenciar e tratar minitransações simultâneas. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((I, D)\), em que \(I\) é o identificador do dado e cujo domínio é o mesmo do identificador de leitura, e \(D\) é um valor, que é usado para efetuar a comparação com o identificador apresentado ou para escrever no identificador.
+
+Para executar uma transação o coordenador deve primeiro identificar os participantes da transação para quem as minitransações serão enviadas. Uma minitransação é construída para cada participante, contendo, nos itens de comparação, leitura e escrita, referências a dados contidos somente no participante específico. Ao receber uma minitransação, o participante tenta executá-la da seguinte maneira:
 
 \begin{enumerate}
 \item Se o conjunto de comparação não for vazio, efetua uma comparação de igualdade entre os dados enviados e os dados armazenados referenciados pelos itens de comparação
@@ -318,17 +324,28 @@ Uma minitransação consiste de um conjunto de itens de comparação, de leitura
 \item Caso contrário, os dados referenciados pelos itens de leitura são retornados e os dados referenciados pelos itens de escrita são trocados pelos dados enviados. O participante vota então por efetivar a transação.
 \end{enumerate}
 
-As operações de uma minitransação, como apresentadas aqui, incluem o mínimo possível que permite balancear utilidade e performance. Os autores originais (\cite{sinfonia}) executam as operações utilizando como referência aos dados o equivalente a um endereço de memória, e as operações trabalham sobre intervalos de endereços. No referido trabalho, as minitransações são utilizadas como base para a construção de um sistema chamado \emph{Sinfonia} que, assim como o trabalho desenvolvido neste texto, visa facilitar o desenvolvimento de sistemas distribuídos ao oferecer ao desenvolvedor uma alternativa à implementação de protocolos de troca de mensagens na rede. Este sistema \emph{Sinfonia} é composto por um conjunto de máquina, chamados nós de memória (\emph{memory nodes}), que armazenam os dados e exportam um intervalo linear de endereços de memória. O foco de \emph{Sinfonia} é prover a base para o desenvolvimento de sistemas básicos distribuídos, como sistemas de arquivos distribuídos, gerenciadores de travas ou serviços de comunicação de grupos de computadores.
+Os passos apresentados ilustram uma visão geral sobre o protocolo de execução. Maiores detalhes serão descritos no capítulo \ref{chap:implementacao}.
 
-O objetivo deste trabalho é utilizar as minitransações como base para a construção de uma infraestrutura que facilite o desenvolvimento de aplicações distribuídas
+As operações de uma minitransação, como apresentadas aqui, incluem o mínimo possível que permite balancear utilidade e performance. Os autores originais (\cite{sinfonia}) executam as operações utilizando como referência aos dados o equivalente a um endereço de memória, e as operações trabalham sobre intervalos de endereços. No referido trabalho, as minitransações são utilizadas como base para a construção de um sistema chamado \emph{Sinfonia} que, assim como o trabalho desenvolvido neste texto, visa facilitar o desenvolvimento de sistemas distribuídos ao oferecer ao desenvolvedor uma alternativa à implementação de protocolos de troca de mensagens na rede. Este sistema \emph{Sinfonia} é composto por um conjunto de máquinas, chamadas nós de memória (\emph{memory nodes}), que armazenam os dados e exportam um intervalo linear de endereços de memória. 
 
-\subsection{Vantagens e Desvantagens}
-\label{subsec:pros-contras-minitransacoes}
+O foco de \emph{Sinfonia} é prover a base para o desenvolvimento de sistemas distribuídos de baixo nível, como sistemas de arquivos distribuídos, gerenciadores de travas ou serviços de comunicação de grupos de computadores, enquanto que o objetivo deste trabalho é utilizar as minitransações como base para a construção de uma infraestrutura que facilite o desenvolvimento de aplicações distribuídas de alto nível, como sistemas de comércio eletrônico ou redes sociais. Os detalhes da implementação da infraestrutura e as semelhanças e diferenças relevantes em relação ao \emph{Sinfonia} estão descritos no capítulo \ref{chap:implementacao}.
 
 \chapter{Implementação}
 \label{chap:implementacao}
 
-Este capítulo irá tratar da implementação da infraestrutura baseada em minitransações e irá apresentar dados comparativos de performance da execução desta infraestrutura.
+A infraestrutura será desenvolvida em \emph{Scala} \cite{scala}, uma linguagem híbrida que combina orientação a objetos com programação funcional. O código \emph{Scala} é compilado para \emph{bytecodes} \emph{Java} e pode ser executado por uma máquina virtual \emph{Java} qualquer. Dessa forma, o código pode interagir com qualquer código já disponível em \emph{Java} e pode rodar em qualquer plataforma que tenha uma máquina virtual compatível, permitindo que a infraestrutura possa ser executada em uma grande quantidade de plataformas.
+
+Na primeira seção (\ref{sec:algoritmos}) são descritos as estruturas de dados e algoritmos utilizados para executar as minitransações e operações relacionadas, como recuperação de falhas. A seção \ref{sec:aplicacoes} irá apresentar alguns exemplos de aplicações utilizando a infraestrutura desenvolvida e a última seção, \ref{sec:testes}, irá descrever o ambiente de testes, os testes realizados e os resultados obtidos.
+
+\section{Algoritmos e estruturas de dados}
+\label{sec:algoritmos}
+
+
+\section{Aplicações desenvolvidas utilizando a infraestrutura}
+\label{sec:aplicacoes}
+
+\section{Execução dos testes}
+\label{sec:testes}
 
 \chapter{Conclusões}
 \label{chap:conclusoes}
