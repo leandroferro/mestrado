@@ -290,7 +290,40 @@ A transação é considerada oficialmente efetivada (ou abortada) no momento que
 
 \section{Minitransações}
 \label{sec:minitransacoes}
-Uma minitransação é uma primitiva que aplicações podem utilizar para ler e, condicionalmente, modificar dados em um ambiente distribuído garantindo atomicidade, consistência, isolamento e durabilidade \cite{sinfonia}. A minitransação pode ser vista como uma otimização do procolo de efetivação de duas fases descrito em \ref{subsec:2pc}.
+As minitransações podem ser vistas como uma otimização do protocolo de efetivação de duas fases descrito em \ref{subsec:2pc} em relação ao número de mensagens utilizadas. Elas constituem um mecanismo simples para ler e alterar dados em um ambiente distribuído garantindo atomicidade, consistência, isolamento e durabilidade \cite{sinfonia}. Porém, este ganho com a redução do número de mensagens utilizadas é obtido através da imposição de certas restrições em relação ao que pode ser feito com uma minitransação, diminuindo sua aplicabilidade.
+
+Em \ref{subsec:derivando-minitransacoes} é apresentado como o protocolo 2PC pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações. \ref{subsec:estrutura-minitransacoes} ilustra a estrutura de uma mensagem de uma minitransação, e em \ref{subsec:pros-contras-minitransacoes} são apresentados os pontos negativos e positivos da utilização de minitransações.
+
+\subsection{Otimizando o 2PC}
+\label{subsec:derivando-minitransacoes}
+A decisão pela efetivação ou cancelamento de uma transação distribuída depende tanto de aspectos operacionais quanto de aspectos semânticos específicos da aplicação. A falha na execução de uma subtransação em alguma máquina do ambiente inviabiliza a efetivação da transação como um todo, e por isso o coordenador é forçado a cancelar a transação. Este tipo de falha operacional não está ligada ao domínio da aplicação, mas sim ao ambiente em que esta aplicação está rodando e está, portanto, fora do controle do coordenador, que pode somente cancelar a transação e, opcionalmente, tentar executá-la novamente. Por outro lado, o aspecto semântico envolvido na decisão pela efetivação ou cancelamento da transação é específico de cada aplicação e depende, direta ou indiretamente, dos dados do sistema.
+
+Considerando novamente o sistema bancário e a operação de transferência de uma determinada quantia entre uma conta de origem e de destino, a transferência só pode ocorrer se o saldo na conta de origem da transferência for maior ou igual à quantia a ser transferida. Esse checagem deve ser feita pela aplicação após a leitura da informação da máquina que armazena os dados da conta de origem, e a decisão pelo cancelamento ou não da transação fica subordinado à semântica dada aos dados do sistema. Isso exige que uma requisição de leitura seja feita e uma resposta seja enviada, para só então a aplicação decidir se vai efetivar e, então, iniciar a primeira fase do protocolo 2PC (votação).
+
+Portanto, podemos ver que do ponto de vista semântico as operações que influenciam na decisão pela possível efetivação ou pelo cancelamento da transação são operações de leitura. As operações de escrita não influenciam nessa decisão, a não ser pelo ponto de vista operacional, ou seja, se ocorrer realmente um erro na operação de escrita. Assim, se tivermos uma transação cuja última ação não afete a decisão do coordenador sobre efetivar a transação, podemos embutir esta última ação na mensagem de votação da primeira fase do protocolo, economizando uma mensagem.
+
+O aspecto semântico da transação em relação aos dados pode ser tratado nos participantes, e não somente no coordenador, caso o participante saiba como o coordenador irá utilizar o dado para fazer sua decisão sobre efetivar ou cancelar a transação. Se isso for possível, podemos então embutir também operações de leitura que influenciam a decisão do coordenador no protocolo de efetivação e fazer o participante adequar seu voto à maneira como o coordenador faria ao analisar o dado retornado.
+
+As minitransações surgem no contexto em que todas as operações de uma subtransação podem ser embutidas dentro do protocolo de efetivação, utilizando somente as trocas de mensagens que ocorreriam no protocolo de efetivação, após a execução dos comandos. Para que isso possa ocorrer, as mensagens do protocolo 2PC precisam ser alteradas para incluir informações sobre os dados a serem comparados, como veremos na próxima seção.
+
+\subsection{As minitransações}
+\label{subsec:estrutura-minitransacoes}
+Uma minitransação consiste de um conjunto de itens de comparação, de leitura e de escrita. Todos os itens possuem uma referência a qual dado deve ser utilizado, e os itens de comparação e escrita incluem também dados. Estes itens são escolhidos pelo coordenador antes da execução da minitransação, e cada participante efetua os seguintes passos para executar a minitransação recebida:
+
+*** TODO colocar uma imagem com a estrutra da minitransação
+
+\begin{enumerate}
+\item Se o conjunto de comparação não for vazio, efetua uma comparação de igualdade entre os dados enviados e os dados armazenados referenciados pelos itens de comparação
+\item Se alguma comparação acima falhar, o participante vota por cancelar a transação
+\item Caso contrário, os dados referenciados pelos itens de leitura são retornados e os dados referenciados pelos itens de escrita são trocados pelos dados enviados. O participante vota então por efetivar a transação.
+\end{enumerate}
+
+As operações de uma minitransação, como apresentadas aqui, incluem o mínimo possível que permite balancear utilidade e performance. Os autores originais (\cite{sinfonia}) executam as operações utilizando como referência aos dados o equivalente a um endereço de memória, e as operações trabalham sobre intervalos de endereços. No referido trabalho, as minitransações são utilizadas como base para a construção de um sistema chamado \emph{Sinfonia} que, assim como o trabalho desenvolvido neste texto, visa facilitar o desenvolvimento de sistemas distribuídos ao oferecer ao desenvolvedor uma alternativa à implementação de protocolos de troca de mensagens na rede. Este sistema \emph{Sinfonia} é composto por um conjunto de máquina, chamados nós de memória (\emph{memory nodes}), que armazenam os dados e exportam um intervalo linear de endereços de memória. O foco de \emph{Sinfonia} é prover a base para o desenvolvimento de sistemas básicos distribuídos, como sistemas de arquivos distribuídos, gerenciadores de travas ou serviços de comunicação de grupos de computadores.
+
+O objetivo deste trabalho é utilizar as minitransações como base para a construção de uma infraestrutura que facilite o desenvolvimento de aplicações distribuídas
+
+\subsection{Vantagens e Desvantagens}
+\label{subsec:pros-contras-minitransacoes}
 
 \chapter{Implementação}
 \label{chap:implementacao}
