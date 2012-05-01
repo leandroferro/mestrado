@@ -341,7 +341,14 @@ Na primeira seção (\ref{sec:algoritmos}) são descritos as estruturas de dados
 
 \section{Algoritmos e estruturas de dados}
 \label{sec:algoritmos}
+Nesta seção serão descritos os algoritmos e as estruturas de dados principais para a execução das minitransações, para o controle de concorrência entre minitransações e para a recuperação de falhas do sistema. Os mecanismos aqui apresentados são baseados em métodos tradicionais de bancos de dados: travas para o controle de concorrência, como em bancos de dados com abordagem \emph{pessimista}, e uso de uma estrutura de escrita intermediária (\emph{log}) para controle de falhas e atomicidade.
 
+Supondo a execução de uma minitransação com identificador \(I_t\), há três estruturas de dados principais utilizadas pelo sistema:
+\begin{itemize}
+\item Tabela de dados: Para cada máquina \(P_i\) participante do sistema, o conjunto \(D_i\) representa a partição dos dados \(D\) do sistema armazenados em \(P_i\). Este conjunto \(D_i\) é representado por uma tabela associativa entre um identificador e um valor, representados por \(Id(X)\) e \(Dado(X)\), onde \(X \in D_i\). Esta tabela suporta as operações \(Leitura(X)\), que retorna \(Dado(X)\) ou um valor especial (\(NULO\)) caso \(X \notin D_i\), e \(Escrita(X, V)\), que atribui a \(Dado(X)\) o valor \(V\). 
+\item Tabela de travas: Para controlar o acesso concorrente aos dados de \(D_i\), é utilizada também uma tabela associativa entre um identificador e um valor do conjunto \(\{LEITURA, ESCRITA, LIVRE\}\). Assim, para \(Id(X), X \in D_i, Trava(X) \rightarrow Y, Y \in \{LEITURA, SCRITA, LIVRE\}\). Se \(Y\) for \(LIVRE\), isso indica que o identificador não possui nenhuma trava associada, e pode ser lido ou escrito sem problemas. Se \(Y\) for \(LEITURA\), isso quer dizer que somente leituras podem ocorrer no identificador associado e escritas estão proibidas. Se \(Y\) for \(ESCRITA\) então nem leituras nem escritas podem ocorrer no identificador associado. Esta tabela suporta as operações \(TentarTravar(I_t, X, T), T \in \{LEITURA, ESCRITA\}\), que verifica se trava \(T\) pode ser associada ao identificador \(X\) pela transação \(I_t\), e \(Liberar(I_t, X)\), que retira a trava que \(I_t\) atribuiu a \(X\). \(TentarTravar\) nunca falha, e retorna um valor em \(\{TRAVOU, NAO\_TRAVOU\}\). O algoritmo para essa operação será mostrada adiante.
+\item Tabela de escrita temporária: Esta tabela é estruturalmente idêntica à tabela de dados, mas seu objetivo é diferente. As escritas de um minitransação são efetuadas nesta tabela durante a execução da minitransação e, somente após o recebimento da efetivação da minitransação é que o participante irá transferir os dados escritos desta tabela de escrita temporária para a tabela de dados. Como foi descrito, esta estrutura suporta as mesmas operações que a tabela de dados.
+\end{itemize}
 
 \section{Aplicações desenvolvidas utilizando a infraestrutura}
 \label{sec:aplicacoes}
