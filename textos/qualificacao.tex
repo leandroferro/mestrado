@@ -15,6 +15,7 @@
 \usepackage{type1cm}              
 \usepackage{listings}                   
 \usepackage{titletoc}
+\usepackage{amsmath}
 %\usepackage[bf,small,compact]{titlesec} 
 \usepackage[fixlanguage]{babelbib}
 \usepackage[font=small,format=plain,labelfont=bf,up,textfont=it,up]{caption}
@@ -221,15 +222,15 @@ text text text.
 
 \chapter{Introdução}
 \label{chap:introducao}
-Há diversos motivos para construir uma aplicação de forma distribuída --- compartilhamento de recursos (permitir o acesso a recursos específicos, como impressoras) (TODO coloco essa parte dos recursos??), tolerância a falhas (adicionando mais máquinas ao sistema aumenta a chance de que, a qualquer momento, haja pelo menos uma máquina capaz de responder pelo sistema) (TODO talvez colocar referência a alguma coisa antigona no lamport) e escalabilidade (particionar e distribuir a carga de processamento do sistema permite que este suporte um número crescente de usuários e informações) (TODO ver alguma referencia para escalabilidade tb) são alguns deles.
+Há diversos motivos para construir uma aplicação de forma distribuída --- compartilhamento de recursos (permitir o acesso a recursos específicos, como impressoras), tolerância a falhas (adicionando mais máquinas ao sistema aumenta a chance de que, a qualquer momento, haja pelo menos uma máquina capaz de responder pelo sistema) e escalabilidade (particionar e distribuir a carga de processamento do sistema permite que este suporte um número crescente de usuários e informações) são alguns deles.
 
-Um sistema distribuído é composto por diversas máquinas conectadas por uma rede de comunicação \cite{tanenbaum}. Cada processador tem acesso somente ao seu próprio sistema de armazenamento (memória e disco), e a única forma de compartilharem informação é através da troca de dados pela rede de comunicação. Esta troca de dados é feita através da utilização de protocolos de comunicação, como por exemplo os protocolos da família TCP/IP (TODO colocar referência).
+Um sistema distribuído é composto por diversas máquinas conectadas por uma rede de comunicação \cite{tanenbaum}. Cada processador tem acesso somente ao seu próprio sistema de armazenamento (memória e disco), e a única forma de compartilharem informação é através da troca de dados pela rede de comunicação. Esta troca de dados é feita através da utilização de protocolos de comunicação, como por exemplo os protocolos da família TCP/IP.
 
-Implementar o compartilhamento de informações sobre o estado da aplicação utilizando a troca de dados na rede não é trivial, em especial quando os dados possuem restrições semânticas que precisam ser mantidas e garantidas como válidas. Se considerarmos o exemplo clássico de um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e uma solicitação de transferência entre contas que estão em duas máquinas diferentes seja feita, é esperado que esta transferência subtraia uma certa quantia da conta de origem e adicione esta quantia na conta de destino. Se a máquina em que a conta de destino estiver falhar, a quantia subtraída da conta de origem deve ser reposta.
+Implementar o compartilhamento de estado da aplicação --- o conjunto de informações que define o funcionamento do sistema --- utilizando a troca de dados na rede não é trivial, em especial quando os dados possuem restrições semânticas que precisam ser mantidas e validadas. Se considerarmos o exemplo clássico de um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e uma solicitação de transferência entre contas que estão em duas máquinas diferentes seja feita, é esperado que esta transferência subtraia uma certa quantia da conta de origem e adicione esta quantia na conta de destino. Se a máquina em que a conta de destino estiver falhar, a quantia subtraída da conta de origem deve ser reposta.
 
-O problema descrito acima exige que as operações efetuadas em cada máquina --- subtrair uma quantia da conta de origem e adicionar essa quantia na conta de destino --- sejam consideradas como uma operação única em que ou as duas operações são bem sucedidas, ou nenhuma das duas irá ocorrer. Uma maneira de se garantir esta execução é através da utilização do protocolo 2PC. Este protocolo permite a coordenação da execução de operações em diversas máquinas e garante que todas as operações em todas as máquinas serão efetivadas somente se todas as máquinas concordarem com a efetivação. Ele basicamente efetua uma rodada de votação entre as máquinas para verificar a possibilidade da efetivação das operações, e uma rodada de notificação, em que as máquinas são notificadas do resultado da votação. As rodadas de votação e notificação ocorrem após a execução das operações, gerando mais mensagens na rede.
+O problema descrito acima exige que as operações efetuadas em cada máquina --- subtrair uma quantia da conta de origem e adicionar essa quantia na conta de destino --- sejam consideradas como uma operação única em que ou as duas operações são bem sucedidas, ou nenhuma das duas irá ocorrer. Uma maneira de se garantir esta execução é através da utilização do protocolo \emph{2PC}. Este protocolo permite a coordenação da execução de operações em diversas máquinas e garante que todas as operações em todas as máquinas serão efetivadas somente se todas as máquinas concordarem com a efetivação. Ele basicamente efetua uma rodada de votação entre as máquinas para verificar a possibilidade da efetivação das operações, e uma rodada de notificação, em que as máquinas são notificadas do resultado da votação. As rodadas de votação e notificação ocorrem após a execução das operações, gerando mais mensagens na rede.
 
-As minitransações são baseadas no protocolo 2PC --- há duas rodadas de mensagens, porém as operações para serem executadas são embutidas na própria mensagem da rodada de votação. Na primeira rodada, equivalente à votação do 2PC, as mensagens possuem basicamente três tipos de operações: comparação, leitura e escrita. A operação de comparação é essencial para as minitransações, uma vez que elas determinam o voto da máquina em relação à efetivar ou não. Caso a comparação seja bem sucedida, as escritas serão efetuadas e as leituras serão retornadas como resposta, e a máquina votará para efetivar as operações. Caso contrário nenhum dado será retornado, nenhuma escrita será efetuada e a máquina votará pela não efetivação das operações, fazendo que na rodada de notificação, todas as outras máquinas não efetivem as operações.
+As minitransações são baseadas no protocolo \emph{2PC} --- há duas rodadas de mensagens, porém as operações para serem executadas são embutidas na própria mensagem da rodada de votação. Na primeira rodada, equivalente à votação do \emph{2PC}, as mensagens possuem basicamente três tipos de operações: comparação, leitura e escrita. A operação de comparação é essencial para as minitransações, uma vez que elas determinam o voto da máquina em relação à efetivar ou não. Caso a comparação seja bem sucedida, as escritas serão efetuadas e as leituras serão retornadas como resposta, e a máquina votará para efetivar as operações. Caso contrário nenhum dado será retornado, nenhuma escrita será efetuada e a máquina votará pela não efetivação das operações, fazendo que na rodada de notificação, todas as outras máquinas não efetivem as operações.
 
 \section{Objetivo}
 \label{sec:objetivo}
@@ -243,13 +244,22 @@ Esta introdução apresenta o contexto de utilização das minitransações e os
 
 \chapter{Conceitos}
 \label{chap:conceitos}
-Como as minitransações são uma extensão do protocolo 2PC, este capítulo irá apresentar uma revisão dos conceitos relacionados a transações, transações distribuídas e, por fim, uma detalhada explicação sobre as minitransações.
+Como as minitransações são uma extensão do protocolo 2PC, este capítulo irá apresentar uma revisão dos conceitos relacionados a sistemas distribuídos, transações, transações distribuídas e, por fim, uma detalhada explicação sobre as minitransações.
+
+\section{Sistemas distribuídos}
+\label{sec:sistemas_distribuidos}
+*** TODO acho que vou jogar essa seção para dentro da parte de transações distribuídas.
+
+De forma geral, um sistema distribuído é uma coleção de dispositivos computacionais individuais que podem comunicar-se uns com os outros \cite{distributed_computing}. Essa definição engloba uma gama de sistemas computacionais atuais, desde placas de circutos integrados até a \emph{internet}. Os sistemas distribuídos com que este trabalho lida se apresentam mais próximos da internet, sendo constituídos por diversos computadores (compostos por processadores, memória e disco, essencialmente) interligados por uma rede de comunicação.
+
+Embora o compartilhamento de recursos e dados, tolerância a falhas parciais do sistema e aumento da disponibilidade sejam características altamente desejáveis de um sistema, tornar operante um sistema distribuído com estas características pode ser difícil. Diferentes plataformas de máquinas e diferentes sistemas operacionais, comunicação não síncrona entre as máquinas, conhecimento de cada máquina sobre as informações do sistema limitado aos dados locais e falhas parciais das máquinas fazem com que o desenvolvimento de aplicações distribuídas exija um esforço adicional em relação a sistemas não distribuídos.
 
 \section{Transações}
 \label{sec:transacoes}
-Uma transação, no contexto da disciplina de bancos de dados, é a unidade de execução de operações em um banco de dados \cite{garcia-molina}. Ela é composta por uma sequência de comandos de leitura e escrita de dados \cite{vaca}. Através das transações os aplicativos acessam ou modificam informações em um banco de dados, e é através da execução de transações que o gerenciador permite que diversas aplicações possam interagir de forma concorrente com o banco de dados.
+Uma transação, no contexto da disciplina de bancos de dados, é a unidade de execução de operações em um banco de dados, composta por uma sequência de comandos de leitura e escrita de dados \cite{garcia-molina}\cite{vaca}. Através das transações os aplicativos acessam ou modificam informações em um banco de dados, e é através da execução de transações que o gerenciador de banco de dados permite que diversas aplicações possam interagir de forma concorrente com o banco de dados.
 
 Há quatro propriedades das transações que o gerenciador de banco de dados precisa garantir em um cenário de acessos concorrentes e falhas de sistema:
+
 \begin{enumerate}
 \item \emph{Atomicidade}: ou todas as operações são executadas com sucesso, ou nenhuma operação é executada. Com isso, o desenvolvedor de aplicações não precisa se preocupar com o efeito de transações incompletas, como quando ocorrem falhas do sistema. Esta propriedade é obtida através do desfazimento de operações já executadas de transações que não foram efetivadas. O gerenciador do banco de dados utiliza uma técnica em que as operações são primeiro escritas para um \emph{log}, para depois serem executadas no banco de dados propriamente dito. Caso a transação não seja efetivada, o \emph{log} é utilizado para desfazer as operações já executadas.
 \item \emph{Consistência}: cada transação deve levar o banco de dados de um estado consistente para outro estado consistente. Esta propriedade depende essencialmente do desenvolvedor de aplicações --- o gerenciador de banco de dados pode auxiliar através de restrições sobre os dados que podem ser configuradas mas, no final, a semântica da consistência fica sob responsabilidade do desenvolvedor. Se retomarmos ao exemplo do sistema bancário, a transferência entre as contas não deve alterar o valor total da soma dos saldos das contas individuais envolvidas na transação.
@@ -257,7 +267,92 @@ Há quatro propriedades das transações que o gerenciador de banco de dados pre
 \item \emph{Durabilidade}: uma vez que a transação tenha sido efetivada, os efeitos de sua execução devem persistir mesmo em casos de falha. A durabilidade garante que os efeitos gerados por uma transação efetivada sejam permanentes, mesmo que ocorram falhas após a efetivação da transação. Um \emph{log} também é utilizado para a garantir a durabilidade. Uma vez que ocorra uma falha e o sistema se recupere, o gerenciador irá vasculhar o \emph{log} em busca de transações que tenham sido efetivadas mas cujos efeitos não estejam refletidos no banco de dados, para executar novamente os comandos da transação.
 \end{enumerate}
 
-Estas quatro propriedades são conhecidas como propriedades \emph{ACID} das transações.
+Estas quatro propriedades são conhecidas como propriedades \emph{ACID}. As transações \emph{ACID}, como são chamadas, são uma característica dos \emph{SGBD}s, permitindo que um grande número de aplicações utilizem de forma concorrente o banco de dados. Através da utilização destas transações uma aplicação pode interagir com o banco de dados sem notar que outras aplicações estão interagindo com o banco de dados também, acessando e alterando possivelmente os mesmos dados.
+
+Como motivação para a necessidade destas propriedades, vamos supor que em um sistema de controle de contas bancárias existam três contas A, B e C com saldos 20, 10 e 5, respectivamente. Vamos considerar o algoritmo \ref{alg:transferencia_valores} que descreve a operação de transferência entre duas contas, origem e destino, de um determinado valor.
+
+\begin{algorithm}
+\caption{Transferência de valores entre contas}
+\label{alg:transferencia_valores}
+\begin{algorithmic}[1]
+\State $O \gets \text{ Conta de origem}$
+\State $D \gets \text{ Conta de destino}$
+\State $V \gets \text{ Valor a ser transferido}$
+\State $VO \gets Ler(O)$
+\If{$VO >= V$}
+	\State $VD \gets Ler(D)$
+	\State $Escrever(O, VO - V)$
+	\State $Escrever(D, VD + V)$
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
+As funções $Ler$ e $Escrever$ representam as operações de leitura e escrita, respectivamente, no banco de dados. Este algoritmo obtém o valor do saldo da conta de origem, verifica se este valor é maior que o valor a ser transferido e, caso seja maior, transfere o valor, somando a quantia ao valor de destino e subtraindo do valor de origem. Este algoritmo, portanto, garante que o valor da conta de origem nunca seja menor do que 0 e garante também que o valor subtraído da conta de origem seja somado ao valor da conta de destino, ou seja, o valor total das contas é o mesmo antes e depois da execução do algoritmo: $(VO - V) + (VD + V) = VO + VD$.
+
+Embora este algoritmo esteja correto, se considerarmos a execução concorrente de aplicações que implementem este algoritmo poderemos observar eventuais inconsistências na invariante do sistema que diz que o valor total das contas deve ser mantido. Duas aplicações, que implementam este algoritmo, executando concorrentemente tentarão transferir, respectivamente, o valor 10 da conta A para a conta B e o valor 15 da conta A para a conta C. As operações das transações podem ser intercaladas de tal forma que as aplicações executem $VO \gets Ler(O)$ e observem o mesmo valor de $VO$. Como o valor inicial da conta A é 20, a condição $VO >= V$ será verdadeira para a duas aplicações (pois V será 10 para uma aplicação e 15 para outra) e, assim, as duas aplicações executarão a transferência e teremos então a conta B com saldo 20, a conta C com saldo 20 e a conta A poderá ter tanto o valor 10 quanto o valor 5 (dependendo de qual aplicação executar a escrita por último), totalizando 50 ou 45, ambos diferentes do valor inicial 35 (20 + 10 + 5).
+
+Portanto, interações de transações concorrentes podem levar o banco de dados a um estado inconsistente, mesmo que individualmente cada transação garanta a consistência dos dados. Assim, para garantir a consistência dos dados algum tipo de controle de concorrência deve ser feito para permitir que as operações das diversas transações possam ser executadas concorrentemente, mas garantindo a consistência. Para permitir a execução concorrente e consistente de transações é utilizado o conceito de \textbf{escalonamento}, que é uma sequência ordenada, de forma temporal, de operações ($Ler$ e $Escrever$) de uma ou mais transações. Dois possíveis escalonamentos para as operações das transações descritas anteriormente podem ser vistos na tabela \ref{tab:exemplo_escalonamento} (consideramos que o tempo aumenta conforme as operações são executadas da primeira para a última linha da tabela).
+
+\begin{table}
+\caption{Dois possíveis escalonamentos para as operações de transferência entre contas}
+\label{tab:exemplo_escalonamento}
+\centering
+\begin{tabular}{ | l | l | }
+	\hline
+	$Ler_1(O)$&$Ler_2(O)$\\
+	$Ler_1(D)$&$Ler_1(O)$\\
+	$Escrever_1(O, VO - V)$&$Ler_1(D)$\\
+	$Ler_2(O)$&$Escrever_1(O, VO - V)$\\
+	$Escrever_1(D, VD + V)$&$Ler_2(D)$\\
+	$Ler_2(D)$&$Escrever_2(O, VO - V)$\\
+	$Escrever_2(O, VO - V)$&$Escrever_2(D, VD + V)$\\
+	$Escrever_2(D, VD + V)$&$Escrever_1(D, VD + V)$\\
+	\hline
+\end{tabular}
+\end{table}
+
+A maneira mais simples de garantir a consistência é forçar a execução sequencial das transações, ou seja, somente uma transação executa por vez enquanto a execução das outras é postergada até o término da execução atual. Um \textbf{escalonamento sequencial} é um escalonamento em que as operações de uma transação estão agrupadas, ou seja, as operações de transações diferentes não são intercaladas, como pode ser visto na tabela \ref{tab:escalonamento_sequencial}.
+
+\begin{table}
+\caption{Escalonamentos sequenciais das operações de transferência entre contas}
+\label{tab:escalonamento_sequencial}
+\centering
+\begin{tabular}{ | l | l | }
+	\hline
+	$Ler_1(O)$&$Ler_2(O)$\\
+	$Ler_1(D)$&$Ler_2(D)$\\
+	$Escrever_1(O, VO - V)$&$Escrever_2(O, VO - V)$\\
+	$Escrever_1(D, VD + V)$&$Escrever_2(D, VD + V)$\\
+	&\\
+	$Ler_2(O)$&$Ler_1(O)$\\
+	$Ler_2(D)$&$Ler_1(D)$\\
+	$Escrever_2(O, VO - V)$&$Escrever_1(O, VO - V)$\\
+	$Escrever_2(D, VD + V)$&$Escrever_1(D, VD + V)$\\
+	\hline
+\end{tabular}
+\end{table}
+
+Esta forma não é a ideal pois desperdiça recursos ao não permitir a intercalação de operações de diferentes transações. Assim, definimos o conceito de um \textbf{escalonamento sequenciável} como sendo um escalonamento em que o resultado de sua execução é equivalente ao resultado de uma execução de um escalonamento sequencial. O escalonamento ilustrado na tabela \ref{tab:escalonamento_sequenciavel} produz como resultado de sua execução o mesmo resultado da execução do escalonamento da primeira coluna da tabela \ref{tab:escalonamento_sequencial}.
+
+\begin{table}
+\caption{Escalonamento sequenciável das operações de transferência entre contas}
+\label{tab:escalonamento_sequenciavel}
+\centering
+\begin{tabular}{ | l | }
+	\hline
+	$Ler_1(O)$\\
+	$Ler_1(D)$\\
+	$Escrever_1(O, VO - V)$\\
+	$Ler_2(O)$\\
+	$Escrever_1(D, VD + V)$\\
+	$Ler_2(D)$\\
+	$Escrever_2(O, VO - V)$\\
+	$Escrever_2(D, VD + V)$\\
+	\hline
+\end{tabular}
+\end{table}
+
+Um escalonamento sequenciável pode ser obtido através do uso de travas, um mecanismo que permite identificar quais dados estão sendo usados, e de que forma, para verificar se esses dados podem ser acessados. Estas travas são mantidas em uma tabela que associa um dado a uma trava, *** TODO parei aqui
 
 \section{Transações distribuídas}
 \label{sec:transacoes_distribuidas}
@@ -382,16 +477,17 @@ O algoritmo \ref{alg:coordenador_minitransacao} inicialmente gera um identificad
 
 As linhas 11---18 ilustram a segunda fase do protocolo. Se todos os participantes votaram $SIM$ (o conjunto de votos é obtido do conjunto de respostas $R$ através de $Voto(R)$) e a aplicação decidiu efetivar a transação ($Processar(Dado(R))$ representa a lógica específica da aplicação que utiliza os dados obtidos do conjunto de respostas através de $Dado(R)$), então a transação será efetivada, representado por $resultado \gets EFETIVAR$. Caso contrário, a transação será abortada. Esse resultado é então enviado para os participantes, e o protocolo termina.
 
-Como pode ser visto, este protocolo difere em alguns pontos do procotolo \emph{2PC}: ***TODO parei aqui
-
 \section{Aplicações desenvolvidas utilizando a infraestrutura}
 \label{sec:aplicacoes}
+A ser definido...
 
 \section{Execução dos testes}
 \label{sec:testes}
+A ser definido...
 
 \chapter{Conclusões}
 \label{chap:conclusoes}
+A ser definido...
 
 % cabeçalho para os apêndices
 \renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{\appendixname\ \thechapter}} {\MakeUppercase{#1}} }
