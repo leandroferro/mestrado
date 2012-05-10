@@ -372,8 +372,11 @@ Como descrito anteriormente na seção \ref{sec:transacoes}, a maneira usual de 
 
 \section{Protocolo de efetivação de duas fases}
 \label{sec:2pc}
+A idéia deste protocolo é efetuar uma rodada de votação, para coletar os votos das máquinas participantes da transação. Cada participante pode votar SIM ou NÃO para respectivamente efetivar ou abortar a transação. Após essa coleta os votos são avaliados para saber se alguma máquina votou NÃO. Caso haja no mínimo um voto NÃO, a transação será abortada, e todos os componentes serão notificados para abortar a transação. Se todos os votos forem SIM, então a transação será efetivada, e os participantes serão notificados também. 
 
-Cada máquina no ambiente distribuído mantém um \emph{log}, e as ações de uma subtransação são escritas no \emph{log} da máquina em que estiver executando. Uma das máquinas atua como coordenadora da transação, e após a execução dos comandos de leitura/escrita da transação, o coordenador inicia o protocolo de efetivação:
+Uma máquina específica, chamada coordenador, é responsável por iniciar a rodada de votação, coletar os votos, decidir sobre o resultado da votação e notificar os participantes sobre este resultado. Cada máquina deve manter um \emph{log} para registrar as ações de uma subtransação, mas não há um log global. A cada mensagem enviada, um registro é feito no log da máquina que enviou a mensagem para auxiliar na recuperação em caso de falhas.
+
+O protocolo de efetivação executa os seguintes passos:
 
 \begin{enumerate}
 \item O coordenador envia uma mensagem, \emph{PREPARAR}, para cada máquina envolvida na transação.
