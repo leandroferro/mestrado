@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="transacao_distribuida.pdf">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.47"
+     inkscape:cx="405.31915"
+     inkscape:cy="520"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1366"
+     inkscape:window-height="690"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Camada 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g3244"
+       transform="translate(-34,-513.63837)">
+      <g
+         id="g3200">
+        <g
+           id="g3197">
+          <rect
+             y="579.60364"
+             x="98.492981"
+             height="83.396919"
+             width="218.8972"
+             id="rect2997"
+             style="fill:#c8b7b7" />
+        </g>
+        <text
+           xml:space="preserve"
+           style="font-size:53.73600769px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           x="108.35024"
+           y="619.1026"
+           id="text2999"
+           sodipodi:linespacing="125%"
+           transform="scale(0.95965588,1.0420402)"><tspan
+             sodipodi:role="line"
+             id="tspan3001"
+             x="108.35024"
+             y="619.1026">Conta A</tspan></text>
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text3236"
+         y="567.2558"
+         x="46.80851"
+         style="font-size:40px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+         xml:space="preserve"><tspan
+           y="567.2558"
+           x="46.80851"
+           id="tspan3238"
+           sodipodi:role="line">Máquina i</tspan></text>
+    </g>
+    <g
+       id="g3253"
+       transform="translate(100,-517.03889)">
+      <g
+         id="g3200-8"
+         transform="translate(313.33501,3.4005119)">
+        <g
+           id="g3197-7">
+          <rect
+             y="579.60364"
+             x="98.492981"
+             height="83.396919"
+             width="218.8972"
+             id="rect2997-4"
+             style="fill:#c8b7b7" />
+        </g>
+        <text
+           xml:space="preserve"
+           style="font-size:53.73600769px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           x="108.35024"
+           y="619.1026"
+           id="text2999-19"
+           sodipodi:linespacing="125%"
+           transform="scale(0.95965588,1.0420402)"><tspan
+             sodipodi:role="line"
+             id="tspan3001-09"
+             x="108.35024"
+             y="619.1026">Conta B</tspan></text>
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text3240"
+         y="571.38342"
+         x="363.82977"
+         style="font-size:40px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+         xml:space="preserve"><tspan
+           y="571.38342"
+           x="363.82977"
+           id="tspan3242"
+           sodipodi:role="line">Máquina j</tspan></text>
+    </g>
+    <g
+       id="g3359-1"
+       transform="matrix(-0.43536134,0.18465462,-0.90611943,-1.3390529,1036.1107,1345.0743)">
+      <path
+         inkscape:transform-center-y="-15.957447"
+         inkscape:transform-center-x="-0.010232918"
+         d="m 200,805.55369 -110.617836,0.0355 55.278216,-95.81558 z"
+         inkscape:randomized="0"
+         inkscape:rounded="0"
+         inkscape:flatsided="true"
+         sodipodi:arg2="1.5704759"
+         sodipodi:arg1="0.52327832"
+         sodipodi:r2="31.932619"
+         sodipodi:r1="63.865238"
+         sodipodi:cy="773.63879"
+         sodipodi:cx="144.68085"
+         sodipodi:sides="3"
+         id="path3355-75"
+         style="fill:#000000"
+         sodipodi:type="star" />
+      <rect
+         y="805.55365"
+         x="119.14894"
+         height="82.978722"
+         width="51.063828"
+         id="rect3357-7"
+         style="fill:#000000" />
+    </g>
+    <g
+       id="g3359-1-3"
+       transform="matrix(0.43536134,0.18465462,0.90611943,-1.3390529,-269.22306,1345.0743)">
+      <path
+         inkscape:transform-center-y="-15.957447"
+         inkscape:transform-center-x="-0.010232918"
+         d="m 200,805.55369 -110.617836,0.0355 55.278216,-95.81558 z"
+         inkscape:randomized="0"
+         inkscape:rounded="0"
+         inkscape:flatsided="true"
+         sodipodi:arg2="1.5704759"
+         sodipodi:arg1="0.52327832"
+         sodipodi:r2="31.932619"
+         sodipodi:r1="63.865238"
+         sodipodi:cy="773.63879"
+         sodipodi:cx="144.68085"
+         sodipodi:sides="3"
+         id="path3355-75-3"
+         style="fill:#000000"
+         sodipodi:type="star" />
+      <rect
+         y="805.55365"
+         x="119.14894"
+         height="82.978722"
+         width="51.063828"
+         id="rect3357-7-3"
+         style="fill:#000000" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+       x="279.31915"
+       y="276.79578"
+       id="text3310"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3312"
+         x="279.31915"
+         y="276.79578">VO</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+       x="430.21277"
+       y="277.36218"
+       id="text3314"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3316"
+         x="430.21277"
+         y="277.36218">VD</tspan></text>
+    <g
+       id="g3244-1"
+       transform="translate(-33.62311,296.22113)">
+      <g
+         id="g3200-6">
+        <g
+           id="g3197-5">
+          <rect
+             y="579.60364"
+             x="98.492981"
+             height="83.396919"
+             width="218.8972"
+             id="rect2997-7"
+             style="fill:#c8b7b7" />
+        </g>
+        <text
+           xml:space="preserve"
+           style="font-size:53.73600769px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           x="108.35024"
+           y="619.1026"
+           id="text2999-8"
+           sodipodi:linespacing="125%"
+           transform="scale(0.95965588,1.0420402)"><tspan
+             sodipodi:role="line"
+             id="tspan3001-5"
+             x="108.35024"
+             y="619.1026">Conta A</tspan></text>
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text3236-9"
+         y="567.2558"
+         x="46.80851"
+         style="font-size:40px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+         xml:space="preserve"><tspan
+           y="567.2558"
+           x="46.80851"
+           id="tspan3238-2"
+           sodipodi:role="line">Máquina i</tspan></text>
+    </g>
+    <g
+       id="g3253-7"
+       transform="translate(100.37689,292.82061)">
+      <g
+         id="g3200-8-3"
+         transform="translate(313.33501,3.4005119)">
+        <g
+           id="g3197-7-6">
+          <rect
+             y="579.60364"
+             x="98.492981"
+             height="83.396919"
+             width="218.8972"
+             id="rect2997-4-4"
+             style="fill:#c8b7b7" />
+        </g>
+        <text
+           xml:space="preserve"
+           style="font-size:53.73600769px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           x="108.35024"
+           y="619.1026"
+           id="text2999-19-7"
+           sodipodi:linespacing="125%"
+           transform="scale(0.95965588,1.0420402)"><tspan
+             sodipodi:role="line"
+             id="tspan3001-09-9"
+             x="108.35024"
+             y="619.1026">Conta B</tspan></text>
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text3240-7"
+         y="571.38342"
+         x="363.82977"
+         style="font-size:40px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+         xml:space="preserve"><tspan
+           y="571.38342"
+           x="363.82977"
+           id="tspan3242-2"
+           sodipodi:role="line">Máquina j</tspan></text>
+    </g>
+    <g
+       id="g3359-1-2"
+       transform="matrix(0.43536134,0.18465462,0.90611943,-1.3390529,-534.85206,1734.0743)">
+      <path
+         inkscape:transform-center-y="-15.957447"
+         inkscape:transform-center-x="-0.010232918"
+         d="m 200,805.55369 -110.617836,0.0355 55.278216,-95.81558 z"
+         inkscape:randomized="0"
+         inkscape:rounded="0"
+         inkscape:flatsided="true"
+         sodipodi:arg2="1.5704759"
+         sodipodi:arg1="0.52327832"
+         sodipodi:r2="31.932619"
+         sodipodi:r1="63.865238"
+         sodipodi:cy="773.63879"
+         sodipodi:cx="144.68085"
+         sodipodi:sides="3"
+         id="path3355-75-1"
+         style="fill:#000000"
+         sodipodi:type="star" />
+      <rect
+         y="805.55365"
+         x="119.14894"
+         height="82.978722"
+         width="51.063828"
+         id="rect3357-7-6"
+         style="fill:#000000" />
+    </g>
+    <g
+       id="g3359-1-3-3"
+       transform="matrix(-0.43536134,0.18465462,-0.90611943,-1.3390529,1310.4935,1734.0743)">
+      <path
+         inkscape:transform-center-y="-15.957447"
+         inkscape:transform-center-x="-0.010232918"
+         d="m 200,805.55369 -110.617836,0.0355 55.278216,-95.81558 z"
+         inkscape:randomized="0"
+         inkscape:rounded="0"
+         inkscape:flatsided="true"
+         sodipodi:arg2="1.5704759"
+         sodipodi:arg1="0.52327832"
+         sodipodi:r2="31.932619"
+         sodipodi:r1="63.865238"
+         sodipodi:cy="773.63879"
+         sodipodi:cx="144.68085"
+         sodipodi:sides="3"
+         id="path3355-75-3-0"
+         style="fill:#000000"
+         sodipodi:type="star" />
+      <rect
+         y="805.55365"
+         x="119.14894"
+         height="82.978722"
+         width="51.063828"
+         id="rect3357-7-3-2"
+         style="fill:#000000" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+       x="139.69604"
+       y="596.79578"
+       id="text3310-1"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3312-5"
+         x="139.69604"
+         y="596.79578">VO - V</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
+       x="496.58966"
+       y="597.36218"
+       id="text3314-6"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3316-5"
+         x="496.58966"
+         y="597.36218">VD + V</tspan></text>
+    <g
+       id="g3555"
+       transform="translate(24,-22)">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3526"
+         d="m 233.70213,509.08559 0,-40.42553 128.7234,0 128.72341,0 0,40.42553 0,40.42553 -128.72341,0 -128.7234,0 0,-40.42553 z"
+         style="fill:#ffb380" />
+      <text
+         transform="scale(0.94488362,1.0583314)"
+         sodipodi:linespacing="125%"
+         id="text3276"
+         y="496.92545"
+         x="259.25223"
+         style="font-size:52.90883255px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="496.92545"
+           x="259.25223"
+           id="tspan3278"
+           sodipodi:role="line">Aplicação</tspan></text>
+    </g>
+  </g>
+</svg>
