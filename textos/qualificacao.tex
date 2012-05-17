@@ -248,7 +248,7 @@ Como as minitransações são uma extensão do protocolo 2PC, este capítulo ir�
 
 \section{Transações}
 \label{sec:transacoes}
-Uma transação, no contexto da disciplina de bancos de dados, é a unidade de execução de operações em um banco de dados, composta por uma sequência de comandos de leitura e escrita de dados \cite{garcia-molina, vaca}. Através das transações os aplicativos acessam ou modificam informações em um banco de dados, e é através da execução de transações que o gerenciador de banco de dados permite que diversas aplicações possam interagir de forma concorrente com o banco de dados.
+Aplicações executam operações, de variados tipos e para diversas finalidades, como somar dois números, ler uma tecla digitada do teclado ou enviar um \emph{email} através da rede. Uma transação é um conjunto de operações que devem ser executadas como um todo indivisível. O exemplo mais clássico e difundido é o de transações de bancos de dados. Neste contexto, transação é a unidade de execução de operações em um banco de dados, composta por uma sequência de comandos de leitura e escrita de dados \cite{garcia-molina, vaca}. Através das transações os aplicativos acessam ou modificam informações em um banco de dados, e é através da execução de transações que o gerenciador de banco de dados permite que diversas aplicações possam interagir de forma concorrente com o banco de dados.
 
 Há quatro propriedades das transações que o gerenciador de banco de dados precisa garantir em um cenário de acessos concorrentes e falhas de sistema:
 
@@ -354,20 +354,20 @@ Travas são um exemplo de abordagem pessimista para controle de concorrência. E
 \label{sec:transacoes_distribuidas}
 Bancos de dados distribuídos apresentam benefícios tais como a possibilidade de paralelização e melhora no tempo de processamento de consultas (devido à possibilidade de distribuição de dados entre máquinas) e a possibilidade de continuar operante mesmo que alguns componentes falhem (devido à possibilidade de replicação de dados entre máquinas). Por outro lado, o processamento distribuído aumenta a complexidade de implementação de cada aspecto do sistema de banco de dados, como controle de concorrência ou recuperação de falhas.
 
-Uma transação distribuída é uma transação que engloba operações que executam em diversas máquinas na forma de subtransações, subordinadas à transação. Os requisitos de atomicidade, consistência, isolamento e durabilidade continuam válidos para estas transações, tornando assim a execução de transações distribuídas mais complexas.
+Uma transação distribuída é uma transação que engloba operações que executam em diversas máquinas na forma de subtransações, subordinadas à transação, e que é finalizada por uma requisição para efetivar ou abortar a transação \cite{gray-lamport}. Os requisitos de atomicidade, consistência, isolamento e durabilidade continuam válidos para estas transações, tornando assim a execução de transações distribuídas mais complexa.
 
 Por exemplo, vamos considerar novamente o problema da transferência entre contas de um sistema bancário, como descrito na seção \ref{sec:transacoes}. O algoritmo utilizado ainda é o \ref{alg:transferencia_valores}, e vamos considerar somente duas contas A (origem) e B (destino) para este exemplo, distribuídas em duas máquinas distintas i e j, respectivamente. Uma aplicação irá executar a transação, gerando duas subtransações para serem executadas nas máquinas i e j, como na figura \ref{fig:transacao_distribuida}. Cada operação de leitura e escrita é executada na máquina responsável pela conta sendo lida ou alterada. Mesmo com a garantia de que cada subtransação é ACID, não podemos afirmar que a transação como um todo seja, pois caso alguma máquina, digamos a máquina j, falhe durante a operação de escrita, a subtransação executada na máquina i já terá sido efetivada.
 
 \begin{figure}
   \centering
   \includegraphics[width=.40\textwidth]{transacao_distribuida} 
-  \caption{Visão geral da arquitetura da infraestrutura}
+  \caption{Esquematização de uma transação distribuída}
   \label{fig:transacao_distribuida} 
 \end{figure}
 
 A atomicidade em um ambiente distribuído é mais difícil de se implementar do que em um ambiente centralizado devido aos novos erros que podem surgir, como falhas de comunicação ou de máquinas remotas. Por exemplo, digamos que a máquina i armazene a conta A e a máquina j armazene a conta B. Quando a aplicação inicia o procedimento que implementa o algoritmo para transferência entre contas, ela cria duas transações, uma na máquina i e outra na máquina j. A efetivação da transação na máquina i ocorre após a escrita na conta A e a efetivação na máquina j ocorre após a escrita na conta B. Se a máquina j não puder efetivar a sua transação, o sistema ficará inconsistente pois a transação na máquina i foi efetivada, ou seja, o valor foi subtraído da conta A.
 
-Por isso, o controle de atomicidade em um banco de dados distribuído torna necessário algum mecanismo que permita que a transação seja bem sucedida somente se todas as subtransações forem bem sucedidas também, ou que a transação seja abortada caso alguma subtransação falhe. Este mecanismo é o protocolo de efetivação, que define uma série de passos a serem seguidos pelas máquinas executando as subtransações de forma que todas as máquinas envolvidas na transação concordem sobre a decisão de efetivar ou abortar a transação para que a atomicidade da transação seja garantida \ref{fig:protocolo_efetivacao}. O protocolo de efetivação mais usado é chamado de protocolo de efetivação de duas fases (\emph{Two-Phase Commit} --- 2PC), e ele será explicado na seção \ref{sec:2pc}.
+Por isso, o controle de atomicidade em um banco de dados distribuído torna necessário algum mecanismo que permita que a transação seja bem sucedida somente se todas as subtransações forem bem sucedidas também, ou que a transação seja abortada caso alguma subtransação falhe. Este mecanismo é o protocolo de efetivação, que define uma série de passos a serem seguidos pelas máquinas executando as subtransações de forma que todas as máquinas envolvidas na transação concordem sobre a decisão de efetivar ou abortar a transação para que a atomicidade da transação seja garantida. O protocolo de efetivação mais usado é chamado de protocolo de efetivação de duas fases (\emph{Two-Phase Commit} --- 2PC), e ele será explicado na seção \ref{sec:2pc}.
 
 A recuperação de falhas em transações distribuídas também é complexa pois a qualquer momento uma máquina envolvida na transação pode falhar. É preciso ser garantido que quando a máquina que falhou voltar a operar a sua decisão em relação a efetivar ou abortar a transação seja consistente com a decisão global tomada para a transação. A recuperação de falhas está ligada à durabilidade da transação e está relacionada com a decisão de efetivar ou não a transação, e por isso também será ilustrado um mecanismo de recuperação de falhas na seção \ref{sec:2pc}.
 
@@ -379,7 +379,7 @@ A idéia deste protocolo é simples e utilizada a bastante tempo \cite{2pc}: ver
 
 Como seu nome diz, o protocolo é dividido em duas fases, ou rodadas. Na primeira fase o coordenador pede para que os participantes enviem seu voto sobre se a transação pode ser efetivada ou não. Os votos são coletados e o coordenador avalia seus valores, decidindo se a transação pode ser efetivada (caso todos os participantes tenham votado de acordo) ou se deve ser abortada (caso algum participante tenha votado para não efetivar a transação). Decidido o resultado da votação, o coordenador efetua a segunda fase, em que os participantes são notificados do resultado da votação. Entre a execução da subtransação em cada participante e sua respectiva efetivação ou aborto, cada participante deve ser capaz de registrar as alterações efetuadas de forma permanente porém não definitiva, ou seja, de forma que possam ser desfeitas caso a transação seja abortada ou que possam ser aplicadas ao banco caso a transação seja efetivada. Neste contexto, os \emph{logs} dos participantes e do coordenador são de extrema importância no controle da transação distribuída e na garantia de sua atomicidade e durabilidade.
 
-De forma mais detalhada, o protocolo de efetivação executa os algoritmos \ref{alg:2pc_coordenador}, \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} para efetivar uma transação $T$. O algoritmo \ref{alg:2pc_coordenador} descreve as ações do coordenador ao ser notificado que o protocolo deve iniciar. Os algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} descrevem como os passos executados pelos participantes ao receberem uma solicitação de votação (primeira fase) e o resultado da votação (segunda fase), respectivamente. A função $Adicionar$ representa a operação de adicionar um elemento no final no \emph{log}. A função $Enviar(d, m)$ representa o envio de uma mensagem $m$ para um destinatário $d$, e a função $Receber(r)$ representa o recebimento de uma mensagem de um remetente $r$.
+De forma mais detalhada, o protocolo de efetivação executa os algoritmos \ref{alg:2pc_coordenador}, \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} para efetivar uma transação $T$. O algoritmo \ref{alg:2pc_coordenador} descreve as ações do coordenador ao ser notificado que o protocolo deve iniciar. Os algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} descrevem como os passos executados pelos participantes ao receberem uma solicitação de votação (primeira fase) e o resultado da votação (segunda fase), respectivamente. A função $Adicionar$ representa a operação de adicionar um elemento no final no \emph{log}. A função $Enviar(d, m)$ representa o envio de uma mensagem $m$ para um destinatário $d$, e a função $Receber(r)$ representa o recebimento de uma mensagem de um remetente $r$. Uma visualização da execução do algoritmo pode ser vista nas figuras \ref{fig:2PC_1fase} e \ref{fig:2PC_2fase}.
 
 \begin{algorithm}
 \caption{Coordenador 2PC}
@@ -408,8 +408,8 @@ De forma mais detalhada, o protocolo de efetivação executa os algoritmos \ref{
 \label{alg:2pc_participante1}
 \begin{algorithmic}[1]
 \State $v \gets Decidir(T)$
-\State $Adicionar(log_i, (d, T))$
-\State $Enviar(c, d)$
+\State $Adicionar(log_i, (v, T))$
+\State $Enviar(c, v)$
 \end{algorithmic}
 \end{algorithm}
 
@@ -431,15 +431,27 @@ A premissa que norteia o protocolo é que qualquer máquina envolvida na transa�
 
 A transação $T$ é considerada oficialmente efetivada (ou abortada) no momento que o registro de $(EFETIVAR, T)$ (ou $(ABORTAR, T)$) do \emph{log} do coordenador for escrito para a área de armazenamento estável da máquina. Falhas posteriores não podem mudar o resultado da decisão do coordenador registrado em seu \emph{log} e salvo em disco.
 
-*** TODO colocar imagem do fluxo de mensagens do 2PC
+\begin{figure}
+  \centering
+  \includegraphics[width=.40\textwidth]{2PC_1fase} 
+  \caption{Primeira fase - coordenador inicia a votação e os participantes respondem com seus votos $V_i$}
+  \label{fig:2PC_1fase} 
+\end{figure}
 
-É importante notar que este protocolo não define como as operações da transação devem ser executadas nas máquinas participantes, mas sim como a efetivação da transação deve proceder. As operações da transação devem ser todas enviadas para cada participante antes que o protocolo de efetivação inicie. Portanto, a execução deste protocolo aumenta o número de mensagens e consequentemente o tempo e o esforço necessários para que uma transação seja executada. Algumas otimizações podem ocorrer, como no caso de transações que efetuam somente operações de leitura ou de transações que envolvam dados em somente uma máquina do sistema, mas de forma geral, a execução do protocolo de efetivação de duas fases é custoso *** TODO encontrar alguma referência que corrobore isso :S...
+\begin{figure}
+  \centering
+  \includegraphics[width=.40\textwidth]{2PC_2fase} 
+  \caption{Segunda fase - coordenador apura os votos e notifica os participantes. Em (a) os participantes são notificados de uma efetivação. Em (b), a transação foi abortada.}
+  \label{fig:2PC_2fase} 
+\end{figure}
+
+É importante notar que este protocolo não define como as operações da transação devem ser executadas nas máquinas participantes, mas sim como a efetivação da transação deve proceder. As operações da transação devem ser todas enviadas para cada participante antes que o protocolo de efetivação inicie. Portanto, a execução deste protocolo aumenta o número de mensagens e consequentemente o tempo e o esforço necessários para que uma transação seja executada. Algumas otimizações podem ocorrer, como no caso de transações que efetuam somente operações de leitura ou de transações que envolvam dados em somente uma máquina do sistema, mas de forma geral, a execução do protocolo de efetivação de duas fases é custoso \cite{gray-lamport}.
 
 \section{Minitransações}
 \label{sec:minitransacoes}
 As minitransações podem ser vistas como uma otimização do protocolo de efetivação de duas fases descrito em \ref{sec:2pc} em relação ao número de mensagens utilizadas. Elas constituem um mecanismo simples para ler e alterar dados em um ambiente distribuído garantindo atomicidade, consistência, isolamento e durabilidade \cite{sinfonia}. Porém, este ganho com a redução do número de mensagens utilizadas é obtido através da imposição de certas restrições em relação ao que pode ser feito com uma minitransação, diminuindo sua aplicabilidade.
 
-Em \ref{subsec:derivando-minitransacoes} é apresentado como o protocolo 2PC pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações. \ref{subsec:estrutura-minitransacoes} ilustra a estrutura de uma minitransação, e em \ref{subsec:pros-contras-minitransacoes} são apresentados os pontos negativos e positivos da utilização de minitransações.
+Em \ref{subsec:derivando-minitransacoes} é apresentado como o protocolo 2PC pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações e em \ref{subsec:estrutura-minitransacoes} ilustra a estrutura de uma minitransação.
 
 \subsection{Otimização do 2PC}
 \label{subsec:derivando-minitransacoes}
