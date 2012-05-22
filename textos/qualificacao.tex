@@ -244,16 +244,16 @@ Esta introdução apresenta o contexto de utilização das minitransações e os
 
 \chapter{Conceitos}
 \label{chap:conceitos}
-Como as minitransações são uma extensão do protocolo 2PC, este capítulo irá apresentar uma revisão dos conceitos relacionados a sistemas distribuídos, transações, transações distribuídas e, por fim, uma detalhada explicação sobre as minitransações.
+Como as minitransações são uma extensão do protocolo 2PC, este capítulo irá apresentar uma revisão dos conceitos relacionados a transações, transações distribuídas e, por fim, uma detalhada explicação sobre as minitransações.
 
 \section{Transações}
 \label{sec:transacoes}
-Aplicações executam operações, de variados tipos e para diversas finalidades, como somar dois números, ler uma tecla digitada do teclado ou enviar um \emph{email} através da rede. Uma transação é um conjunto de operações que devem ser executadas como um todo indivisível. O exemplo mais clássico e difundido é o de transações de bancos de dados. Neste contexto, transação é a unidade de execução de operações em um banco de dados, composta por uma sequência de comandos de leitura e escrita de dados \cite{garcia-molina, vaca}. Através das transações os aplicativos acessam ou modificam informações em um banco de dados, e é através da execução de transações que o gerenciador de banco de dados permite que diversas aplicações possam interagir de forma concorrente com o banco de dados.
+Aplicações executam operações, de variados tipos e para diversas finalidades, como somar dois números, ler uma tecla digitada do teclado ou enviar um \emph{email} através da rede. Uma transação é um conjunto de operações que devem ser executadas como um todo indivisível. O exemplo mais clássico e difundido é o de transações de bancos de dados. Neste contexto, transação é a unidade de execução de operações em um banco de dados, composta por uma sequência de comandos de leitura e escrita de dados \cite{garcia-molina, vaca}. Através das transações os aplicativos acessam ou modificam informações em um banco de dados, e é através da execução de transações que o gerenciador de banco de dados permite que diversas aplicações possam interagir ao mesmo tempo com o banco de dados.
 
 Há quatro propriedades das transações que o gerenciador de banco de dados precisa garantir em um cenário de acessos concorrentes e falhas de sistema:
 
 \begin{enumerate}
-\item \emph{Atomicidade}: ou todas as operações são executadas com sucesso, ou nenhuma operação é executada. Com isso, o desenvolvedor de aplicações não precisa se preocupar com o efeito de transações incompletas, como quando ocorrem falhas do sistema. Esta propriedade é obtida através do desfazimento de operações já executadas de transações que não foram efetivadas. O gerenciador do banco de dados utiliza uma técnica em que as operações são primeiro escritas em uma tabela de registro de operações (\emph{log}), para depois serem executadas no banco de dados propriamente dito. Caso a transação não seja efetivada, esta tabela é utilizada para desfazer as operações já executadas.
+\item \emph{Atomicidade}: ou todas as operações são executadas com sucesso, ou nenhuma operação é executada. Com isso, o desenvolvedor de aplicações não precisa se preocupar com o efeito de transações incompletas, como quando ocorrem falhas do sistema. Esta propriedade é obtida através do desfazimento de operações já executadas de transações que não foram efetivadas. O gerenciador do banco de dados utiliza uma técnica em que as operações são primeiro escritas em uma tabela de registro de operações (\emph{log}), para depois serem efetivadas no banco de dados propriamente dito.
 \item \emph{Consistência}: cada transação deve levar o banco de dados de um estado consistente para outro estado consistente. Esta propriedade depende essencialmente do desenvolvedor de aplicações --- o gerenciador de banco de dados pode auxiliar através de restrições sobre os dados que podem ser configuradas mas, no final, a semântica da consistência fica sob responsabilidade do desenvolvedor. Se retomarmos ao exemplo do sistema bancário, a transferência entre as contas não deve alterar o valor total da soma dos saldos das contas individuais envolvidas na transação.
 \item \emph{Isolamento}: a execução de uma transação não pode interferir na execução de outras transações, garantindo que mesmo que as operações executadas por diferentes transações possam ser intercaladas por questões de performance ou aproveitamento de recursos o resultado final da execução das transações será equivalente ao resultado de alguma execução sequencial de todas as transações.
 \item \emph{Durabilidade}: uma vez que a transação tenha sido efetivada, os efeitos de sua execução devem persistir mesmo em casos de falha. A durabilidade garante que os efeitos gerados por uma transação efetivada sejam permanentes, mesmo que ocorram falhas após a efetivação da transação. Um \emph{log} também é utilizado para a garantir a durabilidade. Uma vez que ocorra uma falha e o sistema se recupere, o gerenciador irá vasculhar a tabela de registro de operações em busca de transações que tenham sido efetivadas mas cujos efeitos não estejam refletidos no banco de dados, para executar novamente os comandos da transação.
@@ -261,7 +261,7 @@ Há quatro propriedades das transações que o gerenciador de banco de dados pre
 
 %Estas quatro propriedades são conhecidas como propriedades \emph{ACID}. As transações \emph{ACID}, como são chamadas, são uma característica dos \emph{SGBD}s, permitindo que um grande número de aplicações utilizem de forma concorrente o banco de dados. Através da utilização destas transações uma aplicação pode interagir com o banco de dados sem notar que outras aplicações estão interagindo com o banco de dados também, acessando e alterando possivelmente os mesmos dados.
 
-Como motivação para a necessidade destas propriedades, vamos supor que em um sistema de controle de contas bancárias existam três contas A, B e C com saldos 20, 10 e 5, respectivamente. Vamos considerar o algoritmo \ref{alg:transferencia_valores} que descreve a operação de transferência entre duas contas, origem e destino, de um determinado valor.
+A exposição de uma interface de acesso a um sistema através de transações \emph{ACID} (\textbf{A}tomicidade, \textbf{C}onsistência, \textbf{I}solamento e \textbf{D}urabilidade) permite que o desenvolvedor que utiliza este sistema pode utilizá-lo de mais simples e intuitiva, sem precisar se preocupar com controles de concorrência ou outros aspectos do tipo. Por exemplo, vamos supor que em um sistema de controle de contas bancárias existam três contas A, B e C com saldos 20, 10 e 5, respectivamente. Vamos considerar o algoritmo \ref{alg:transferencia_valores} que descreve a operação de transferência entre duas contas, origem e destino, de um determinado valor.
 
 \begin{algorithm}
 \caption{Transferência de valores entre contas}
@@ -283,7 +283,7 @@ As funções $Ler$ e $Escrever$ representam as operações de leitura e escrita,
 
 Embora este algoritmo esteja correto, se considerarmos a execução concorrente de aplicações que implementem este algoritmo poderemos observar eventuais inconsistências na invariante do sistema que diz que o valor total das contas deve ser mantido. Duas aplicações, que implementam este algoritmo, executando concorrentemente tentarão transferir, respectivamente, o valor 10 da conta A para a conta B e o valor 15 da conta A para a conta C. As operações das transações podem ser intercaladas de tal forma que as aplicações executem $VO \gets Ler(O)$ e observem o mesmo valor de $VO$. Como o valor inicial da conta A é 20, a condição $VO >= V$ será verdadeira para a duas aplicações (pois V será 10 para uma aplicação e 15 para outra) e, assim, as duas aplicações executarão a transferência e teremos então a conta B com saldo 20, a conta C com saldo 20 e a conta A poderá ter tanto o valor 10 quanto o valor 5 (dependendo de qual aplicação executar a escrita por último), totalizando 50 ou 45, ambos diferentes do valor inicial 35 (20 + 10 + 5).
 
-Portanto, interações de transações concorrentes podem levar o banco de dados a um estado inconsistente, mesmo que individualmente cada transação garanta a consistência dos dados. Assim, para garantir a consistência dos dados algum tipo de controle de concorrência deve ser feito para permitir que as operações das diversas transações possam ser executadas concorrentemente, mas garantindo a consistência. Para formalizar o estudo de um mecanismo que permita a execução concorrente e consistente de transações é utilizado o conceito de \textbf{escalonamento}, que é uma sequência ordenada, de forma temporal, de operações ($Ler$ e $Escrever$) de uma ou mais transações. Dois possíveis escalonamentos para as operações das transações descritas anteriormente podem ser vistos na tabela \ref{tab:exemplo_escalonamento} (consideramos que o tempo aumenta conforme as operações são executadas da primeira para a última linha da tabela).
+Portanto, interações de transações concorrentes podem levar o banco de dados a um estado inconsistente, mesmo que individualmente cada transação garanta a consistência dos dados. Assim, para garantir a consistência dos dados algum tipo de controle de concorrência deve ser feito para permitir que as operações das diversas transações possam ser executadas concorrentemente. Para formalizar o estudo de um mecanismo que permita a execução concorrente e consistente de transações é utilizado o conceito de \textbf{escalonamento}, que é uma sequência ordenada, de forma temporal, de operações ($Ler$ e $Escrever$) de uma ou mais transações. Dois possíveis escalonamentos para as operações das transações descritas anteriormente podem ser vistos na tabela \ref{tab:exemplo_escalonamento} (consideramos que o tempo aumenta conforme as operações são executadas da primeira para a última linha da tabela).
 
 \begin{table}
 \caption{Dois possíveis escalonamentos para as operações de transferência entre contas}
@@ -302,8 +302,6 @@ Portanto, interações de transações concorrentes podem levar o banco de dados
 	\hline
 \end{tabular}
 \end{table}
-
-A maneira mais simples de garantir a consistência é forçar a execução sequencial das transações, ou seja, somente uma transação executa por vez enquanto a execução das outras é postergada até o término da execução atual. Um \textbf{escalonamento sequencial} é um escalonamento em que as operações de uma transação estão agrupadas, ou seja, as operações de transações diferentes não são intercaladas, como pode ser visto na tabela \ref{tab:escalonamento_sequencial}.
 
 \begin{table}
 \caption{Escalonamentos sequenciais das operações de transferência entre contas}
@@ -324,8 +322,6 @@ A maneira mais simples de garantir a consistência é forçar a execução seque
 \end{tabular}
 \end{table}
 
-Esta forma não é a ideal pois desperdiça recursos ao não permitir a intercalação de operações de diferentes transações. Assim, definimos o conceito de um \textbf{escalonamento sequenciável} como sendo um escalonamento em que o resultado de sua execução é equivalente ao resultado de uma execução de um escalonamento sequencial. O escalonamento ilustrado na tabela \ref{tab:escalonamento_sequenciavel} produz como resultado de sua execução o mesmo resultado da execução do escalonamento da primeira coluna da tabela \ref{tab:escalonamento_sequencial}.
-
 \begin{table}
 \caption{Escalonamento sequenciável das operações de transferência entre contas}
 \label{tab:escalonamento_sequenciavel}
@@ -344,11 +340,19 @@ Esta forma não é a ideal pois desperdiça recursos ao não permitir a intercal
 \end{tabular}
 \end{table}
 
-Um escalonamento sequenciável pode ser obtido através do uso de \textbf{travas} (\emph{locks}), um mecanismo que permite identificar quais dados estão sendo usados, e de que forma, para verificar se esses dados podem ser acessados para leituras ou escritas. O tipo de trava mais simples é uma varíavel binária associada ao dado: caso essa variável tenha valor 0 o dado não está travado por outra transação e pode ser utilizado, atribuindo então o valor 1 a essa variável durante a utilização; caso o valor seja 1, o dado está sendo utilizado e não pode ser acessado até que o valor da variável seja 0. As transações precisam portanto adquirir travas para que possam ler ou escrever os dados, e precisam liberar estas travas ao fim da operação para permitir que outras transações possam utilizar os mesmos dados. Este tipo de trava binária é um tanto restritiva pois impede a ocorrência concorrente de operações que não causam inconsistência dos dados, como leituras concorrentes, e um tipo mais sofisticado será apresentado na seção \ref{chap:implementacao}.
+Um \textbf{escalonamento sequencial} é um escalonamento em que as operações de uma transação estão agrupadas, ou seja, as operações de transações diferentes não são intercaladas, como pode ser visto na tabela \ref{tab:escalonamento_sequencial}. Um \textbf{escalonamento sequenciável} como sendo um escalonamento em que o resultado de sua execução é equivalente ao resultado de uma execução de um escalonamento sequencial. O escalonamento ilustrado na tabela \ref{tab:escalonamento_sequenciavel} produz como resultado de sua execução o mesmo resultado da execução do escalonamento da coluna esquerda da tabela \ref{tab:escalonamento_sequencial}.
 
-Travas são um exemplo de abordagem pessimista para controle de concorrência. Existe também a abordagem otimista, em que o gerenciador permite que os dados sejam alterados e acessados sem nenhum controle prévio. De forma simplificada, mecanismos que utilizam a abordagem otimista copiam os dados para uma área temporária exclusiva da transação, e as operações são efetuadas nesta área. Somente no momento da efetivação é que o gerenciador irá checar se houve conflito com outras transações, e então é necessário algum mecanismo para resolução destes conflitos. Como a implementação apresentada em \ref{chap:implementacao} irá utilizar uma abordagem pessimista, não iremos abordar este assunto a fundo.
+O uso de mecanismos como \textbf{travas} e \emph{logs} são uma maneira de implementar um escalonamento sequenciável de operações de transações simultâneas. As travas controlam o acesso aos dados e os \emph{logs} permitem que operações possam ser refeitas ou desfeitas, garantindo assim isolamento entre as operações de diferentes transações, atomicidade em situações de erro e durabilidade em cenários de recuperação de falhas.
 
-*** TODO verificar se vale a pensa citar os níveis de isolamento de transações... acho que vale, por que o uso de travas faz mais sentido para o nível READ COMMITED, que é o default, mas existem outros níveis mais "frouxos"...
+%A atomicidade e a durabilidade das transações é garantida através da utilização do \emph{log}, uma estrutura que registra as operações que alteram os dados do sistema em uso. O \emph{log} permite que alterações possam ser desfeitas em um cenário de falha de alguma operação, garantindo a atomicidade da transação; permite também que operações possam ser refeitas caso ocorra alguma falha entre a efetivação da transação e a escrita permanente 
+
+%Um escalonamento sequenciável pode ser obtido através do uso de \textbf{travas} (\emph{locks}), um mecanismo que permite identificar quais dados estão sendo usados, e de que forma, para verificar se esses dados podem ser acessados para leituras ou escritas. A utilização de um escalonamento sequenciável aliada à utilização de um \emph{log} permite que 
+
+%O tipo de trava mais simples é uma varíavel binária associada ao dado: caso essa variável tenha valor 0 o dado não está travado por outra transação e pode ser utilizado, atribuindo então o valor 1 a essa variável durante a utilização; caso o valor seja 1, o dado está sendo utilizado e não pode ser acessado até que o valor da variável seja 0. As transações precisam portanto adquirir travas para que possam ler ou escrever os dados, e precisam liberar estas travas ao fim da operação para permitir que outras transações possam utilizar os mesmos dados. Este tipo de trava binária é um tanto restritiva pois impede a ocorrência concorrente de operações que não causam inconsistência dos dados, como leituras concorrentes, e um tipo mais sofisticado será apresentado na seção \ref{chap:implementacao}.
+
+%Travas são um exemplo de abordagem pessimista para controle de concorrência. Existe também a abordagem otimista, em que o gerenciador permite que os dados sejam alterados e acessados sem nenhum controle prévio. De forma simplificada, mecanismos que utilizam a abordagem otimista copiam os dados para uma área temporária exclusiva da transação, e as operações são efetuadas nesta área. Somente no momento da efetivação é que o gerenciador irá checar se houve conflito com outras transações, e então é necessário algum mecanismo para resolução destes conflitos. Como a implementação apresentada em \ref{chap:implementacao} irá utilizar uma abordagem pessimista, não iremos abordar este assunto a fundo.
+
+%*** TODO verificar se vale a pensa citar os níveis de isolamento de transações... acho que vale, por que o uso de travas faz mais sentido para o nível READ COMMITED, que é o default, mas existem outros níveis mais "frouxos"...
 
 \section{Transações distribuídas}
 \label{sec:transacoes_distribuidas}
@@ -356,7 +360,9 @@ Bancos de dados distribuídos apresentam benefícios tais como a possibilidade d
 
 Uma transação distribuída é uma transação que engloba operações que executam em diversas máquinas na forma de subtransações, subordinadas à transação, e que é finalizada por uma requisição para efetivar ou abortar a transação \cite{gray-lamport}. Os requisitos de atomicidade, consistência, isolamento e durabilidade continuam válidos para estas transações, tornando assim a execução de transações distribuídas mais complexa.
 
-Por exemplo, vamos considerar novamente o problema da transferência entre contas de um sistema bancário, como descrito na seção \ref{sec:transacoes}. O algoritmo utilizado ainda é o \ref{alg:transferencia_valores}, e vamos considerar somente duas contas A (origem) e B (destino) para este exemplo, distribuídas em duas máquinas distintas i e j, respectivamente. Uma aplicação irá executar a transação, gerando duas subtransações para serem executadas nas máquinas i e j, como na figura \ref{fig:transacao_distribuida}. Cada operação de leitura e escrita é executada na máquina responsável pela conta sendo lida ou alterada. Mesmo com a garantia de que cada subtransação é ACID, não podemos afirmar que a transação como um todo seja, pois caso alguma máquina, digamos a máquina j, falhe durante a operação de escrita, a subtransação executada na máquina i já terá sido efetivada.
+Por exemplo, vamos considerar novamente o problema da transferência entre contas de um sistema bancário, como descrito na seção \ref{sec:transacoes}. O algoritmo utilizado ainda é o \ref{alg:transferencia_valores}, e vamos considerar somente duas contas A (origem) e B (destino) para este exemplo, distribuídas em duas máquinas distintas i e j, respectivamente. Uma aplicação irá executar a transação, gerando duas subtransações para serem executadas nas máquinas i e j, como na figura \ref{fig:transacao_distribuida}. Cada operação de leitura e escrita é executada na máquina responsável pela conta sendo lida ou alterada. 
+
+%Mesmo com a garantia de que cada subtransação é ACID, não podemos afirmar que a transação como um todo seja, pois caso alguma máquina, digamos a máquina j, falhe durante a operação de escrita, a subtransação executada na máquina i já terá sido efetivada.
 
 \begin{figure}
   \centering
@@ -365,21 +371,23 @@ Por exemplo, vamos considerar novamente o problema da transferência entre conta
   \label{fig:transacao_distribuida} 
 \end{figure}
 
-A atomicidade em um ambiente distribuído é mais difícil de se implementar do que em um ambiente centralizado devido aos novos erros que podem surgir, como falhas de comunicação ou de máquinas remotas. Por exemplo, digamos que a máquina i armazene a conta A e a máquina j armazene a conta B. Quando a aplicação inicia o procedimento que implementa o algoritmo para transferência entre contas, ela cria duas transações, uma na máquina i e outra na máquina j. A efetivação da transação na máquina i ocorre após a escrita na conta A e a efetivação na máquina j ocorre após a escrita na conta B. Se a máquina j não puder efetivar a sua transação, o sistema ficará inconsistente pois a transação na máquina i foi efetivada, ou seja, o valor foi subtraído da conta A.
+%A atomicidade em um ambiente distribuído é mais difícil de se implementar do que em um ambiente centralizado devido aos novos erros que podem surgir, como falhas de comunicação ou de máquinas remotas. Por exemplo, digamos que a máquina i armazene a conta A e a máquina j armazene a conta B. 
+
+Quando a aplicação inicia o procedimento que implementa o algoritmo para transferência entre contas, ela cria duas transações, uma na máquina i e outra na máquina j. A efetivação da transação na máquina i ocorre após a escrita na conta A e a efetivação na máquina j ocorre após a escrita na conta B. Se a máquina j não puder efetivar a sua transação, o sistema ficará inconsistente pois a transação na máquina i foi efetivada, ou seja, o valor foi subtraído da conta A.
 
 Por isso, o controle de atomicidade em um banco de dados distribuído torna necessário algum mecanismo que permita que a transação seja bem sucedida somente se todas as subtransações forem bem sucedidas também, ou que a transação seja abortada caso alguma subtransação falhe. Este mecanismo é o protocolo de efetivação, que define uma série de passos a serem seguidos pelas máquinas executando as subtransações de forma que todas as máquinas envolvidas na transação concordem sobre a decisão de efetivar ou abortar a transação para que a atomicidade da transação seja garantida. O protocolo de efetivação mais usado é chamado de protocolo de efetivação de duas fases (\emph{Two-Phase Commit} --- 2PC), e ele será explicado na seção \ref{sec:2pc}.
 
-A recuperação de falhas em transações distribuídas também é complexa pois a qualquer momento uma máquina envolvida na transação pode falhar. É preciso ser garantido que quando a máquina que falhou voltar a operar a sua decisão em relação a efetivar ou abortar a transação seja consistente com a decisão global tomada para a transação. A recuperação de falhas está ligada à durabilidade da transação e está relacionada com a decisão de efetivar ou não a transação, e por isso também será ilustrado um mecanismo de recuperação de falhas na seção \ref{sec:2pc}.
+%A recuperação de falhas em transações distribuídas também é complexa pois a qualquer momento uma máquina envolvida na transação pode falhar. É preciso ser garantido que quando a máquina que falhou voltar a operar a sua decisão em relação a efetivar ou abortar a transação seja consistente com a decisão global tomada para a transação. A recuperação de falhas está ligada à durabilidade da transação e está relacionada com a decisão de efetivar ou não a transação, e por isso também será ilustrado um mecanismo de recuperação de falhas na seção \ref{sec:2pc}.
 
-Como descrito anteriormente na seção \ref{sec:transacoes}, uma maneira de efetuar controle de concorrência é através do uso de travas associadas aos dados acessados. Em um sistema não distribuído, o controle de alocação e liberação destas travas fica a cargo de um gerenciador de travas, um único componente que centraliza e sabe sobre todas as travas ativas no banco. Em um sistema distribuído, este gerenciamento de travas pode ser feito de várias maneira, variando desde de uma implementação totalmente centralizada, em que uma única máquina fica responsável por controlar os acessos, até uma implementação totalmente distribuída. A implementação centralizada é mais simples e direta, mas deixa o sistema vulnerável --- se a máquina escolhida para o gerenciamento de travas falhar, o sistema ficará indisponível. A abordagem totalmente centralizada torna o sistema mais independente e tolerante a falhas, mas aumenta a complexidade e a necessidade de comunicação entre as máquinas.
+Como descrito anteriormente na seção \ref{sec:transacoes}, uma maneira de efetuar controle de concorrência é através do uso de travas associadas aos dados acessados. Em um sistema não distribuído, o controle de alocação e liberação destas travas fica a cargo de um gerenciador de travas, um único componente que centraliza e sabe sobre todas as travas ativas no banco. Em um sistema distribuído, este gerenciamento de travas pode ser feito de várias maneira, variando desde de uma implementação totalmente centralizada, em que uma única máquina fica responsável por controlar os acessos, até uma implementação totalmente distribuída. A implementação centralizada é mais simples e direta, mas deixa o sistema vulnerável --- se a máquina escolhida para o gerenciamento de travas falhar, o sistema ficará indisponível. A abordagem totalmente distribuída torna o sistema mais independente e tolerante a falhas, mas aumenta a complexidade e a necessidade de comunicação entre as máquinas.
 
 \section{Protocolo de efetivação de duas fases}
 \label{sec:2pc}
-A idéia deste protocolo é simples e utilizada a bastante tempo \cite{2pc}: verificar se todas as máquinas envolvidas em uma transação estão aptos a efetivar suas respectivas subtransações. Se estiverem, a transação será efetivada. Se algum participante não puder efetivar, por qualquer motivo, a transação será abortada. Neste protocolo existe o \textbf{coordenador}, uma máquina responsável por gerenciar a execução do protocolo e tomar a decisão sobre efetivar ou abortar a transação através da troca de mensagens com os \textbf{participantes}, as máquinas que executam as subtransações associadas à transação. O coordenador pode ser também um participante da transação.
+A idéia deste protocolo é simples e utilizada a bastante tempo \cite{2pc}: verificar se todas as máquinas envolvidas em uma transação estão aptas a efetivar suas respectivas subtransações. Se estiverem, a transação será efetivada. Se algum participante não puder efetivar, por qualquer motivo, a transação será abortada. Neste protocolo existe o \textbf{coordenador}, uma máquina responsável por gerenciar a execução do protocolo e tomar a decisão sobre efetivar ou abortar a transação através da troca de mensagens com os \textbf{participantes}, as máquinas que executam as subtransações associadas à transação. O coordenador pode ser também um participante da transação.
 
-Como seu nome diz, o protocolo é dividido em duas fases, ou rodadas. Na primeira fase o coordenador pede para que os participantes enviem seu voto sobre se a transação pode ser efetivada ou não. Os votos são coletados e o coordenador avalia seus valores, decidindo se a transação pode ser efetivada (caso todos os participantes tenham votado de acordo) ou se deve ser abortada (caso algum participante tenha votado para não efetivar a transação). Decidido o resultado da votação, o coordenador efetua a segunda fase, em que os participantes são notificados do resultado da votação. Entre a execução da subtransação em cada participante e sua respectiva efetivação ou aborto, cada participante deve ser capaz de registrar as alterações efetuadas de forma permanente porém não definitiva, ou seja, de forma que possam ser desfeitas caso a transação seja abortada ou que possam ser aplicadas ao banco caso a transação seja efetivada. Neste contexto, os \emph{logs} dos participantes e do coordenador são de extrema importância no controle da transação distribuída e na garantia de sua atomicidade e durabilidade.
+Como seu nome diz, o protocolo é dividido em duas fases, ou rodadas. Na primeira fase o coordenador pede para que os participantes enviem seu voto para opinar se a transação pode ser efetivada ou não. Os votos são coletados e o coordenador avalia seus valores, decidindo se a transação pode ser efetivada (caso todos os participantes tenham votado de acordo) ou se deve ser abortada (caso algum participante tenha votado para não efetivar a transação). Decidido o resultado da votação, o coordenador efetua a segunda fase, em que os participantes são notificados do resultado da votação. Entre a execução da subtransação em cada participante e sua respectiva efetivação ou aborto, cada participante deve ser capaz de registrar as alterações efetuadas de forma permanente porém não definitiva, ou seja, de forma que possam ser desfeitas caso a transação seja abortada ou que possam ser aplicadas ao banco caso a transação seja efetivada. Neste contexto, os \emph{logs} dos participantes e do coordenador são de extrema importância no controle da transação distribuída e na garantia de sua atomicidade e durabilidade.
 
-De forma mais detalhada, o protocolo de efetivação executa os algoritmos \ref{alg:2pc_coordenador}, \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} para efetivar uma transação $T$. O algoritmo \ref{alg:2pc_coordenador} descreve as ações do coordenador ao ser notificado que o protocolo deve iniciar. Os algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} descrevem como os passos executados pelos participantes ao receberem uma solicitação de votação (primeira fase) e o resultado da votação (segunda fase), respectivamente. A função $Adicionar$ representa a operação de adicionar um elemento no final no \emph{log}. A função $Enviar(d, m)$ representa o envio de uma mensagem $m$ para um destinatário $d$, e a função $Receber(r)$ representa o recebimento de uma mensagem de um remetente $r$. Uma visualização da execução do algoritmo pode ser vista nas figuras \ref{fig:2PC_1fase} e \ref{fig:2PC_2fase}.
+De forma mais detalhada, o protocolo de efetivação executa os algoritmos \ref{alg:2pc_coordenador}, \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} para efetivar uma transação $T$. O algoritmo \ref{alg:2pc_coordenador} descreve as ações do coordenador ao ser notificado que o protocolo deve iniciar. Os algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} descrevem como os passos executados pelos participantes ao receberem uma solicitação de votação (primeira fase) e o resultado da votação (segunda fase), respectivamente. A função $Adicionar$ representa a operação de adicionar um elemento ao final do \emph{log}. A função $Enviar(d, m)$ representa o envio de uma mensagem $m$ para um destinatário $d$, e a função $Receber(r)$ representa o recebimento de uma mensagem de um remetente $r$. Uma visualização da execução do algoritmo pode ser vista nas figuras \ref{fig:2PC_1fase} e \ref{fig:2PC_2fase}.
 
 \begin{algorithm}
 \caption{Coordenador 2PC}
@@ -427,9 +435,9 @@ De forma mais detalhada, o protocolo de efetivação executa os algoritmos \ref{
 \end{algorithmic}
 \end{algorithm}
 
-A premissa que norteia o protocolo é que qualquer máquina envolvida na transação pode decidir abortá-la de forma unilateral, exigindo assim unanimidade na decisão pela efetivação da transação. As mensagens enviadas durante a execução do protocolo indicam uma decisão do remetente, e para garantir que essa decisão sobreviva a falhas na máquina que enviou a mensagem, os dados do \emph{log} são forçados para uma forma de armazenamento estável, como um disco rígido, antes da mensagem ser enviada.
+A premissa que norteia o protocolo é que qualquer máquina envolvida na transação pode decidir abortá-la de forma unilateral, exigindo assim unanimidade na decisão pela efetivação da transação. As mensagens enviadas durante a execução do protocolo indicam uma decisão do remetente, e para garantir que essa decisão sobreviva a falhas na máquina que enviou a mensagem, os dados do \emph{log} são gravados em um meio de armazenamento estável, como um disco rígido, antes da mensagem ser enviada.
 
-A transação $T$ é considerada oficialmente efetivada (ou abortada) no momento que o registro de $(EFETIVAR, T)$ (ou $(ABORTAR, T)$) do \emph{log} do coordenador for escrito para a área de armazenamento estável da máquina. Falhas posteriores não podem mudar o resultado da decisão do coordenador registrado em seu \emph{log} e salvo em disco.
+A transação $T$ é considerada oficialmente efetivada (ou abortada) no momento que o registro de $(EFETIVAR, T)$ (ou $(ABORTAR, T)$) do \emph{log} do coordenador for escrito para a área de armazenamento estável da máquina. Falhas posteriores não podem mudar a decisão do coordenador registrada em seu \emph{log} e gravada em disco.
 
 \begin{figure}
   \centering
@@ -445,17 +453,17 @@ A transação $T$ é considerada oficialmente efetivada (ou abortada) no momento
   \label{fig:2PC_2fase} 
 \end{figure}
 
-É importante notar que este protocolo não define como as operações da transação devem ser executadas nas máquinas participantes, mas sim como a efetivação da transação deve proceder. As operações da transação devem ser todas enviadas para cada participante antes que o protocolo de efetivação inicie. Portanto, a execução deste protocolo aumenta o número de mensagens e consequentemente o tempo e o esforço necessários para que uma transação seja executada. Algumas otimizações podem ocorrer, como no caso de transações que efetuam somente operações de leitura ou de transações que envolvam dados em somente uma máquina do sistema, mas de forma geral, a execução do protocolo de efetivação de duas fases é custoso \cite{gray-lamport}.
+É importante notar que este protocolo não define como as operações da transação devem ser executadas nas máquinas participantes, mas sim como a efetivação da transação deve proceder. As operações da transação devem ser todas enviadas para cada participante antes que o protocolo de efetivação inicie. Portanto, a execução deste protocolo aumenta o número de mensagens e consequentemente o tempo e o esforço necessários para que uma transação seja executada. Algumas otimizações podem ocorrer, como no caso de transações que efetuam somente operações de leitura ou de transações que envolvam dados em somente uma máquina do sistema mas, de forma geral, a execução do protocolo de efetivação de duas fases é custoso \cite{gray-lamport}.
 
 \section{Minitransações}
 \label{sec:minitransacoes}
 As minitransações podem ser vistas como uma otimização do protocolo de efetivação de duas fases descrito em \ref{sec:2pc} em relação ao número de mensagens utilizadas. Elas constituem um mecanismo simples para ler e alterar dados em um ambiente distribuído garantindo atomicidade, consistência, isolamento e durabilidade \cite{sinfonia}. Porém, este ganho com a redução do número de mensagens utilizadas é obtido através da imposição de certas restrições em relação ao que pode ser feito com uma minitransação, diminuindo sua aplicabilidade.
 
-Em \ref{subsec:derivando-minitransacoes} é apresentado como o protocolo 2PC pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações e em \ref{subsec:estrutura-minitransacoes} ilustra a estrutura de uma minitransação.
+Em \ref{subsec:derivando-minitransacoes} é apresentado como o protocolo 2PC pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações e em \ref{subsec:estrutura-minitransacoes} é descrita a estrutura e o protocolo de execução de uma minitransação.
 
 \subsection{Otimização do 2PC}
 \label{subsec:derivando-minitransacoes}
-A decisão pela efetivação ou cancelamento de uma transação distribuída depende tanto de aspectos operacionais quanto de aspectos semânticos específicos da aplicação. A falha na execução de uma subtransação em alguma máquina do ambiente inviabiliza a efetivação da transação como um todo, e por isso o coordenador é forçado a cancelar a transação. Este tipo de falha operacional não está ligada ao domínio da aplicação, mas sim ao ambiente em que esta aplicação está rodando e está, portanto, fora do controle do coordenador, que pode somente cancelar a transação e, opcionalmente, tentar executá-la novamente. Por outro lado, o aspecto semântico envolvido na decisão pela efetivação ou cancelamento da transação é específico de cada aplicação e depende, direta ou indiretamente, dos dados do sistema.
+A decisão pela efetivação ou cancelamento de uma transação distribuída depende tanto de aspectos operacionais, relacionados ao ambiente de execução, quanto de aspectos semânticos, específicos do domínio da aplicação. A falha na execução de uma subtransação em alguma máquina do ambiente inviabiliza a efetivação da transação como um todo, e por isso o coordenador é forçado a cancelar a transação. Este tipo de falha operacional não está ligada ao domínio da aplicação, mas sim ao ambiente em que esta aplicação está rodando e está, portanto, fora do controle do coordenador, que pode somente cancelar a transação e, opcionalmente, tentar executá-la novamente. Por outro lado, o aspecto semântico envolvido na decisão pela efetivação ou cancelamento da transação é específico de cada aplicação e depende, direta ou indiretamente, dos dados do sistema.
 
 Considerando novamente o sistema bancário e a operação de transferência de uma determinada quantia entre uma conta de origem e de destino, a transferência só pode ocorrer se o saldo na conta de origem da transferência for maior ou igual à quantia a ser transferida. Esse checagem deve ser feita pela aplicação após a leitura da informação da máquina que armazena os dados da conta de origem, e a decisão pelo cancelamento ou não da transação fica subordinado à semântica dada aos dados do sistema. Isso exige que uma requisição de leitura seja feita e uma resposta seja enviada, para só então a aplicação decidir se vai efetivar e então, após a execução do restante da transação, iniciar a primeira fase do protocolo 2PC (votação).
 
@@ -467,11 +475,16 @@ As minitransações surgem no contexto em que todas as operações de uma subtra
 
 \subsection{Estrutura e protocolo}
 \label{subsec:estrutura-minitransacoes}
-Uma minitransação consiste de um conjunto de itens de comparação, de leitura e de escrita. Todos os itens possuem uma referência a qual dado deve ser utilizado, e os itens de comparação e escrita incluem também informações que serão comparados com ou que irão sobrescrever os dados armazenados. 
+Uma minitransação consiste de três conjuntos: itens de comparação, itens de leitura e itens de escrita, como pode ser visto na figura \ref{fig:estrutura_minitransacao}. Todos os itens possuem uma referência a qual dado deve ser utilizado, e os itens de comparação e escrita incluem também dados, que serão comparadas com ou substituirão os dados armazenados, respectivamente. 
 
-*** TODO colocar uma imagem com a estrutra da minitransação
+\begin{figure}
+  \centering
+  \includegraphics[width=.40\textwidth]{estrutura_minitransacao} 
+  \caption{Estrutura de uma minitransação}
+  \label{fig:estrutura_minitransacao} 
+\end{figure}
 
-Formalmente, uma minitransação pode ser vista como uma tupla na forma \( (T, C, L, E) \). \(T\) é o identificador da minitransação, permitindo aos participantes diferenciar e tratar minitransações simultâneas. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((Id, Dado)\), em que \(Id\) é o identificador do dado e \(Dado\) é o valor para se comparar com o valor identificador por $Id$ ou para substituí-lo.
+Formalmente, uma minitransação pode ser vista como uma tupla na forma $(I_t, C, L, E)$. $I_t$ é o identificador da minitransação, permitindo aos participantes diferenciar e tratar minitransações simultâneas. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((Id, Dado)\), em que \(Id\) é o identificador do dado e \(Dado\) é o valor para se comparar com o valor identificado por $Id$ ou para substituí-lo.
 
 Para cada máquina \(P_i\) podemos definir \(K_i\) como sendo o conjunto de identificadores de dados armazenados em \(P_i\). Para executar uma transação cujo identificador seja \(I_t\) o coordenador deve primeiro identificar os participantes \(P_j\) da transação para quem as minitransações serão enviadas. Estes participantes são identificados através dos identificadores dos dados que a minitransação utiliza.
 
@@ -485,30 +498,33 @@ Para cada \(P_j\) é construída uma minitransação \(M_j = (I_t, C_j, L_j, E_j
 
 Na notação acima $Id[X]$ representa o conjunto formado pelo elemento $Id$ de todas as tuplas no formato $(Id, Valor)$ do conjunto $X$. Os identificadores de $E_j$ são tratados como um superconjunto de $K_j$ pois a operação de escrita pode inserir novos dados no sistema, e não somente alterar dados que já existem.
 
-Sendo uma extensão do \emph{2PC}, o protocolo de minitransações possui também um coordenador responsável por iniciar e gerenciar a execução do protocolo entre os participantes da transação. O protocolo de execução é composto também por duas fases, mas agora a primeira fase passa a ser uma fase de execução, em que as minitransações são enviadas para cada participante, que irá tentar executar as operações e responder com um voto de acordo com a situação. O coordenador coleta os votos de todos os participantes e, como no protocolo original, irá decidir por efetivar a transação somente se os votos forem unânimes. Na segunda fase os participantes são notificados da decisão do coordenador. O comportamento do coordenador e dos participantes é descrito pelos protocolos \ref{alg:mini_coordenador}, \ref{alg:mini_participante1} e \ref{alg:mini_participante2}, respectivamente.
+Sendo uma extensão do \emph{2PC}, o protocolo de minitransações possui também um coordenador responsável por iniciar e gerenciar a execução do protocolo entre os participantes da transação. O protocolo de execução é composto também por duas fases, mas agora a primeira fase passa a ser uma fase de execução, em que as minitransações são enviadas para cada participante, que irá tentar executar as operações e responder com um voto de acordo com a situação. O coordenador coleta os votos de todos os participantes e, como no protocolo original, irá decidir por efetivar a transação somente se os votos forem unânimes. Na segunda fase os participantes são notificados da decisão do coordenador. O comportamento do coordenador e dos participantes é descrito pelos protocolos \ref{alg:mini_coordenador}, \ref{alg:mini_participante1} e \ref{alg:mini_participante2}.
 
-O detalhamento da execução e dos controles de atomicidade, isolamento e durabilidade serão descritos na seção \ref{chap:implementacao} sobre a implementação da infraestrutura.
+O algoritmo \ref{alg:mini_coordenador} inicia construindo as minitransações para cada participante no conjunto $Participantes$. Este conjunto é determinado a partir do conjunto de identificadores $L \cup Id[C] \cup Id[E]$ da transação. A forma como é feito o mapeamento entre os identificadores e os participantes será explicado no capítulo \ref{chap:implementacao}. As minitransações são enviadas para cada participante $p_j \in Participantes$. O coordenador irá esperar pela execução e resposta de cada participante, que irão executar o algoritmo descrito em \ref{alg:mini_participante1}. Ao receber uma minitransação, cada participante irá tentar ler os dados identificados por $Id[C_j]$ e compará-los com os respectivos $Dado[C_j]$. Caso a comparação não seja bem sucedida, o participante votará então por abortar a transação, indicando isso em sua resposta, e nem tentará ler ou modificar os dados em $L_j$ e $E_j$.
+
+Se a comparação for bem sucedida para todos os elementos de $Id[C_j]$, então o participante irá ler os dados identificados por $L_J$ e agrupá-los no conjunto $R_l$. Os dados $Dado[E_j]$ identificados por $Id[E_j]$ serão armazenados no \emph{log} do participante. O participante envia então a sua resposta para o coordenador. Ao coletar todas as resposta, o coordenador irá apurar os votos de cada participante. Para cada resposta $EFETIVAR$ há um conjunto, possivelmente vazio, de elementos lidos. O algoritmo \ref{alg:mini_coordenador} agrega todos esses conjuntos para as minitransações que votaram por efetivar a transação em um conjunto $R$ e utiliza esse conjunto para executar a lógica específica do domínio da aplicação e decidir, de acordo com critérios semânticos, se a transação irá ser efetivada ou não ($d \gets Decidir(R)$). A decisão sobre efetivação ou não da transação é então comunicada a cada participante, que irá executar o algoritmo \ref{alg:mini_participante2} para finalmente efetivar as operações que a mini-transação executou ($Efetivar(I_t)$) ou para abortá-las ($Abortar(I_t)$). $Efetivar(I_t)$ irá vasculhar o \emph{log} de operações para aplicar as operações aos dados, e $Abortar(I_t)$ irá ignorar as operações dos mesmos.
+
+Notamos que, de forma contrária ao que ocorre no \emph{2PC}, o coordenador nunca escreve em um \emph{log}. Neste protocolo somente os participantes utilizam o \emph{log}, e o protocolo não fica paralizado caso o coordenador falhe. O protocolo só não terá progresso se algum participante que está processando a transação falhar, pois neste ponto o coordenador não saberá o que fazer. O processo de recuperação de falhas e monitoração será explicado no capítulo \ref{chap:implementacao}.
 
 \begin{algorithm}
-\caption{Coordenador}
+\caption{Coordenador - recebe um transação no formato $(I_t, C, L, E)$}
 \label{alg:mini_coordenador}
 \begin{algorithmic}[1]
 \ForAll{$p_j \in Participantes$}
 	\State $Enviar(p_j, (I_t, C_j, L_j, E_j))$
 \EndFor
 \State $d \gets EFETIVAR$
-\State $V \gets \{\}$
+\State $R \gets \{\}$
 \ForAll{$p_j \in Participantes$}
-	\State $r \gets Receber(p_j)$
-	\If{$r = ABORTAR$}
+	\State $(v_j, r_j) \gets Receber(p_j)$
+	\If{$v_j = ABORTAR$}
 		\State $d \gets ABORTAR$
 	\Else
-		\Comment{$r está no formato (EFETIVAR, R_l), onde R_l é o conjunto de valores associados aos identificadores de L_j$}
-		$V \gets  R_l \cup V$
+		\State $R \gets r_j \cup R$
 	\EndIf
 \EndFor
 \If{$d \neq ABORTAR$}
-	\State $d \gets Decidir(V)$
+	\State $d \gets Decidir(R)$
 \EndIf
 \ForAll{$p_j \in Participantes$}
 	\State $Enviar(p_j, (d, I_t))$
@@ -520,25 +536,24 @@ O detalhamento da execução e dos controles de atomicidade, isolamento e durabi
 \caption{Execução - $p_j$ recebe $(I_t, C_j, L_j, E_j)$ de $c$}
 \label{alg:mini_participante1}
 \begin{algorithmic}[1]
-\State $d \gets ABORTAR$
+\State $d \gets EFETIVAR$
 \ForAll{$c \in C_j$}
-	\If{$Valor(c) \neq Ler(Id(c))$}
+	\If{$Dado(c) \neq Ler(Id(c))$}
 		\State $d \gets ABORTAR$
 	\EndIf
 \EndFor
-\If{$d = ABORTAR$}
-	\State $Enviar(c, d)$
-\Else
-	$R_l \gets \{\}$
+\State $R_l \gets \{\}$
+\If{$d = EFETIVAR$}
 	\ForAll{$l \in L_j$}
-		$R_l \gets Ler(Id(l)) \cup R_l$
+		\State $R_l \gets Ler(Id(l)) \cup R_l$
 	\EndFor
 	
 	\ForAll{$e \in E_j$}
-		$Escrever(Id(e), Valor(e))$
+		\State $Adicionar(log_{p_j}, ( (Id(e), Dado(e)), I_t ) )$
+		%\State $Escrever(Id(e), Dado(e))$
 	\EndFor
-	\State $Enviar(c, (EFETIVAR, R_l))$
 \EndIf
+\State $Enviar(c, (d, R_l))$
 \end{algorithmic}
 \end{algorithm}
 
@@ -566,9 +581,9 @@ O foco de \emph{Sinfonia} é prover a base para o desenvolvimento de sistemas di
 \chapter{Implementação}
 \label{chap:implementacao}
 
-A infraestrutura será desenvolvida em \emph{Scala} \cite{scala}, uma linguagem híbrida que combina orientação a objetos com programação funcional. O código \emph{Scala} é compilado para \emph{bytecodes} \emph{Java} e pode ser executado por uma máquina virtual \emph{Java} qualquer. Dessa forma, o código pode interagir com qualquer código já disponível em \emph{Java} e pode rodar em qualquer plataforma que tenha uma máquina virtual compatível, permitindo que a infraestrutura possa ser executada em uma grande quantidade de plataformas.
+%A infraestrutura será desenvolvida em \emph{Scala} \cite{scala}, uma linguagem híbrida que combina orientação a objetos com programação funcional. O código \emph{Scala} é compilado para \emph{bytecodes} \emph{Java} e pode ser executado por uma máquina virtual \emph{Java} qualquer. Dessa forma, o código pode interagir com qualquer código já disponível em \emph{Java} e pode rodar em qualquer plataforma que tenha uma máquina virtual compatível, permitindo que a infraestrutura possa ser executada em uma grande quantidade de plataformas.
 
-Na primeira seção (\ref{sec:algoritmos}) são descritos as estruturas de dados e algoritmos utilizados para implementar a executação das minitransações e das operações relacionadas, como recuperação de falhas, controle de concorrência e persistência dos dados. A seção \ref{sec:aplicacoes} irá apresentar alguns exemplos de aplicações utilizando a infraestrutura desenvolvida e a última seção, \ref{sec:testes}, irá descrever o ambiente de testes, os testes realizados e os resultados obtidos.
+Este capítulo irá apresentar a proposta de arquitetura e desenvolvimento da infraestrutura. A arquitetura e a interface de acesso serão discutidas na seção \ref{sec:arquitetura}. A seção (\ref{sec:algoritmos}) descreve as estruturas de dados e algoritmos utilizados para implementar a executação das minitransações e das operações relacionadas, como recuperação de falhas, controle de concorrência e persistência dos dados. A seção \ref{sec:aplicacoes} irá apresentar alguns exemplos de aplicações utilizando a infraestrutura desenvolvida e a última seção, \ref{sec:testes}, irá descrever o ambiente de testes, os testes realizados e os resultados obtidos.
 
 \section{Arquitetura e interface}
 \label{sec:arquitetura}
@@ -584,9 +599,11 @@ A figura \ref{fig:overview_arquitetura} ilustra de maneira simplificada a relaç
   \label{fig:overview_arquitetura} 
 \end{figure}
 
-A interface de acesso oferecida aos clientes da infraestrutura é a de uma tabela associativa chave-valor: os nós de memória armazenam um sequência de bytes (valor) nomeados por uma chave. Cada chave é única e o números de bytes utilizados para armazenar o valor é, teoricamente, ilimitado. Ao especificar um dado na transação enviada ao componente de acesso, o cliente deve utilizar como identificador um dupla no formato (Identificador do nó de memória, Chave do dado dentro do nó de memória). Portanto, a identificação é feita em dois níveis: primeiro identifica-se o nó de memória onde o dado está e depois identifica-se o dado dentro da tabela chave-valor do nó de memória especificado.
+A interface de acesso oferecida aos clientes da infraestrutura é a de uma tabela associativa chave-valor: os nós de memória armazenam um sequência de bytes (valor) nomeados por uma chave. Cada chave é única e o número de bytes utilizados para armazenar o valor é, teoricamente, ilimitado. 
 
-*** TODO verificar se faz dessa forma mesmo ou se deixamos um esquema mais DHT...
+%Ao especificar um dado na transação enviada ao componente de acesso, o cliente deve utilizar como identificador um dupla no formato (Identificador do nó de memória, Chave do dado dentro do nó de memória). Portanto, a identificação é feita em dois níveis: primeiro identifica-se o nó de memória onde o dado está e depois identifica-se o dado dentro da tabela chave-valor do nó de memória especificado.
+
+%*** TODO verificar se faz dessa forma mesmo ou se deixamos um esquema mais DHT...
 
 \section{Algoritmos e estruturas de dados}
 \label{sec:algoritmos}
@@ -604,7 +621,7 @@ O sistema está distribuído em $n$ máquinas $P_1, P_2, \dotsc, P_n$, e cada $P
 
 A execução da transação \(I_t\) é efetuada de maneira distribuída entre o coordenador da transação e o participante. O comportamento do coordenador é descrito pelo algoritmo \ref{alg:mini_coordenador}. Diferentemente do \emph{2PC}, o protocolo de execução das minitransações não grava nenhum registro no \emph{log} do coordendaor. O coordenador envia uma minitransação no formato \(M = (I, C, L, E)\) para cada participante \(P_i\) da transação através do algoritmo \ref{alg:mini_coordenador}. $I$ é o identificador da transação, devendo ser único em todo o sistema. $C$ é o conjunto de itens de comparação, $L$ é o conjunto de itens a serem lidos e $E$ é o conjunto de dados a serem atualizados ou inseridos.
 
-O algoritmo \ref{alg:coordenador_minitransacao} inicialmente gera um identificador único para a transação a ser executada, $I_t$. Todas as máquinas do sistema que irão participar da transação são identificadas através do conjunto de identificadores dos dados dos conjuntos $C$ de itens de comparação, $L$ de leitura e $E$ de escrita da transação. O algoritmo então envia uma minitransação para cada participante com os respectivos itens de comparação, leitura e escrita de cada participante, identificando a transação com $I_t$. A resposta enviada pelo participante é armazenada para descobrirmos o resultado da transação. As linhas 2---10 representam a primeira fase do protocolo, equivalente à fase de votação do \emph{2PC}.
+O algoritmo \ref{alg:mini_coordenador} inicialmente gera um identificador único para a transação a ser executada, $I_t$. Todas as máquinas do sistema que irão participar da transação são identificadas através do conjunto de identificadores dos dados dos conjuntos $C$ de itens de comparação, $L$ de leitura e $E$ de escrita da transação. O algoritmo então envia uma minitransação para cada participante com os respectivos itens de comparação, leitura e escrita de cada participante, identificando a transação com $I_t$. A resposta enviada pelo participante é armazenada para descobrirmos o resultado da transação. As linhas 2---10 representam a primeira fase do protocolo, equivalente à fase de votação do \emph{2PC}.
 
 As linhas 11---18 ilustram a segunda fase do protocolo. Se todos os participantes votaram $SIM$ (o conjunto de votos é obtido do conjunto de respostas $R$ através de $Voto(R)$) e a aplicação decidiu efetivar a transação ($Processar(Dado(R))$ representa a lógica específica da aplicação que utiliza os dados obtidos do conjunto de respostas através de $Dado(R)$), então a transação será efetivada, representado por $resultado \gets EFETIVAR$. Caso contrário, a transação será abortada. Esse resultado é então enviado para os participantes, e o protocolo termina.
 
@@ -616,9 +633,15 @@ A ser definido...
 \label{sec:testes}
 A ser definido...
 
-\chapter{Conclusões}
-\label{chap:conclusoes}
-A ser definido...
+\chapter{Cronograma}
+\label{chap:cronograma}
+Os próximos passos no trabalho serão:
+
+\begin{itemize}
+\item Desenvolvimento da infraestrutura: deverão ser implementados os nós de memória e os componentes de acesso, efetuando controle simples de concorrência (através de travas associadas aos identificadores acessados) e de recuperação de erros. Período: Julho/2012 - Outubro/2012.
+\item Desenvolvimento das aplicações de teste: aplicações simples que permitam explorar e analisar a utilização e a performance da infraestrutura. Período: Outubro/2012 - Dezembro/2012.
+\item Testes das aplicações: execução dos testes, coleta e análise dos dados obtidos. Período: Janeiro/2013 - Abril/2013.
+\end{itemize}
 
 % cabeçalho para os apêndices
 \renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{\appendixname\ \thechapter}} {\MakeUppercase{#1}} }
