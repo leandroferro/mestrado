@@ -139,11 +139,11 @@ framexrightmargin=10pt
 
 \pagenumbering{roman}
 
-\chapter*{Agradecimentos}
-Texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto texto texto. Texto opcional.
+%\chapter*{Agradecimentos}
+%Texto texto texto texto texto texto texto texto texto texto texto texto texto
+%texto texto texto texto texto texto texto texto texto texto texto texto texto
+%texto texto texto texto texto texto texto texto texto texto texto texto texto
+%texto texto texto texto. Texto opcional.
 
 \chapter*{Resumo}
 
@@ -153,25 +153,10 @@ Dissertação (Mestrado) - Instituto de Matemática e Estatística,
 Universidade de São Paulo, São Paulo, 2012.
 \\
 
-Elemento obrigatório, constituído de uma sequência de frases concisas e
-objetivas, em forma de texto.  Deve apresentar os objetivos, métodos empregados,
-resultados e conclusões.  O resumo deve ser redigido em parágrafo único, conter
-no máximo 500 palavras e ser seguido dos termos representativos do conteúdo do
-trabalho (palavras-chave). 
-Texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto texto texto texto texto texto texto.
-Texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto texto texto texto texto texto texto texto texto texto texto texto
-texto texto.
+A proposta deste trabalho é implementar uma infraestrutura para sistemas distribuídos que possibilite o compartilhamento de estado entre as máquinas do sistema utilizando minitransações. Ao invés de trocarem mensagens explicitamente, as máquinas verão um repositório que pode crescer de forma a acomodar grandes quantidades de dados e que permite que todas as máquinas tenham sempre acesso a dados consistentes. Assim, esperamos que o desenvolvimento da aplicação distribuída seja mais simples e ajude o desenvolvedor a focar nas necessidades reais da aplicação.
 \\
 
-\noindent \textbf{Palavras-chave:} palavra-chave1, palavra-chave2, palavra-chave3.
+\noindent \textbf{Palavras-chave:} minitransação, transação, banco de dado, sistemas distribuídos.
 
 \chapter*{Abstract}
 \noindent LUZIA, L. F. \textbf{An infrastructure for developing distributed applications based in minitransactions}. 
@@ -180,20 +165,10 @@ Dissertação (Mestrado) - Instituto de Matemática e Estatística,
 Universidade de São Paulo, São Paulo, 2012.
 \\
 
-
-Elemento obrigatório, elaborado com as mesmas características do resumo em
-língua portuguesa. De acordo com o Regimento da Pós- Graduação da USP (Artigo
-99), deve ser redigido em inglês para fins de divulgação. 
-Text text text text text text text text text text text text text text text text
-text text text text text text text text text text text text text text text text
-text text text text text text text text text text text text text text text text
-text text text text text text text text text text text text.
-Text text text text text text text text text text text text text text text text
-text text text text text text text text text text text text text text text text
-text text text.
+A proposta deste trabalho é implementar uma infraestrutura para sistemas distribuídos que possibilite o compartilhamento de estado entre as máquinas do sistema utilizando minitransações. Ao invés de trocarem mensagens explicitamente, as máquinas verão um repositório que pode crescer de forma a acomodar grandes quantidades de dados e que permite que todas as máquinas tenham sempre acesso a dados consistentes. Assim, esperamos que o desenvolvimento da aplicação distribuída seja mais simples e ajude o desenvolvedor a focar nas necessidades reais da aplicação.
 \\
 
-\noindent \textbf{Keywords:} keyword1, keyword2, keyword3.
+\noindent \textbf{Keywords:} minitransaction, transaction, database, distributed systems.
 
 \tableofcontents
 
@@ -571,19 +546,19 @@ Notamos que, de forma contrária ao que ocorre no \emph{2PC}, o coordenador nunc
 
 \section{Trabalhos relacionados}
 \label{sec:trabalhos_relacionados}
-*** TODO não está pronto...
-As operações de uma minitransação, como apresentadas aqui, incluem o mínimo possível que permite balancear utilidade e performance. Os autores originais (\cite{sinfonia}) executam as operações utilizando como identificadores dos dados o equivalente a um endereço de memória, e as operações trabalham sobre intervalos de endereços. Uma comparação mais detalhada será dada na seção \ref{sec:trabalhos_relacionados} sobre trabalhos relacionados.
+O conceito de minitransações é introduzido como base para a construção de \emph{Sinfonia} (\cite{sinfonia}), que é um sistema cujo foco é prover a base para o desenvolvimento de sistemas distribuídos de baixo nível, como sistemas de arquivos distribuídos, gerenciadores de travas ou serviços de comunicação de grupos de computadores, enquanto que o objetivo deste trabalho é utilizar as minitransações como base para a construção de uma infraestrutura que facilite o desenvolvimento de aplicações distribuídas de alto nível, como sistemas de comércio eletrônico ou redes sociais. 
 
-No referido trabalho, as minitransações são utilizadas como base para a construção de um sistema chamado \emph{Sinfonia} que, assim como o trabalho desenvolvido neste texto, visa facilitar o desenvolvimento de sistemas distribuídos ao oferecer ao desenvolvedor uma alternativa à implementação de protocolos de troca de mensagens na rede. Este sistema \emph{Sinfonia} é composto por um conjunto de máquinas, chamadas nós de memória (\emph{memory nodes}), que armazenam os dados e exportam um intervalo linear de endereços de memória. 
+\emph{Sinfonia} é composto por nós de memória mas a interface exposta por estes componentes é diferente: cada nó de memória mantém uma sequência de bytes puros, sem dar interpretação específica a esses bytes. Estes bytes são organizados como em um espaço de endereçamento linear, sem nenhuma estrutura. Cada nó de memória possui um espaço de endereçamento separado de forma que os dados são referenciados por um par que especifica o nó de memória e o endereço deste dado. Em nossa infraestrutura, o acesso é feito através de uma única chave, que é um conjunto de bytes que faça sentido para a aplicação.
 
-O foco de \emph{Sinfonia} é prover a base para o desenvolvimento de sistemas distribuídos de baixo nível, como sistemas de arquivos distribuídos, gerenciadores de travas ou serviços de comunicação de grupos de computadores, enquanto que o objetivo deste trabalho é utilizar as minitransações como base para a construção de uma infraestrutura que facilite o desenvolvimento de aplicações distribuídas de alto nível, como sistemas de comércio eletrônico ou redes sociais. Os detalhes da implementação da infraestrutura e as semelhanças e diferenças relevantes em relação ao \emph{Sinfonia} estão descritos no capítulo \ref{chap:implementacao}.
+Ao invés de utilizar um componente de acesso como em nossa infraestrutura, \emph{Sinfonia} disponibiliza uma biblioteca que é compilada junto ao aplicativo cliente, e o acesso aos nós de memória são efetuados por esta biblioteca. Em nosso infraestrutura, o componente de acesso permite isolar a aplicação de detalhes da distribuição dos dados entre os nós de memória, e pode ser acessado pela rede através do protocolo TCP/IP. Acreditamos que esta abordagem seja mais efetiva que a abordagem que utiliza uma biblioteca, pois qualquer linguagem que permita o comunicação TCP/IP poderá utilizar nossa infraestrutura, ao passo que se disponibilizarmos uma biblioteca, somente as linguagens para as quais uma biblioteca for escrita poderão usufruir da infraestrutra.
+
+\cite{padilha} apresenta um sistema de armazenamento baseado em minitransações tolerante a falhas bizantinas. Em sistemas que toleram somente componentes com falhas simples (\emph{fail-stop components}), é assumido que um componente pode estar em dois estados: ativo e inativo. Se estiver em um estado ativo, o componente se comportará de acordo com a especificação do sistema. Se estiver inativo, o componente simplesmente para de interagir com o sistema. Está é uma simples e um tanto simplificada de lidar com falhas no sistema, mas é a forma utilizada por diversos sistemas, entre ele \emph{Sinfonia} e a nossa infraestrutura. A maneira mais geral de lidar com falhas é através de falhas bizantinas (\cite{byzantine}). Em sistemas que lidam com este tipo de falha, um componente ativo pode se comportar de forma incorreta, enviando mensagens errada ou mesmo mensagens sem sentido. O tratamento de falhas bizantinas não será discutido neste trabalho.
+
+Existem diversos sistemas que visam o armazenamento escalável de informações e a disponibilização de serviços para facilitar o desenvolvimento de sistemas distribuídos, em geral tendo em vista a utilização para prover serviços a aplicações de internet de larga escala. Entre eles, podemos citar Bigtable (\cite{bigtable}), Dynamo (\cite{dynamo}), ZooKeeper (\cite{zookeeper}), PNUTS (\cite{pnuts}), entre outros. Bigtable é o sistema que permite ao Google armazenar de forma eficiente grandes quantidades de dados, provendo um tipo de consistência chamada de eventual (\cite{eventual_consistency}), assim como o Dynamo, da Amazon. Este tipo de consistência permite que dados sejam particionados e replicados para obter melhor performance e disponibilidade, mas permitem que diferentes máquinas possam ter versões diferentes de uma mesma informação. ZooKeeper é um sistema que provê serviços de coordenação e sincronização para a construção de sistemas distribuídos que utiliza o algoritmo Paxos (\cite{paxos}) para garantir consistência entre as operações. Como o foco do ZooKeeper é permitir a coordenação entre componentes de uma sistema distribuído, sua capacidade de armazenamento é limitada (em um megabyte), e portanto não é utilizável como um repositório de dados. PNUTS é o serviço de armazenamento de dados do Yahoo! que provê um tipo de consistência mais forte que a consistência eventual, porém mais fraca que a consistência obtida através de escalonamentos sequenciáveis de operações --- a chamada consistência na linha do tempo (\emph{timeline consistency}), em que todas as réplicas de um determinado objeto armazenado executam as mesmas alterações neste objeto na mesma ordem. Este sistema oferece também uma primitiva de acesso chamada \emph{test-and-set-write}, que efetua uma escrita de dados somente se uma comparação for bem sucedida, semelhante à forma de execução de nossa infraestrutura.
 
 \chapter{Implementação}
 \label{chap:implementacao}
-
-%A infraestrutura será desenvolvida em \emph{Scala} \cite{scala}, uma linguagem híbrida que combina orientação a objetos com programação funcional. O código \emph{Scala} é compilado para \emph{bytecodes} \emph{Java} e pode ser executado por uma máquina virtual \emph{Java} qualquer. Dessa forma, o código pode interagir com qualquer código já disponível em \emph{Java} e pode rodar em qualquer plataforma que tenha uma máquina virtual compatível, permitindo que a infraestrutura possa ser executada em uma grande quantidade de plataformas.
-
-Este capítulo irá apresentar a proposta de arquitetura e desenvolvimento da infraestrutura. A arquitetura e a interface de acesso serão discutidas na seção \ref{sec:arquitetura}. A seção (\ref{sec:algoritmos}) descreve as estruturas de dados e algoritmos utilizados para implementar a executação das minitransações e das operações relacionadas, como recuperação de falhas, controle de concorrência e persistência dos dados. A seção \ref{sec:aplicacoes} irá apresentar alguns exemplos de aplicações utilizando a infraestrutura desenvolvida e a última seção, \ref{sec:testes}, irá descrever o ambiente de testes, os testes realizados e os resultados obtidos.
+Este capítulo irá apresentar a proposta de arquitetura e desenvolvimento da infraestrutura. A arquitetura e a interface de acesso serão discutidas na seção \ref{sec:arquitetura}. A seção \ref{sec:algoritmos} descreve as estruturas de dados e algoritmos utilizados para implementar a executação das minitransações e das operações relacionadas, como recuperação de falhas, controle de concorrência e persistência dos dados. A seção \ref{sec:aplicacoes} irá apresentar alguns exemplos de aplicações utilizando a infraestrutura desenvolvida e a última seção, \ref{sec:testes}, irá descrever o ambiente de testes, os testes realizados e os resultados obtidos.
 
 \section{Arquitetura e interface}
 \label{sec:arquitetura}
@@ -600,10 +575,6 @@ A figura \ref{fig:overview_arquitetura} ilustra de maneira simplificada a relaç
 \end{figure}
 
 A interface de acesso oferecida aos clientes da infraestrutura é a de uma tabela associativa chave-valor: os nós de memória armazenam um sequência de bytes (valor) nomeados por uma chave. Cada chave é única e o número de bytes utilizados para armazenar o valor é, teoricamente, ilimitado. 
-
-%Ao especificar um dado na transação enviada ao componente de acesso, o cliente deve utilizar como identificador um dupla no formato (Identificador do nó de memória, Chave do dado dentro do nó de memória). Portanto, a identificação é feita em dois níveis: primeiro identifica-se o nó de memória onde o dado está e depois identifica-se o dado dentro da tabela chave-valor do nó de memória especificado.
-
-%*** TODO verificar se faz dessa forma mesmo ou se deixamos um esquema mais DHT...
 
 \section{Algoritmos e estruturas de dados}
 \label{sec:algoritmos}
