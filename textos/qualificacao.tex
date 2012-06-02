@@ -711,18 +711,18 @@ Notamos que, de forma contrária ao que ocorre no \emph{2PC}, o coordenador nunc
 \end{algorithmic}
 \end{algorithm}
 
-\chapter{Implementação}
+\chapter{A infraestrutura}
 \label{chap:implementacao}
-Este capítulo irá apresentar a proposta de arquitetura e desenvolvimento da infraestrutura. A arquitetura e a interface de acesso serão discutidas na seção \ref{sec:arquitetura}. A seção \ref{sec:algoritmos} descreve as estruturas de dados e algoritmos utilizados para implementar a executação das minitransações e das operações relacionadas, como recuperação de falhas, controle de concorrência e persistência dos dados. 
+Neste capítulo apresentamos uma visão detalhada da infraestrutura desenvolvida. A arquitetura e a interface de acesso serão discutidas na seção \ref{sec:arquitetura}. A seção \ref{sec:algoritmos} descreve as estruturas de dados e algoritmos utilizados para implementar a execução das minitransações. Na seção \ref{sec:trabalhos_relacionados} são apresentados os trabalhos que compartilham características de nossa infraestrutura, assim como suas diferenças em relação à nossa infraestrutura. 
 
 % A seção \ref{sec:aplicacoes} irá apresentar alguns exemplos de aplicações utilizando a infraestrutura desenvolvida e a última seção, \ref{sec:testes}, irá descrever o ambiente de testes, os testes realizados e os resultados obtidos.
 
-\section{Arquitetura e interface}
+\section{Arquitetura e interface de acesso}
 \label{sec:arquitetura}
 
-A infraestrutura desenvolvida neste trabalho é um sistema composto por componentes de armazenamento de dados e execução de minitransações e por componentes de acesso (o nome componente se refere à funcionalidade, e podemos ter mais de um componente em um máquina). O componente de armazenamento e execução é responsável por prover acesso aos dados sob sua responsabilidade através da execução das operações expecificadas nas minitransações, e é chamado de \emph{nó de memória}. O componente de acesso é o ponto de comunicação entre a aplicação e a infraestrutura, atuando como o coordenador das transações.
+A infraestrutura desenvolvida neste trabalho é um sistema composto por dois tipos de componentes: execução e acesso. O componente de execução é responsável por prover acesso aos dados através da execução das operações expecificadas nas minitransações, e é chamado de \emph{nó de memória}. O componente de acesso é o ponto de comunicação entre a aplicação e a infraestrutura, atuando como o coordenador das transações e isolando a aplicação cliente dos detalhes sobre a distribuição dos dados entre os nós de memória.
 
-A figura \ref{fig:overview_arquitetura} ilustra de maneira simplificada a relação entre os componentes do sistema. O itens \emph{App} representam as aplicações que acessam a infraestrutura (eles não fazem parte da infraestrutura), os itens \emph{$C_a$} representam os componentes de acesso e os itens \emph{$C_e$} representam os nós de memória. Cada aplicação pode acessar qualquer componente de acesso que, como coordenadores, irão identificar os nós de memória participantes da transação e seguir o algoritmo \ref{alg:mini_coordenador}, não havendo uma estrutura rígida em relação à conexão dos componentes.
+A figura \ref{fig:overview_arquitetura} ilustra a relação entre os componentes do sistema. O itens \emph{App} representam as aplicações cliente que utilizam a infraestrutura, os itens \emph{$C_a$} representam os componentes de acesso e os itens \emph{$C_e$} representam os nós de memória. Cada aplicação pode acessar qualquer componente de acesso que, como coordenadores, irão identificar os nós de memória participantes da transação e seguir o algoritmo \ref{alg:mini_coordenador}, não havendo uma estrutura rígida em relação à conexão dos componentes.
 
 \begin{figure}
   \centering
@@ -731,9 +731,48 @@ A figura \ref{fig:overview_arquitetura} ilustra de maneira simplificada a relaç
   \label{fig:overview_arquitetura} 
 \end{figure}
 
-A interface de acesso oferecida aos clientes da infraestrutura é a de uma tabela associativa chave-valor: os nós de memória armazenam uma sequência de bytes (valor) nomeados por uma outra sequência de bytes (chave). Cada chave é única e o número de bytes utilizados para armazenar o valor é, teoricamente, ilimitado. Os componentes de acesso são responsáveis por efetuar o mapeamento entre as chaves de dados e os nós de memória que os armazenam. Este mapeamento será feito através de uma função de espalhamento consistente (\emph{consistent hashing} \cite{consistent_hashing}) aplicada à chave acessada.
+A interface de acesso oferecida aos clientes da infraestrutura é a de uma tabela associativa chave-valor: os nós de memória armazenam uma sequência de bytes (valor) nomeados por uma outra sequência de bytes (chave). Cada chave é única e o número de bytes utilizados para armazenar o valor é, teoricamente, ilimitado. 
 
-Algumas funcionalidades presentes em sistemas com propostas semelhantes à nossa infraestrutura não serão implementadas para este trabalho, como por exemplo replicação dos dados ou controle de acesso. Apesar de serem muito relevantes em um sistema de uso real, a sua utilização torna a implementação mais complexa. Neste trabalho iremos focar no desenvolvimento das funcionalidades necessárias para a execução de minitransações, e essas e outras funcionalidades~serão deixadas como propostas de melhorias para trabalhos futuros.
+Os componentes de acesso são responsáveis por efetuar o mapeamento entre as chaves de dados e os nós de memória que armazenam esses dados, utilizando uma função de espalhamento consistente (\emph{consistent hashing} \cite{consistent_hashing}) aplicada à chave acessada. Como pode ser visto na Figura \ref{fig:funcao_espalhamento}, o componente de acesso $C_a$ irá aplicar uma função de espalhamento consistente em "Chave", resultando em um número que indica que $(Chave, Valor)$ deve ser armazenado no nó de memória $C_e\text{ }2$.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.80\textwidth]{funcao_espalhamento} 
+  \caption{Mapeamento entre a chave e o nó de memória responsável por seu armazenamento}
+  \label{fig:funcao_espalhamento} 
+\end{figure}
+
+As aplicações se comunicam com os componentes de acesso por meio de um protocolo simples da camada de aplicação da pilha TCP/IP. Esse protocolo é textual, como o protocolo HTTP (\emph{Hypertext Transmission Protocol}), utilizando o protocolo TCP para o transporte de dados. A Figura \ref{fig:protocolo} ilustra a execução de uma minitransação com identificador 123 que efetua a leitura da chave "Chave-Leitura", cujo valor é "Valor" e a escrita de "Teste" na chave "Chave-Escrita" e sua efetivação.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.80\textwidth]{protocolo} 
+  \caption{Exemplo de execução de uma minitransação por meio do protocolo textual utilizado entre as aplicações e o componente de acesso}
+  \label{fig:protocolo} 
+\end{figure}
+
+Os comandos do protocolo são separados em linhas e são compostos por uma letra, que indica a ação desse comando, e um conjunto de parâmetros, que fornecem informações para a execução da ação. Os comandos que iniciam uma minitransação e que contém a resposta da execução dessa minitransação podem ser compostos por subcomandos, e por isso são utilizados chaves (\{\}) para delimitar o seu escopo. Os comandos disponíveis para utilização estão listados a seguir:
+
+\begin{itemize}
+\item \textbf{M}(\textit{Identificador}): indica a criação de uma minitransação com identificador \textit{Identificador}. É composto por comandos de leitura, escrita e comparação.
+
+\item \textbf{L} \textit{Tamanho} \textit{Chave}: indica a leitura dos bytes associados à chave \textit{Chave}. \textit{Tamanho} indica o número de bytes de \textit{Chave}.
+
+\item \textbf{E} \textit{TamanhoChave} \textit{Chave} \textit{TamanhoDado} \textit{Dado}: indica a escrita de \textit{Dado}, cujo número de bytes é \textit{TamanhoDado}, no valor associado a \textit{Chave}.
+
+\item \textbf{C} \textit{TamanhoChave} \textit{Chave} \textit{TamanhoDado} \textit{Dado}: indica a comparação dos bytes associados a \textit{Chave} com \textit{Dado}.
+
+\item \textbf{S}(\textit{Identificador}): indica que a execução da minitransação \textit{Identificador} foi bem sucedida e que esse minitransação pode ser efetivada.
+
+\item \textbf{R} \textit{TamanhoChave} \textit{Chave} \textit{TamanhoDado} \textit{Dado}: indica a resposta de um comando de leitura de \textit{Chave}.
+
+\item \textbf{E}(\textit{Identificador}): indica que a votação foi apurada e foi decidido pela efetivação da minitransação \textit{Identificador}.
+
+\item \textbf{A}(\textit{Identificador}): indica que a votação foi apurada e foi decidido pelo cancelamento da minitransação \textit{Identificador}.
+
+\end{itemize}
+
+% Algumas funcionalidades presentes em sistemas com propostas semelhantes à nossa infraestrutura não serão implementadas para este trabalho, como por exemplo replicação dos dados ou controle de acesso. Apesar de serem muito relevantes em um sistema de uso real, a sua utilização torna a implementação mais complexa. Neste trabalho iremos focar no desenvolvimento das funcionalidades necessárias para a execução de minitransações, e essas e outras funcionalidades serão deixadas como propostas de melhorias para trabalhos futuros.
 
 \section{Algoritmos e estruturas de dados}
 \label{sec:algoritmos}
