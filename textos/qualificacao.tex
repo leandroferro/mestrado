@@ -742,7 +742,7 @@ Os componentes de acesso são responsáveis por efetuar o mapeamento entre as ch
   \label{fig:funcao_espalhamento} 
 \end{figure}
 
-As aplicações se comunicam com os componentes de acesso por meio de um protocolo simples da camada de aplicação da pilha TCP/IP. Esse protocolo é textual, como o protocolo HTTP (\emph{Hypertext Transmission Protocol}), utilizando o protocolo TCP para o transporte de dados. A Figura \ref{fig:protocolo} ilustra a execução de uma minitransação com identificador 123 que efetua a leitura da chave "Chave-Leitura", cujo valor é "Valor" e a escrita de "Teste" na chave "Chave-Escrita" e sua efetivação.
+As aplicações se comunicam com os componentes de acesso por meio de um protocolo simples da camada de aplicação da pilha TCP/IP. Esse protocolo é textual, como o protocolo HTTP (\emph{Hypertext Transmission Protocol}), utilizando o protocolo TCP para o transporte de dados. 
 
 \begin{figure}
   \centering
@@ -751,7 +751,7 @@ As aplicações se comunicam com os componentes de acesso por meio de um protoco
   \label{fig:protocolo} 
 \end{figure}
 
-Os comandos do protocolo são separados em linhas e são compostos por uma letra, que indica a ação desse comando, e um conjunto de parâmetros, que fornecem informações para a execução da ação. Os comandos que iniciam uma minitransação e que contém a resposta da execução dessa minitransação podem ser compostos por subcomandos, e por isso são utilizados chaves (\{\}) para delimitar o seu escopo. Os comandos disponíveis para utilização estão listados a seguir:
+Os comandos do protocolo são separados em linhas e são compostos por uma letra, que indica a ação desse comando, e um conjunto de parâmetros, chamados campos, que fornecem informações para a execução da ação. Os comandos que iniciam uma minitransação e que contém a resposta da execução dessa minitransação podem ser compostos por subcomandos, e por isso são utilizadas chaves (\{\}) para delimitar o seu escopo. Os campos de cada comando são separados por um caracter de espaço em branco (`` ''). Os comandos disponíveis para utilização estão listados a seguir:
 
 \begin{itemize}
 \item \textbf{M}(\textit{Identificador}): indica a criação de uma minitransação com identificador \textit{Identificador}. É composto por comandos de leitura, escrita e comparação.
@@ -762,7 +762,9 @@ Os comandos do protocolo são separados em linhas e são compostos por uma letra
 
 \item \textbf{C} \textit{TamanhoChave} \textit{Chave} \textit{TamanhoDado} \textit{Dado}: indica a comparação dos bytes associados a \textit{Chave} com \textit{Dado}.
 
-\item \textbf{S}(\textit{Identificador}): indica que a execução da minitransação \textit{Identificador} foi bem sucedida e que esse minitransação pode ser efetivada.
+\item \textbf{S}(\textit{Identificador}): indica que a execução da minitransação \textit{Identificador} foi bem sucedida e que essa minitransação pode ser efetivada.
+
+\item \textbf{N}(\textit{Identificador}): indica que a execução da minitransação \textit{Identificador} não foi bem sucedida e que essa minitransação não pode ser efetivada. 
 
 \item \textbf{R} \textit{TamanhoChave} \textit{Chave} \textit{TamanhoDado} \textit{Dado}: indica a resposta de um comando de leitura de \textit{Chave}.
 
@@ -771,6 +773,10 @@ Os comandos do protocolo são separados em linhas e são compostos por uma letra
 \item \textbf{A}(\textit{Identificador}): indica que a votação foi apurada e foi decidido pelo cancelamento da minitransação \textit{Identificador}.
 
 \end{itemize}
+
+A Figura \ref{fig:protocolo} ilustra a execução de uma minitransação cujo identificador é 123 (\textbf{M}(123)). Essa minitransação possui dois subcomandos: a leitura da chave ``Chave-Leitura'' (\textbf{L} 13 Chave-Leitura) e a escrita de ``Teste'' na chave ``Chave-Escrita'' (\textbf{E} 13 Chave-Escrita 5 Teste). Como as chaves são formadas por uma sequência de bytes arbitrária, é necessário que seja expecificado quantos bytes fazem parte da chave. Pelo mesmo motivo é necessário também informar o número de bytes do valor do campo ``Dado'' dos comandos de escrita e de comparação.
+
+A execução dessa minitransação é bem sucedida e o participante retorna um comando indicando que a minitransação pode ser efetivada (\textbf{S}). Esse comando é formando por subcomandos de resposta de leitura (\textbf{R}), que contém os dados associados à chaves solicitadas. O coordenador então decide pela efetivação da minitransação e notifica o participante com o comando de efetivação (\textbf{E}(123). Caso algum ocorresse algum problema na execução da minitransação, o participante geraria uma resposta indicando que não possível executar a minitransação (\textbf{N}(123)), e o coordenador só poderia decidir por cancelar a transação (\textbf{A}(123)).
 
 % Algumas funcionalidades presentes em sistemas com propostas semelhantes à nossa infraestrutura não serão implementadas para este trabalho, como por exemplo replicação dos dados ou controle de acesso. Apesar de serem muito relevantes em um sistema de uso real, a sua utilização torna a implementação mais complexa. Neste trabalho iremos focar no desenvolvimento das funcionalidades necessárias para a execução de minitransações, e essas e outras funcionalidades serão deixadas como propostas de melhorias para trabalhos futuros.
 
