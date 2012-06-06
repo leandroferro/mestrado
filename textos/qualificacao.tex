@@ -640,76 +640,15 @@ Para cada \(P_j\) é construída uma minitransação \(M_j = (I_t, C_j, L_j, E_j
 
 Na notação acima, $K_j$ é o conjunto de identificadores de dados armazenados em $P_j$ e $Id[X]$ representa o conjunto formado pelo elemento $Id$ de todas as tuplas no formato $(Id, Valor)$ do conjunto $X$. Os identificadores de $E_j$ são tratados como um superconjunto de $K_j$ pois a operação de escrita pode inserir novos dados no sistema, e não somente alterar dados que já existem.
 
-Sendo uma extensão do \emph{2PC}, o protocolo de minitransações possui também um coordenador responsável por iniciar e gerenciar a execução do protocolo entre os participantes da transação. O protocolo de execução é composto também por duas fases, mas agora a primeira fase passa a ser uma fase de execução, em que as minitransações são executadas em cada participante e seus votos são enviados para o coordenador. O coordenador coleta os votos de todos os participantes e, como no protocolo original, irá decidir por efetivar a transação somente se os votos forem unânimes. Na segunda fase os participantes são notificados da decisão do coordenador. O comportamento do coordenador e dos participantes é descrito pelos Algoritmos \ref{alg:mini_coordenador}, \ref{alg:mini_participante1} e \ref{alg:mini_participante2}.
+Sendo uma extensão do \emph{2PC}, o protocolo de minitransações possui também um coordenador responsável por iniciar e gerenciar a execução do protocolo entre os participantes da transação. O protocolo de execução é composto também por duas fases, mas agora a primeira fase passa a ser uma fase de execução, em que as minitransações são executadas em cada participante e seus votos são enviados para o coordenador. O coordenador coleta os votos de todos os participantes e, como no protocolo original, irá decidir por efetivar a transação somente se os votos forem unânimes. Na segunda fase os participantes são notificados da decisão do coordenador. 
 
-O algoritmo \ref{alg:mini_coordenador} inicia construindo as minitransações para cada participante no conjunto $Participantes$. Este conjunto é determinado a partir do conjunto de identificadores $L \cup Id[C] \cup Id[E]$ da transação. As minitransações são enviadas para cada participante $p_j \in Participantes$. O coordenador irá esperar pela execução e resposta de cada participante, que irão executar o algoritmo descrito em \ref{alg:mini_participante1}. Ao receber uma minitransação, cada participante irá tentar ler os dados identificados por $Id[C_j]$ e compará-los com os respectivos $Dado[C_j]$. Caso a comparação não seja bem sucedida, o participante votará então por abortar a transação, indicando isso em sua resposta, e nem tentará ler ou modificar os dados em $L_j$ e $E_j$.
+% O comportamento do coordenador e dos participantes é descrito pelos Algoritmos \ref{alg:mini_coordenador}, \ref{alg:mini_participante1} e \ref{alg:mini_participante2}.
 
-Se a comparação for bem sucedida para todos os elementos de $Id[C_j]$, então o participante irá ler os dados identificados por $L_J$ e agrupá-los no conjunto $R_l$. Os dados $Dado[E_j]$ identificados por $Id[E_j]$ serão registrados no \emph{log} do participante. O participante envia então a sua resposta para o coordenador. Ao coletar todas as resposta, o coordenador irá apurar os votos de cada participante. Para cada resposta $EFETIVAR$ há um conjunto, possivelmente vazio, de elementos lidos. O algoritmo \ref{alg:mini_coordenador} agrega todos esses conjuntos para as minitransações que votaram por efetivar a transação em um conjunto $R$ e utiliza esse conjunto para executar a lógica específica do domínio da aplicação e decidir, de acordo com critérios semânticos, se a transação irá ser efetivada ou não ($d \gets Decidir(R)$). A decisão sobre efetivação ou não da transação é então comunicada a cada participante, que irá executar o algoritmo \ref{alg:mini_participante2} para finalmente efetivar as operações que a mini-transação executou ($Efetivar(I_t)$) ou para abortá-las ($Abortar(I_t)$). $Efetivar(I_t)$ irá vasculhar o \emph{log} de operações para aplicar as operações aos dados, e $Abortar(I_t)$ irá ignorar as operações dos mesmos.
+% O algoritmo \ref{alg:mini_coordenador} inicia construindo as minitransações para cada participante no 
 
-Notamos que, de forma contrária ao que ocorre no \emph{2PC}, o coordenador nunca escreve em um \emph{log}. Neste protocolo somente os participantes utilizam o \emph{log}, e o protocolo não fica paralizado caso o coordenador falhe. O protocolo só não terá progresso se algum participante que está processando a transação falhar, pois neste ponto o coordenador não saberá o que fazer. O processo de recuperação de falhas e monitoração será explicado no capítulo \ref{chap:implementacao}.
+O conjunto $Participantes$, que contém todo os nós de memória que participarão da transação, é determinado a partir do conjunto de identificadores $L \cup Id[C] \cup Id[E]$ da transação. As minitransações são enviadas para cada participante $p_j \in Participantes$. O coordenador irá esperar pela execução e resposta de cada participante. Ao receber uma minitransação, cada participante irá tentar ler os dados identificados por $Id[C_j]$ e compará-los com os respectivos $Dado[C_j]$. Caso a comparação não seja bem sucedida, o participante votará então por abortar a transação, indicando isso em sua resposta, e nem tentará ler ou modificar os dados em $L_j$ e $E_j$.
 
-\begin{algorithm}
-\caption{Coordenador - recebe um transação no formato $(I_t, C, L, E)$}
-\label{alg:mini_coordenador}
-\begin{algorithmic}[1]
-\ForAll{$p_j \in Participantes$}
-	\State $Enviar(p_j, (I_t, C_j, L_j, E_j))$
-\EndFor
-\State $d \gets EFETIVAR$
-\State $R \gets \{\}$
-\ForAll{$p_j \in Participantes$}
-	\State $(v_j, r_j) \gets Receber(p_j)$
-	\If{$v_j = ABORTAR$}
-		\State $d \gets ABORTAR$
-	\Else
-		\State $R \gets r_j \cup R$
-	\EndIf
-\EndFor
-\If{$d \neq ABORTAR$}
-	\State $d \gets Decidir(R)$
-\EndIf
-\ForAll{$p_j \in Participantes$}
-	\State $Enviar(p_j, (d, I_t))$
-\EndFor
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
-\caption{Execução - $p_j$ recebe $(I_t, C_j, L_j, E_j)$ de $c$}
-\label{alg:mini_participante1}
-\begin{algorithmic}[1]
-\State $d \gets EFETIVAR$
-\ForAll{$c \in C_j$}
-	\If{$Dado(c) \neq Ler(Id(c))$}
-		\State $d \gets ABORTAR$
-	\EndIf
-\EndFor
-\State $R_l \gets \{\}$
-\If{$d = EFETIVAR$}
-	\ForAll{$l \in L_j$}
-		\State $R_l \gets Ler(Id(l)) \cup R_l$
-	\EndFor
-	
-	\ForAll{$e \in E_j$}
-		\State $Adicionar(log_{p_j}, ( (Id(e), Dado(e)), I_t ) )$
-		%\State $Escrever(Id(e), Dado(e))$
-	\EndFor
-\EndIf
-\State $Enviar(c, (d, R_l))$
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
-\caption{Confirmação - $p_j$ recebe $(d, I_t)$ de $c$}
-\label{alg:mini_participante2}
-\begin{algorithmic}[1]
-\If{$d = EFETIVAR$}
-	\State $Efetivar(I_t)$
-\Else
-	\State $Abortar(I_t)$
-\EndIf
-\end{algorithmic}
-\end{algorithm}
+Se a comparação for bem sucedida para todos os elementos de $Id[C_j]$, então o participante irá ler os dados identificados por $L_J$ e agrupá-los no conjunto $R_l$. Os dados $Dado[E_j]$ identificados por $Id[E_j]$ serão inseridos no conjunto de dados ou irão alterar algum dado já existente. O participante envia então a sua resposta, junto com o conjunto $R_l$, para o coordenador. Ao coletar todas as resposta, o coordenador irá apurar os votos de cada participante. Para cada resposta $EFETIVAR$ há um conjunto, possivelmente vazio, de elementos lidos. O coordenador agrega todos esses conjuntos para as minitransações que votaram por efetivar a transação em um conjunto $R$ e utiliza esse conjunto para executar a lógica específica do domínio da aplicação e decidir, de acordo com critérios semânticos, se a transação irá ser efetivada ou não ($d \gets Decidir(R)$). A decisão sobre efetivação ou não da transação é então comunicada a cada participante, que irá finalmente efetivar as operações que a minitransação executou ($Efetivar(I_t)$) ou para abortá-las ($Abortar(I_t)$). 
 
 \chapter{A infraestrutura}
 \label{chap:implementacao}
@@ -825,7 +764,71 @@ Um exemplo das operações sobre as estruturas e a relação entre elas pode ser
 \end{figure}
 
 
-A execução da transação \(I_t\) é efetuada de maneira distribuída entre o coordenador da transação e o participante. O comportamento do coordenador é descrito pelo algoritmo \ref{alg:mini_coordenador}. Diferentemente do \emph{2PC}, o protocolo de execução das minitransações não grava nenhum registro no \emph{log} do coordendaor. O coordenador envia uma minitransação no formato \(M = (I, C, L, E)\) para cada participante \(P_i\) da transação através do algoritmo \ref{alg:mini_coordenador}. $I$ é o identificador da transação, devendo ser único em todo o sistema. $C$ é o conjunto de itens de comparação, $L$ é o conjunto de itens a serem lidos e $E$ é o conjunto de dados a serem atualizados ou inseridos.
+A execução da transação \(I_t\) é efetuada de maneira distribuída entre o coordenador da transação e o participante. O comportamento do coordenador é descrito pelo Algoritmo \ref{alg:mini_coordenador}. Diferentemente do \emph{2PC}, o protocolo de execução das minitransações não grava nenhum registro no \emph{log} do coordendaor. O coordenador recebe a requisição de uma transação no formato $(I_t, C, L, E)$ e envia uma minitransação no formato $M = (I_t, C_j, L_j, E_j)$ para cada participante \(P_j\) da transação, como demonstramos no Algoritmo \ref{alg:mini_coordenador}. $I_t$ é o identificador da transação, devendo ser único em todo o sistema. $C$ é o conjunto de itens de comparação, $L$ é o conjunto de itens a serem lidos e $E$ é o conjunto de dados a serem atualizados ou inseridos. $L_j, Id[C_j]\text{ e } Id[E_j] \in C$ são os conjuntos de identificadores da transação que estão armazenados em $P_J$.
+
+\begin{algorithm}
+\caption{Coordenador - recebe uma transação no formato $(I_t, C, L, E)$}
+\label{alg:mini_coordenador}
+\begin{algorithmic}[1]
+\ForAll{$p_j \in Participantes$}
+    \State $Enviar(p_j, (I_t, C_j, L_j, E_j))$
+\EndFor
+\State $d \gets EFETIVAR$
+\State $R \gets \{\}$
+\ForAll{$p_j \in Participantes$}
+    \State $(v_j, r_j) \gets Receber(p_j)$
+    \If{$v_j = ABORTAR$}
+        \State $d \gets ABORTAR$
+    \Else
+        \State $R \gets r_j \cup R$
+    \EndIf
+\EndFor
+% \Comment{Segunda Fase - Notificação}
+\If{$d \neq ABORTAR$}
+    \State $d \gets Decidir(R)$
+\EndIf
+\ForAll{$p_j \in Participantes$}
+    \State $Enviar(p_j, (d, I_t))$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Execução - $p_j$ recebe $(I_t, C_j, L_j, E_j)$ de $c$}
+\label{alg:mini_participante1}
+\begin{algorithmic}[1]
+\State $d \gets EFETIVAR$
+\ForAll{$c \in C_j$}
+    \If{$Dado(c) \neq Ler(Id(c))$}
+        \State $d \gets ABORTAR$
+    \EndIf
+\EndFor
+\State $R_l \gets \{\}$
+\If{$d = EFETIVAR$}
+    \ForAll{$l \in L_j$}
+        \State $R_l \gets Ler(Id(l)) \cup R_l$
+    \EndFor
+    
+    \ForAll{$e \in E_j$}
+        \State $Adicionar(log_{p_j}, ( (Id(e), Dado(e)), I_t ) )$
+        %\State $Escrever(Id(e), Dado(e))$
+    \EndFor
+\EndIf
+\State $Enviar(c, (d, R_l))$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Confirmação - $p_j$ recebe $(d, I_t)$ de $c$}
+\label{alg:mini_participante2}
+\begin{algorithmic}[1]
+\If{$d = EFETIVAR$}
+    \State $Efetivar(I_t)$
+\Else
+    \State $Abortar(I_t)$
+\EndIf
+\end{algorithmic}
+\end{algorithm}
 
 O algoritmo \ref{alg:mini_coordenador} inicialmente gera um identificador único para a transação a ser executada, $I_t$. Todas as máquinas do sistema que irão participar da transação são identificadas através do conjunto de identificadores dos dados dos conjuntos $C$ de itens de comparação, $L$ de leitura e $E$ de escrita da transação. O algoritmo então envia uma minitransação para cada participante com os respectivos itens de comparação, leitura e escrita de cada participante, identificando a transação com $I_t$. A resposta enviada pelo participante é armazenada para descobrirmos o resultado da transação. As linhas 2---10 representam a primeira fase do protocolo, equivalente à fase de votação do \emph{2PC}.
 
@@ -839,7 +842,8 @@ As linhas 11---18 ilustram a segunda fase do protocolo. Se todos os participante
 % \label{sec:testes}
 % A ser definido...
 
-*** TODO COLOCAR O ALGORITMO LA DO PAPER AQUI...
+
+Notamos que, de forma contrária ao que ocorre no \emph{2PC}, o coordenador nunca escreve em um \emph{log}. Neste protocolo somente os participantes utilizam o \emph{log}, e o protocolo não fica paralizado caso o coordenador falhe. O protocolo só não terá progresso se algum participante que está processando a transação falhar, pois neste ponto o coordenador não saberá o que fazer. O processo de recuperação de falhas e monitoração será explicado no capítulo \ref{chap:implementacao}.
 
 \section{Trabalhos relacionados}
 \label{sec:trabalhos_relacionados}
