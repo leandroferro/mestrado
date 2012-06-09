@@ -197,15 +197,15 @@ The proposal of this work is to implement a distributed systems infrastructure t
 \label{chap:introducao}
 Há diversos motivos para construir uma aplicação de forma distribuída, como por exemplo o compartilhamento de recursos, tolerância a falhas e escalabilidade. Embora o compartilhamento de recursos e dados, tolerância a falhas parciais do sistema e aumento da disponibilidade sejam características altamente desejáveis de um sistema, tornar operante um sistema distribuído com essas características pode ser difícil. Múltiplos fatores fazem com que o desenvolvimento de aplicações distribuídas exija um esforço adicional em relação a sistemas convencionais. Dentre estes fatores podemos mencionar diferentes plataformas de hardware, diferentes sistemas operacionais, comunicação não síncrona entre as máquinas, falhas parciais do sistema e conhecimento parcial de estado.
 
-De forma geral, um sistema distribuído é uma coleção de dispositivos computacionais individuais que podem comunicar-se uns com os outros \cite{tanenbaum, distributed_computing}. Essa definição engloba uma gama de sistemas computacionais atuais, desde placas de circutos integrados contendo diversos processadores até a \emph{Internet}. Os sistemas distribuídos a que este trabalho se refere situam-se mais próximos da \emph{Internet}, sendo constituídos por diversos computadores interligados por uma rede de comunicação. Nesses sistemas, cada processador tem acesso somente ao seu próprio sistema de armazenamento (memória e disco), e a única forma desses processadores compartilharem informação é por meio da troca de dados por uma rede de comunicação ou seja (modelo de comunicação é baseado na troca de mensagens, e não em memória compartilhada).***TODO colocar alguma referência que cite a diferença entre estes dois modelos....
+De forma geral, um sistema distribuído é uma coleção de dispositivos computacionais individuais que podem se comunicar uns com os outros \cite{tanenbaum, distributed_computing}. Essa definição engloba uma gama de sistemas computacionais atuais, desde placas de circutos integrados contendo diversos processadores até a \emph{Internet}. Os sistemas distribuídos a que este trabalho se refere situam-se mais próximos da \emph{Internet}, sendo constituídos por diversos computadores interligados por uma rede de comunicação. Nesses sistemas, cada processador tem acesso somente ao seu próprio sistema de armazenamento (memória e disco), e a única forma desses processadores compartilharem informação é por meio da troca de dados por uma rede de comunicação (modelo de comunicação é baseado na troca de mensagens, e não em memória compartilhada).
 
-Implementar o compartilhamento de estado da aplicação (o conjunto de informações que define o funcionamento do sistema) utilizando a troca de dados na rede não é trivial, em especial quando os dados possuem restrições semânticas que precisam ser mantidas e validadas. Se considerarmos o exemplo clássico de um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e uma solicitação de transferência entre contas que estão em duas máquinas diferentes seja feita, é esperado que esta transferência subtraia uma certa quantia da conta de origem e adicione esta quantia na conta de destino, sem alterar o valor total das contas envolvidas. Se a máquina da conta de destino falhar, a quantia subtraída da conta de origem deve ser reposta.
+Implementar o compartilhamento de estado da aplicação (o conjunto de informações que define o funcionamento do sistema) utilizando a troca de dados na rede não é trivial, em especial quando os dados possuem restrições semânticas que precisam ser mantidas e validadas. Se considerarmos o exemplo clássico de um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e uma solicitação de transferência entre contas que estão em duas máquinas diferentes seja feita, é esperado que essa transferência subtraia uma certa quantia da conta de origem e adicione a mesma quantia na conta de destino, sem alterar o valor total das contas envolvidas. Se a máquina da conta de destino falhar, a quantia subtraída da conta de origem deve ser reposta.
 
 O problema descrito acima exige que as operações efetuadas em cada máquina sejam consideradas como uma única operação lógica, ou uma transação,. Para satisfazer essa exigência pode ser utilizado o protocolo de efetivação em duas fases (\emph{two-phase commit} ou \emph{2PC}). O \emph{2PC} coordena a efetivação de operações executadas em diversas máquinas e garante que todas as operações em todas as máquinas serão efetivadas somente se todas as máquinas concordarem com a efetivação. Com a utilização do \emph{2PC}, são necessárias duas rodadas adicionais de comunicação entre as máquinas, aumentando o tempo e a complexidade de uma transação.
 
 % Ele basicamente efetua uma rodada de votação entre as máquinas para verificar a possibilidade da efetivação das operações, e uma rodada de notificação, em que as máquinas são notificadas do resultado da votação. As rodadas de votação e notificação ocorrem após a execução das operações, gerando mais mensagens na rede.
 
-Neste trabalho propomos a utilização de minitransações para construir uma infraestrutura para o desenvolvimento de aplicações distribuídas. Uma minitransação é uma primitiva que aglutina a execução das operações de uma transação na primeira fase do \emph{2PC}, permitindo que as operações sejam executadas e efetivadas com apenas duas rodadas de comunicação entre as máquinas. Esta abordagem diminui o escopo em que as minitransações podem ser utilizadas, mas oferece ao desenvolvedor uma alternativa menos custosa para a execução de transações em um ambiente distribuído.
+Neste trabalho propomos a utilização de minitransações para construir uma infraestrutura para o desenvolvimento de aplicações distribuídas. Uma minitransação é uma primitiva que aglutina a execução das operações de uma transação na primeira fase do \emph{2PC}, permitindo que as operações sejam executadas e efetivadas com apenas duas rodadas de comunicação entre as máquinas. Essa abordagem diminui o escopo em que as minitransações podem ser utilizadas, mas oferece ao desenvolvedor uma alternativa menos custosa para a execução de transações em um ambiente distribuído.
 
 %, um protocolo que aglutina as operações a serem executadas por uma transação  As minitransações são baseadas no protocolo \emph{2PC} --- há duas rodadas de mensagens, porém as operações para serem executadas são embutidas na própria mensagem da rodada de votação. 
 %Na primeira rodada, equivalente à votação do \emph{2PC}, as mensagens possuem basicamente três tipos de operações: comparação, leitura e escrita. A operação de comparação é essencial para as minitransações, uma vez que elas determinam o voto da máquina em relação à efetivar ou não. Caso a comparação seja bem sucedida, as escritas serão efetuadas e as leituras serão retornadas como resposta, e a máquina votará para efetivar as operações. Caso contrário nenhum dado será retornado, nenhuma escrita será efetuada e a máquina votará pela não efetivação das operações, causando o cancelamento da transação.
@@ -228,7 +228,7 @@ Como as minitransações são uma extensão do protocolo 2PC, este capítulo ir�
 \label{sec:transacoes}
 Aplicações executam operações, de variados tipos e para diversas finalidades, como somar dois números, ler uma tecla digitada do teclado ou enviar um \emph{email} através da rede. Vamos considerar por exemplo o Algoritmo \ref{alg:transferencia_valores_sem_transacao}, que implementa a transferência de valores entre duas contas, origem e destino. Digamos que as funções $Ler$ e $Escrever$ implementam as operações de leitura e escrita em um gerenciador de recursos que armazene os dados das contas. Essas operações são executadas imediatamente e abortam a execução do programa caso algum erro ocorra.
 
-O algoritmo irá obter uma referência às contas, verificar se o saldo da conta de origem é suficiente, subtrair o valor da conta de origem, somar este mesmo valor na conta de destino e escrever os novos valores nos recursos correspondentes. Se um erro ocorrer ao executar a escrita do novo valor na conta de destino os dados ficarão inconsistentes, pois o valor terá sido retirado da conta de origem ($Escrever(O, V_O - V)$ já aconteceu), mas não terá sido adicionado à conta de destino ($Escrever(D, V_D + V)$ falhou).
+O algoritmo irá obter uma referência às contas, verificar se o saldo da conta de origem é suficiente, subtrair o valor da conta de origem, somar esse mesmo valor na conta de destino e escrever os novos valores nos recursos correspondentes. Se um erro ocorrer ao executar a escrita do novo valor na conta de destino os dados ficarão inconsistentes, pois o valor terá sido retirado da conta de origem ($Escrever(O, V_O - V)$ já aconteceu), mas não terá sido adicionado à conta de destino ($Escrever(D, V_D + V)$ falhou).
 
 \begin{algorithm}
 \caption{Transferência de valores}
@@ -246,7 +246,7 @@ O algoritmo irá obter uma referência às contas, verificar se o saldo da conta
 \end{algorithmic}
 \end{algorithm}
 
-Como alternativa poderíamos fazer com que as funções $Ler$ e $Escrever$ não abortassem o programa caso algum erro ocorra, e que tivéssemos acesso a uma função, $HouveErro()$, pode ser usada para checar se a última operação $Ler$ ou $Escrever$ falhou. Assim, poderíamos implementar uma nova versão do algoritmo para transferência (Algoritmo \ref{alg:transferencia_valores_checar_erro}), efetuando novas operações para desfazer alterações no estado do sistema.
+Como alternativa poderíamos fazer com que as funções $Ler$ e $Escrever$ não abortassem o programa caso algum erro ocorra, e que tivéssemos acesso a uma função, $HouveErro()$, que pode ser usada para checar se a última operação $Ler$ ou $Escrever$ falhou. Assim, poderíamos implementar uma nova versão do algoritmo para transferência (Algoritmo \ref{alg:transferencia_valores_checar_erro}), efetuando novas operações para desfazer alterações no estado do sistema.
 
 \begin{algorithm}
 \caption{Transferência de valores - tratamento de erros}
@@ -274,7 +274,7 @@ Como alternativa poderíamos fazer com que as funções $Ler$ e $Escrever$ não 
 \end{algorithmic}
 \end{algorithm}
 
-O Algoritmo \ref{alg:transferencia_valores_checar_erro} demonstra duas coisas: mesmo que todos os erros sejam tratados, ainda é possível que os dados fiquem em um estado inconsistente (linha 15); e que as operações executadas pela aplicação não são isoladas, mas fazem parte de uma operação lógica mais abrangente, a transferência de valores, que só pode ocorrer por completo caso todas as operações que a constituem sejam executadas corretamente. Esta operação lógica constituída por um conjunto de operações sobre os recursos do sistema é chamada de \textbf{transação}. O uso mais clássico e difundido de transações é feito na área de banco de dados, em que uma transação é a unidade de execução de operações, composta por uma sequência de comandos de leitura e escrita de dados \cite{garcia-molina, vaca}.
+O Algoritmo \ref{alg:transferencia_valores_checar_erro} demonstra duas coisas: mesmo que todos os erros sejam tratados, ainda é possível que os dados fiquem em um estado inconsistente (linha 15); e que as operações executadas pela aplicação não são isoladas, mas fazem parte de uma operação lógica mais abrangente, a transferência de valores, que só pode ocorrer por completo caso todas as operações que a constituem sejam executadas corretamente. Essa operação lógica constituída por um conjunto de operações sobre os recursos do sistema é chamada de \textbf{transação}. O uso mais clássico e difundido de transações é feito na área de banco de dados, em que uma transação é a unidade de execução de operações, composta por uma sequência de comandos de leitura e escrita de dados \cite{garcia-molina, vaca}.
 
 %Se tivéssemos três contas envolvidas, uma de origem e duas de destino, o procedimento ficaria mais complicado, como podemos ver no algoritmo \ref{alg:transferencia_valores_tres_contas}, em que o valor subtraído da conta de origem é igualmente divido entre as contas de destino 1 e 2.
 
@@ -332,17 +332,17 @@ O uso de transações para o desenvolvimento de aplicativos facilita a maneira c
 \If{$V_O >= V$}
     \State $V_D \gets Ler(T, D)$
     \State $Escrever(T, O, V_O - V)$
-    % \State $E_{V_O} \gets HouveErro()$
-    \State $Escrever(T, D, V_D + V)$
-    % \State $E_{V_D} \gets HouveErro()$
-    % \If{$E_{V_O} \vee E_{V_D}$}
-        % \State $Imprimir($ERRO - não foi possível efetuar a transferência$)$
-        % \State $Abortar(T)$
-    % \Else
-        % \State $Efetivar(T)$
-    % \EndIf
+    \If{$HouveErro()$}
+        \State $Abortar(T)$
+    \Else
+        \State $Escrever(T, D, V_D + V)$
+        \If{$HouveErro()$}
+            \State $Abortar(T)$
+        \Else
+            \State $Efetivar(T)$
+        \EndIf
+    \EndIf
 \EndIf
-\State $TerminarTransacao(T)$
 \end{algorithmic}
 \end{algorithm}
 
