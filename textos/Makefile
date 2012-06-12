@@ -35,3 +35,9 @@ clean:
 	      missfont.log $(BASE_NAME)*.bbl $(BASE_NAME)*.pdf $(BASE_NAME)*.out \
 		  $(BASE_NAME)*.lof $(BASE_NAME)*.lot $(RESUMO)*.ps $(RESUMO)*.dvi \
 		  $(RESUMO)*.bbl $(RESUMO)*.pdf $(RESUMO)*.out $(RESUMO)*.lof $(RESUMO)*.lot
+
+imagens:
+	for i in `ls imagens/*.eps`
+	do
+		epstopdf $i
+	done
