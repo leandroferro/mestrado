@@ -15,11 +15,28 @@
    width="1052.3622"
    height="744.09447"
    xml:space="preserve"
-   sodipodi:docname="estruturas.eps"><metadata
+   sodipodi:docname="estruturas.svg"><metadata
      id="metadata2991"><rdf:RDF><cc:Work
          rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
-     id="defs2989" /><sodipodi:namedview
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
+     id="defs2989">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</defs><sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="1"
@@ -28,226 +45,515 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="640"
-     inkscape:window-height="480"
+     inkscape:window-width="1366"
+     inkscape:window-height="690"
      id="namedview2987"
      showgrid="false"
-     inkscape:zoom="0.38839154"
+     inkscape:zoom="0.59"
      inkscape:cx="526.18109"
-     inkscape:cy="372.04724"
+     inkscape:cy="340.91608"
      inkscape:window-x="0"
      inkscape:window-y="24"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:current-layer="g2993" /><g
      id="g2993"
      inkscape:groupmode="layer"
      inkscape:label="estruturas"
      transform="matrix(1.25,0,0,-1.25,0,744.09447)"><g
-       id="g2995"><g
-         id="g2997"
-         transform="matrix(0.893982,0,0,-1,0,595.27557)"><path
-           d="m 376.039,53.305 263.598,0 0,206.008 -263.598,0 0,-206.008 z"
-           style="fill:none;stroke:#000000;stroke-opacity:1;stroke-width:2.67037;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none"
-           id="path2999" /></g><text
-         transform="matrix(0.89398228,0,0,-1,353.7338,556.9254)"
-         id="text3001"><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;font-variant:normal;font-weight:bold;font-size:24.897252;writing-mode:lr;-inkscape-font-specification:DejaVuSans-Bold"
-           x="0 13.76818036 30.57382546 48.40025789 65.25569749 73.79545493 90.60110003 99.26534372 117.09177616 133.94721576 142.61145946 160.43789189 177.21863974 195.04507217 212.17438154"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3003">Tabela de dados</tspan></text>
+   transform="matrix(0.80757842,0,0,-0.90334975,-28.245704,604.82407)"
+   id="g2997"><path
+     inkscape:connector-curvature="0"
+     id="path2999"
+     style="fill:none;stroke:#000000;stroke-width:2.6703701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1;stroke-opacity:1;stroke-dasharray:none"
+     d="m 376.039,53.305 263.598,0 0,206.008 -263.598,0 0,-206.008 z" /></g><text
+   id="text3001"
+   transform="scale(0.9455064,-1.0576343)"
+   x="308.0885"
+   y="-539.10919"
+   style="font-size:10.24947548px"><tspan
+     id="tspan3003"
+     sodipodi:role="line"
+     y="-539.10919"
+     x="308.0885 319.84824 334.2023 349.42828 363.82489 371.1189 385.47299 392.87332 408.09927 422.49591 429.89624 445.12219 459.45502 474.68097 489.31152"
+     style="font-size:21.2653141px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;-inkscape-font-specification:DejaVuSans-Bold">Tabela de dados</tspan></text>
+
+
 <text
-         transform="matrix(0.89398228,0,0,-1,347.70604,503.65455)"
-         id="text3005"><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:21.785095;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0 15.2277814 29.03953163 42.37200977 55.24700092 68.64483434 75.57249455 152.84422652 169.59696457 182.95122781 196.76297804 210.05188599 216.9795462"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3007">Chave 1Dado 1</tspan><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:21.785095;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0.19864129 15.42642269 29.23817292 42.57065106 55.44564221 68.84347563 75.77113584"
-           y="46.847888"
-           sodipodi:role="line"
-           id="tspan3009">Chave 2</tspan><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:21.785095;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="152.92605613 169.70057928 183.03305742 196.84480765 210.15550069 217.06137581"
-           y="46.549903"
-           sodipodi:role="line"
-           id="tspan3011">Dado 2</tspan><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:21.785095;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0.39727779 15.62505919 29.43680942 42.76928756 55.64427871 69.04211213 75.96977234"
-           y="141.07338"
-           sodipodi:role="line"
-           id="tspan3013">Chave N</tspan><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:21.785095;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="153.32335091 170.09787406 183.4303522 197.24210243 210.55279547 217.45867059"
-           y="139.31866"
-           sodipodi:role="line"
-           id="tspan3015">Dado N</tspan></text>
+   id="text3005"
+   transform="scale(0.9455064,-1.0576343)"
+   x="302.3295"
+   y="-493.60938"
+   style="font-size:10.24947548px"><tspan
+     id="tspan3007"
+     sodipodi:role="line"
+     y="-493.60938"
+     x="302.3295 315.33588 327.13281 338.52039 349.51721 360.96063 366.87769 432.87726 447.18616 458.59235 470.38928 481.73962 487.65668"
+     style="font-size:18.60714912px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">Chave 1Dado 1</tspan><tspan
+     id="tspan3009"
+     sodipodi:role="line"
+     y="-453.59555"
+     x="302.49915 315.50555 327.30249 338.69006 349.68689 361.13028 367.04736"
+     style="font-size:18.60714912px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">Chave 2</tspan><tspan
+     id="tspan3011"
+     sodipodi:role="line"
+     y="-453.85007"
+     x="432.94714 447.27466 458.66223 470.45917 481.82812 487.72656"
+     style="font-size:18.60714912px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">Dado 2</tspan><tspan
+     id="tspan3013"
+     sodipodi:role="line"
+     y="-373.11539"
+     x="302.66882 315.6752 327.47214 338.85971 349.85654 361.29996 367.21701"
+     style="font-size:18.60714912px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">Chave N</tspan><tspan
+     id="tspan3015"
+     sodipodi:role="line"
+     y="-374.61414"
+     x="433.28647 447.61398 459.00156 470.79849 482.16748 488.06592"
+     style="font-size:18.60714912px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">Dado N</tspan></text>
+
+
 <g
-         id="g3017"
-         transform="matrix(0.893982,0,0,-1,0,595.27557)"><path
-           d="m 387.12,107.578 235.275,0"
-           style="fill:none;stroke:#000000;stroke-opacity:1;stroke-width:2.115609;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
-           id="path3019" /></g><g
-         id="g3021"
-         transform="matrix(0.893982,0,0,-1,0,595.27557)"><path
-           d="m 508.959,61.918 0,189.129"
-           style="fill:none;stroke:#000000;stroke-opacity:1;stroke-width:1.896828;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
-           id="path3023" /></g><g
-         id="g3025"
-         transform="matrix(1,0,0,-1,0,595.27557)"><path
-           d="m 233.781,435.93 462.125,0 0,126.074 -462.125,0 0,-126.074 z"
-           style="fill:none;stroke:#000000;stroke-opacity:1;stroke-width:2.765993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none"
-           id="path3027" /></g><text
-         transform="matrix(0.89398235,0,0,-1,430.59428,174.30167)"
-         id="text3029"><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;font-variant:normal;font-weight:bold;font-size:24.897251;writing-mode:lr;-inkscape-font-specification:DejaVuSans-Bold"
-           x="0 15.85954889 32.96396032"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3031">Log</tspan></text>
+   transform="matrix(0.80757842,0,0,-0.90334975,-28.245704,604.82407)"
+   id="g3017"><path
+     inkscape:connector-curvature="0"
+     id="path3019"
+     style="fill:none;stroke:#000000;stroke-width:2.11560893;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     d="m 387.12,107.578 235.275,0" /></g><g
+   transform="matrix(0.80757842,0,0,-0.90334975,-28.245704,604.82407)"
+   id="g3021"><path
+     inkscape:connector-curvature="0"
+     id="path3023"
+     style="fill:none;stroke:#000000;stroke-width:1.89682806;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     d="m 508.959,61.918 0,189.129" /></g><g
+   transform="matrix(0.90334975,0,0,-0.90334975,99.754296,515.22407)"
+   id="g3025"><path
+     inkscape:connector-curvature="0"
+     id="path3027"
+     style="fill:none;stroke:#000000;stroke-width:2.76599312;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1;stroke-opacity:1;stroke-dasharray:none"
+     d="m 233.781,435.93 462.125,0 0,126.074 -462.125,0 0,-126.074 z" /></g><text
+   id="text3029"
+   transform="scale(0.9455064,-1.0576343)"
+   x="516.89923"
+   y="-127.58416"
+   style="font-size:10.24947548px"><tspan
+     id="tspan3031"
+     sodipodi:role="line"
+     y="-127.58416"
+     x="516.89923 530.44519 545.05444"
+     style="font-size:21.2653141px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;-inkscape-font-specification:DejaVuSans-Bold">Log</tspan></text>
+
+
 <path
-         d="m 253.77,509.42 0,2.461 47.203,0 0,-2.461 -47.203,0 z"
-         style="fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path3033" /><path
-         d="m 322.57,510.776 -21.457,-10.653 0,21.305 21.457,-10.652 z"
-         style="fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path3035" /><path
-         d="m 253.156,365.182 0,2.461 47.203,0 0,-2.461 -47.203,0 z"
-         style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path3037" /><path
-         d="m 321.957,366.537 -21.457,-10.652 0,21.305 21.457,-10.653 z"
-         style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path3039" /><path
-         d="m 587.863,510.779 0,2.461 47.203,0 0,-2.461 -47.203,0 z"
-         style="fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path3041" /><path
-         d="m 656.664,512.135 -21.457,-10.652 0,21.304 21.457,-10.652 z"
-         style="fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path3043" /><text
-         transform="matrix(1,0,0,-1,667.13193,503.9319)"
-         id="text3045"><tspan
-           style="fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;font-variant:normal;font-weight:bold;font-size:18.4;writing-mode:lr;-inkscape-font-specification:DejaVuSans-Bold"
-           x="0 15.272 27.692 40.8664 53.5072 59.9104"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3047">Dado 1</tspan></text>
+   inkscape:connector-curvature="0"
+   id="path3033"
+   style="fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 200.99736,527.26647 0,2.22314 42.64082,0 0,-2.22314 -42.64082,0 z" /><path
+   inkscape:connector-curvature="0"
+   id="path3035"
+   style="fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 263.14782,528.49141 -19.38317,-9.62339 0,19.24587 19.38317,-9.62248 z" /><path
+   inkscape:connector-curvature="0"
+   id="path3037"
+   style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 200.44271,396.96911 0,2.22314 42.64081,0 0,-2.22314 -42.64081,0 z" /><path
+   inkscape:connector-curvature="0"
+   id="path3039"
+   style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 262.59407,398.19314 -19.38317,-9.62248 0,19.24587 19.38317,-9.62339 z" /><path
+   inkscape:connector-curvature="0"
+   id="path3041"
+   style="fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 502.80019,528.49412 0,2.22314 42.64082,0 0,-2.22314 -42.64082,0 z" /><path
+   inkscape:connector-curvature="0"
+   id="path3043"
+   style="fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 564.95156,529.71906 -19.38318,-9.62248 0,19.24496 19.38318,-9.62248 z" /><text
+   id="text3045"
+   transform="scale(1,-1)"
+   x="574.40778"
+   y="-522.30878"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3047"
+     sodipodi:role="line"
+     y="-522.30878"
+     x="574.40778 588.20374 599.42334 611.3244 622.74347 628.52783"
+     style="font-size:16.62163544px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;-inkscape-font-specification:DejaVuSans-Bold">Dado 1</tspan></text>
+
+
 <text
-         transform="matrix(1,0,0,-1,84.119139,503.31913)"
-         id="text3049"><tspan
-           style="fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:18.4;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0 9.9176 21.2336 26.312 33.5432 45.2088 52.7896 64.0504 71.2448 84.1064 95.772 107.0328 117.9072 129.2232 135.0744 146.7768"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3051">Leitura(Chave 1)</tspan></text>
+   id="text3049"
+   transform="scale(1,-1)"
+   x="47.743301"
+   y="-521.75525"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3051"
+     sodipodi:role="line"
+     y="-521.75525"
+     x="47.743301 56.702362 66.924667 71.512238 78.04454 88.582657 95.430771 105.60321 112.10226 123.72079 134.25891 144.43135 154.25475 164.47705 169.76273 180.33408"
+     style="font-size:16.62163544px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">Leitura(Chave 1)</tspan></text>
+
+
 <path
-         d="m 791.031,57.776 0,2.461 -61.219,0 0,-2.461 61.219,0 z"
-         style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path3053" /><path
-         d="m 701.805,59.131 27.824,-10.652 0,21.304 -27.824,-10.652 z"
-         style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path3055" /><text
-         transform="matrix(1,0,0,-1,37.038297,360.44257)"
-         id="text3057"><tspan
-           style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:18.4;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0 11.6288 21.1968 31.3168 38.8976 43.9944 51.2072 62.4864 69.6624 82.524 94.1896 105.4688 116.3432 127.6592 133.492 147.2552 153.1064 158.9392 171.5248 183.816 196.8656296"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3059">Escrita(Chave N, ABC)</tspan></text>
+   inkscape:connector-curvature="0"
+   id="path3053"
+   style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 814.33195,29.673973 0,2.223143 -55.30217,0 0,-2.223143 55.30217,0 z" /><path
+   inkscape:connector-curvature="0"
+   id="path3055"
+   style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 733.72967,30.898011 25.1348,-9.622481 0,19.244963 -25.1348,-9.622482 z" /><text
+   id="text3057"
+   transform="scale(1,-1)"
+   x="5.2128334"
+   y="-392.68774"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3059"
+     sodipodi:role="line"
+     y="-392.68774"
+     x="5.2128334 15.717705 24.360954 33.502853 40.350967 44.955162 51.47084 61.659904 68.142342 79.760872 90.298981 100.48805 110.31143 120.53374 125.8028 138.23578 143.52145 148.79051 160.15971 171.26297 183.05135"
+     style="font-size:16.62163544px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">Escrita(Chave N, ABC)</tspan></text>
+
+
 <path
-         d="m 791.234,365.315 0,2.461 -203.796,0 0,-2.461 203.796,0 z"
-         style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path3061" /><path
-         d="m 789.137,367.26 2.461,0 0,-309.328 -2.461,0 0,309.328 z"
-         style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path3063" /><text
-         transform="matrix(1,0,0,-1,454.94468,282.0766)"
-         id="text3065"><tspan
-           style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:18.4;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0 12.2544 23.92 28.9984 39.1184 44.2152 55.4392 67.1048 78.384 85.9648 93.1408"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3067">Adicionar(I</tspan></text>
+   inkscape:connector-curvature="0"
+   id="path3061"
+   style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 815.32889,397.08925 0,2.22315 -312.91262,0 0,-2.22315 312.91262,0 z" /><path
+   inkscape:connector-curvature="0"
+   id="path3063"
+   style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 814.22101,398.57508 2.22314,0 0,-368.922897 -2.22314,0 0,368.922897 z" /><text
+   id="text3065"
+   transform="scale(1,-1)"
+   x="513.92865"
+   y="-409.8959"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3067"
+     sodipodi:role="line"
+     y="-409.8959"
+     x="513.92865 524.99866 535.53674 540.12439 549.26624 553.87048 564.00964 574.54773 584.73682 591.58496 598.06738"
+     style="font-size:16.62163544px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">Adicionar(I</tspan></text>
+
+
 <text
-         transform="matrix(1,0,0,-1,553.62905,278.3966)"
-         id="text3069"><tspan
-           style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:11.960168;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0"
-           y="0"
-           id="tspan3071">T</tspan></text>
+   id="text3069"
+   transform="scale(1,-1)"
+   x="603.0752"
+   y="-406.57156"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3071"
+     y="-406.57156"
+     x="603.0752"
+     style="font-size:10.80421448px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">T</tspan></text>
+
+
 <text
-         transform="matrix(1,0,0,-1,560.94064,282.0766)"
-         id="text3073"><tspan
-           style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:18.4;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0 5.8328 18.6944 30.36 41.6392 52.5136 63.8296 69.6624 83.4256 89.2768 95.1096 109.2776 120.5384 132.204 143.4464 149.2792 163.0424 168.8936 174.7264 187.5218888 199.8130888 212.6746888"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3075">,Chave N, Dado N, ABC)</tspan></text>
+   id="text3073"
+   transform="scale(1,-1)"
+   x="609.68005"
+   y="-409.8959"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3075"
+     sodipodi:role="line"
+     y="-409.8959"
+     x="609.68005 614.94916 626.56769 637.10577 647.29486 657.11823 667.34052 672.60956 685.04254 690.32825 695.59729 708.396 718.56842 729.10651 739.26233 744.53143 756.96442 762.25006 767.5191 779.07794 790.18121 801.79968"
+     style="font-size:16.62163544px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">,Chave N, Dado N, ABC)</tspan></text>
+
+
 <text
-         transform="matrix(1,0,0,-1,246.12766,127.01278)"
-         id="text3077"><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:20.592;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0 8.03088"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3079">(I</tspan></text>
+   id="text3077"
+   transform="scale(1,-1)"
+   x="322.09366"
+   y="-92.219009"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3079"
+     sodipodi:role="line"
+     y="-92.219009"
+     x="322.09366 329.34836"
+     style="font-size:18.60177803px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">(I</tspan></text>
+
+
 <text
-         transform="matrix(1,0,0,-1,260.24444,122.89438)"
-         id="text3081"><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:13.384988;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0"
-           y="0"
-           id="tspan3083">X</tspan></text>
+   id="text3081"
+   transform="scale(1,-1)"
+   x="334.84607"
+   y="-88.49865"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3083"
+     y="-88.49865"
+     x="334.84607"
+     style="font-size:12.09132576px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">X</tspan></text>
+
+
 <text
-         transform="matrix(1,0,0,-1,269.42048,127.01278)"
-         id="text3085"><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:20.592;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0 6.527664 13.07592 27.469728 40.525056 53.12736 65.297232 77.961312 84.509568 97.997328 104.545584 111.073248 126.929088 139.531392 152.58672 165.168432 171.696096 185.781024 198.836352 207.16678382 212.87076782 225.92609582 238.50780782 245.03547182 258.13198382 264.65964782 271.18731182 287.04315182 299.64545582 312.70078382 325.28249582 331.81015982 347.21297582 359.79468782 371.96455982 384.54627182 391.07393582 404.17044782"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3087">, Chave K, Dado Antigo 1, Dado Novo 1)</tspan><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:20.592;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="-23.69737656 -15.66649656"
-           y="37.068174"
-           sodipodi:role="line"
-           id="tspan3089">(I</tspan></text>
+   id="text3085"
+   transform="scale(1,-1)"
+   x="343.13522"
+   y="-92.219009"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3087"
+     sodipodi:role="line"
+     y="-92.219009"
+     x="343.13522 349.03198 354.94736 367.94998 379.74353 391.12781 402.12146 413.56155 419.47693 431.66107 437.57645 443.47321 457.79657 469.18088 480.9744 492.34009 498.23685 510.96045 522.75403 530.2793 535.43201 547.22546 558.59119 564.48792 576.31873 582.21545 588.11218 602.43555 613.81989 625.6134 636.97906 642.87585 656.78998 668.15564 679.14929 690.51501 696.41174 708.24249"
+     style="font-size:18.60177803px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">, Chave K, Dado Antigo 1, Dado Novo 1)</tspan><tspan
+     id="tspan3089"
+     sodipodi:role="line"
+     y="-58.733482"
+     x="321.72821 328.98291"
+     style="font-size:18.60177803px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">(I</tspan></text>
+
+
 <text
-         transform="matrix(1,0,0,-1,259.83988,85.826217)"
-         id="text3091"><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:13.384988;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0"
-           y="0"
-           id="tspan3093">Y</tspan></text>
+   id="text3091"
+   transform="scale(1,-1)"
+   x="334.48059"
+   y="-55.013138"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3093"
+     y="-55.013138"
+     x="334.48059"
+     style="font-size:12.09132576px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">Y</tspan></text>
+
+
 <text
-         transform="matrix(1,0,0,-1,268.0225,89.944617)"
-         id="text3095"><tspan
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;font-variant:normal;font-weight:normal;font-size:20.592;writing-mode:lr;-inkscape-font-specification:DejaVuSans"
-           x="0 6.527664 13.07592 27.469728 40.525056 53.12736 65.297232 77.961312 84.509568 90.563616 97.09128 103.639536 117.703872 130.7592 138.851856 144.535248 157.590576 170.172288 176.699952 182.754 189.302256 195.82992 211.5506147 224.1323267 236.3021987 248.8839107 255.4115747 261.4656227"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3097">, Chave J, Antigo J, Novo J)</tspan></text>
+   id="text3095"
+   transform="scale(1,-1)"
+   x="341.87234"
+   y="-58.733498"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3097"
+     sodipodi:role="line"
+     y="-58.733498"
+     x="341.87234 347.7691 353.68448 366.68713 378.48065 389.86493 400.85858 412.29868 418.21405 423.68295 429.57974 435.49509 448.2001 459.99365 467.30414 472.43823 484.23175 495.59744 501.4942 506.96313 512.87854 518.77527 532.97656 544.34222 555.33588 566.70154 572.59833 578.06726"
+     style="font-size:18.60177803px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">, Chave J, Antigo J, Novo J)</tspan></text>
+
+
 <text
-         transform="matrix(1,0,0,-1,245.58694,53.75741)"
-         id="text3099"><tspan
-           style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;font-variant:normal;font-weight:bold;font-size:20.592;writing-mode:lr;-inkscape-font-specification:DejaVuSans-Bold"
-           x="0 9.410544"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3101">(I</tspan></text>
+   id="text3099"
+   transform="scale(1,-1)"
+   x="321.60519"
+   y="-26.043781"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3101"
+     sodipodi:role="line"
+     y="-26.043781"
+     x="321.60519 330.1062"
+     style="font-size:18.60177803px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;-inkscape-font-specification:DejaVuSans-Bold">(I</tspan></text>
+
+
 <text
-         transform="matrix(1,0,0,-1,262.67991,49.63901)"
-         id="text3103"><tspan
-           style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;font-variant:normal;font-weight:bold;font-size:13.384988;writing-mode:lr;-inkscape-font-specification:DejaVuSans-Bold"
-           x="0"
-           y="0"
-           id="tspan3105">T</tspan></text>
+   id="text3103"
+   transform="scale(1,-1)"
+   x="337.04614"
+   y="-22.323421"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3105"
+     y="-22.323421"
+     x="337.04614"
+     style="font-size:12.09132576px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;-inkscape-font-specification:DejaVuSans-Bold">T</tspan></text>
+
+
 <text
-         transform="matrix(1,0,0,-1,271.80366,53.75741)"
-         id="text3107"><tspan
-           style="fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;font-variant:normal;font-weight:bold;font-size:20.592;writing-mode:lr;-inkscape-font-specification:DejaVuSans-Bold"
-           x="0 7.82496 14.970384 30.084912 44.746416 58.646016 72.051408 86.012784 93.158208 110.393712 118.218672 125.384688 142.476048 156.375648 171.11952 185.266224 192.43224 209.86143235 217.66580035 224.83181635 240.74943235 256.44053635 271.53447235"
-           y="0"
-           sodipodi:role="line"
-           id="tspan3109">, Chave N, Dado N, ABC)</tspan></text>
-</g></g></svg>
+   id="text3107"
+   transform="scale(1,-1)"
+   x="345.28806"
+   y="-26.043781"
+   style="font-size:10.84019661px"><tspan
+     id="tspan3109"
+     sodipodi:role="line"
+     y="-26.043781"
+     x="345.28806 352.35675 358.81155 372.46527 385.70972 398.26593 410.37567 422.9877 429.4425 445.01218 452.08087 458.55429 473.99374 486.54996 499.86884 512.64825 519.1217 534.86633 541.91638 548.38983 562.76904 576.94354 590.57867"
+     style="font-size:18.60177803px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;-inkscape-font-specification:DejaVuSans-Bold">, Chave N, Dado N, ABC)</tspan></text>
+
+
+<text
+   id="text3001-7"
+   transform="scale(0.9455064,-1.0576343)"
+   x="35.733669"
+   y="-294.37787"
+   style="font-size:10.24947548px"><tspan
+     id="tspan3003-4"
+     sodipodi:role="line"
+     y="-294.37787"
+     x="35.733669 47.493401 61.847473 77.073456 91.470062 98.764069 113.11815 120.51849 135.74445 150.14108"
+     style="font-size:21.2653141px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;-inkscape-font-specification:DejaVuSans-Bold">Tabela de travas</tspan></text>
+
+
+<g
+   transform="matrix(0.8075784,0,0,-0.50428206,-287.10583,325.97685)"
+   id="g2997-1"><path
+     inkscape:connector-curvature="0"
+     id="path2999-3"
+     style="fill:none;stroke:#000000;stroke-width:2.6703701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1;stroke-opacity:1;stroke-dasharray:none"
+     d="m 376.039,53.305 263.598,0 0,206.008 -263.598,0 0,-206.008 z" /></g><text
+   id="text3005-7"
+   transform="scale(0.9455064,-1.0576343)"
+   x="28.550152"
+   y="-250.07066"
+   style="font-size:10.24947548px"><tspan
+     id="tspan3007-7"
+     sodipodi:role="line"
+     y="-250.07066"
+     x="28.550152 41.55653 53.353455 64.74102 75.737854 87.181267 93.098343"
+     style="font-size:18.60714912px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">Chave 1       <tspan
+   style="fill:#008000"
+   id="tspan3302">LEITURA</tspan></tspan><tspan
+     id="tspan3011-6"
+     sodipodi:role="line"
+     style="font-size:18.60714912px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans"
+     x="28.550152"
+     y="-15.128102" /><tspan
+     sodipodi:role="line"
+     style="font-size:18.60714912px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans"
+     x="nan"
+     y="inf"
+     id="tspan3286">Chave N       <tspan
+   style="fill:#800000"
+   id="tspan3304">ESCRITA</tspan></tspan><tspan
+     id="tspan3015-5"
+     sodipodi:role="line"
+     style="font-size:18.60714912px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans"
+     x="28.550152"
+     y="-15.128102" /></text>
+
+
+<g
+   transform="matrix(0.8075784,0,0,-0.90334976,-287.10583,347.24915)"
+   id="g3017-2"><path
+     inkscape:connector-curvature="0"
+     id="path3019-0"
+     style="fill:none;stroke:#000000;stroke-width:2.11560893;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     d="m 387.12,107.578 235.275,0" /></g><g
+   transform="matrix(0.8075784,0,0,-0.43239502,-287.10583,316.48857)"
+   id="g3021-2"><path
+     inkscape:connector-curvature="0"
+     id="path3023-9"
+     style="fill:none;stroke:#000000;stroke-width:1.89682806;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     d="m 508.959,61.918 0,189.129" /></g><text
+   id="text3001-7-1"
+   transform="scale(0.9455064,-1.0576343)"
+   x="35.242905"
+   y="-157.73936"
+   style="font-size:10.24947548px"><tspan
+     sodipodi:role="line"
+     y="-157.73936"
+     x="35.242905 47.00264 61.356705 76.582687 90.979294 98.273293 112.62737 120.02773 135.25368"
+     style="font-size:21.2653141px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans Bold;-inkscape-font-specification:DejaVuSans-Bold"
+     id="tspan3366" /></text>
+
+
+<g
+   transform="matrix(0.8075784,0,0,-0.50428206,-285.96985,138.26326)"
+   id="g2997-1-5"><path
+     inkscape:connector-curvature="0"
+     id="path2999-3-9"
+     style="fill:none;stroke:#000000;stroke-width:2.6703701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1;stroke-opacity:1;stroke-dasharray:none"
+     d="m 376.039,53.305 263.598,0 0,206.008 -263.598,0 0,-206.008 z" /></g><g
+   transform="matrix(0.8075784,0,0,-0.90334976,-285.96985,157.93557)"
+   id="g3017-2-5"><path
+     inkscape:connector-curvature="0"
+     id="path3019-0-6"
+     style="fill:none;stroke:#000000;stroke-width:2.11560893;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     d="m 387.12,107.578 235.275,0" /></g><g
+   transform="matrix(0.8075784,0,0,-0.43239502,-349.96985,128.77498)"
+   id="g3021-2-5"><path
+     inkscape:connector-curvature="0"
+     id="path3023-9-9"
+     style="fill:none;stroke:#000000;stroke-width:1.89682806;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     d="m 508.959,61.918 0,189.129" /></g><text
+   xml:space="preserve"
+   style="font-size:22.39999962px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+   x="124.13434"
+   y="-150.53552"
+   id="text3370"
+   sodipodi:linespacing="125%"
+   transform="scale(1,-1)"><tspan
+     sodipodi:role="line"
+     id="tspan3372"
+     x="124.13434"
+     y="-150.53552"
+     style="font-size:21.26399994px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold">Tabela de</tspan><tspan
+     sodipodi:role="line"
+     x="124.13434"
+     y="-123.95552"
+     id="tspan3374"
+     style="font-size:21.26399994px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold">minitransações</tspan></text>
+
+
+<text
+   xml:space="preserve"
+   style="font-size:22.39999962px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+   x="28.230511"
+   y="-78.291504"
+   id="text3380"
+   sodipodi:linespacing="125%"
+   transform="scale(1,-1)"><tspan
+     sodipodi:role="line"
+     id="tspan3382"
+     x="28.230511"
+     y="-78.291504"
+     style="font-size:20.61600113px">I<tspan
+   style="font-size:18.60000038px"
+   id="tspan3388"><tspan
+     style="font-size:12.09016991px;baseline-shift:sub"
+     id="tspan3390">W</tspan></tspan></tspan><tspan
+     sodipodi:role="line"
+     x="28.230511"
+     y="-52.521503"
+     id="tspan3384"
+     style="font-size:18.60000038px" /><tspan
+     sodipodi:role="line"
+     x="28.230511"
+     y="-28.760948"
+     id="tspan3386"
+     style="font-size:18.60000038px;font-weight:bold;fill:#008080;-inkscape-font-specification:Sans Bold">I<tspan
+   style="font-size:12.09016991px;font-weight:bold;baseline-shift:sub;fill:#008080;-inkscape-font-specification:Sans Bold"
+   id="tspan3392">T </tspan></tspan></text>
+
+
+<text
+   id="text3057-7"
+   x="334.56833"
+   y="-242.02206"
+   style="font-size:10.84019661px"
+   transform="scale(1,-1)"><tspan
+     id="tspan3059-2"
+     sodipodi:role="line"
+     style="font-size:16.62163544px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans"
+     x="334.56833"
+     y="-242.02206">Travar(I<tspan
+   style="font-size:8.64332104px;baseline-shift:sub"
+   id="tspan3434">T</tspan> , {Chave 1}, {Chave N})</tspan></text>
+
+<path
+   inkscape:connector-curvature="0"
+   id="path3037-2"
+   style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 315.12743,245.25686 0,2.22314 -42.64081,0 0,-2.22314 42.64081,0 z" /><path
+   inkscape:connector-curvature="0"
+   id="path3039-7"
+   style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+   d="m 252.97607,246.48089 19.38317,-9.62248 0,19.24587 -19.38317,-9.62339 z" /><text
+   xml:space="preserve"
+   style="font-size:28px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+   x="93.220337"
+   y="645.78943"
+   id="text3597"
+   sodipodi:linespacing="125%"
+   transform="matrix(0.8,0,0,-0.8,0,595.27558)"><tspan
+     sodipodi:role="line"
+     id="tspan3599"
+     x="93.220337"
+     y="645.78943"
+     style="font-size:23.25px">EFETIVADA</tspan><tspan
+     sodipodi:role="line"
+     x="93.220337"
+     y="680.78943"
+     id="tspan3601"
+     style="font-size:23.25px" /><tspan
+     sodipodi:role="line"
+     x="93.220337"
+     y="715.78943"
+     id="tspan3603"
+     style="font-weight:bold;-inkscape-font-specification:Sans Bold;fill:#008080;font-size:23.25px">AGUARDANDO</tspan></text>
+
+</g></svg>
