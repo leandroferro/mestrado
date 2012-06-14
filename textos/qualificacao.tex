@@ -21,8 +21,9 @@
 \usepackage[pdftex,plainpages=false,pdfpagelabels,pagebackref,colorlinks=true,citecolor=DarkGreen,linkcolor=NavyBlue,urlcolor=DarkRed,filecolor=green,bookmarksopen=true]{hyperref} % links coloridos
 \usepackage[all]{hypcap}                % soluciona o problema com o hyperref e capitulos
 \usepackage[square,sort,nonamebreak,comma]{natbib}  
-\usepackage[chapter]{algorithm}
-\usepackage{algpseudocode}
+% \usepackage[chapter]{algorithm}
+% \usepackage{algpseudocode}
+\usepackage[portugues,algochapter,boxruled,linesnumbered]{algorithm2e}
 \fontsize{60}{62}\usefont{OT1}{cmr}{m}{n}{\selectfont}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -165,18 +166,18 @@ The proposal of this work is to implement a distributed systems infrastructure t
 
 \tableofcontents
 
-\chapter{Lista de Abreviaturas}
-\begin{tabular}{ll}
-	ACID    & Atomicidade, Consistência, Isolamento e Durabilidade \\
-            & (\emph{Atomicity, Consistency, Isolation and Durability})\\
-    SGBD	& Sistema Gerenciador de Banco de Dados\\
-	2PC		& Efetivação em Duas Fases (\emph{Two-Phase Commit})\\
-	TCP/IP	& Conjunto de protocolos de comunicação utilizado na Internet\\
-			& (\emph{Transmition Control Protocol} e \emph{Internet Protocol})\\
-\end{tabular}
+% \chapter{Lista de Abreviaturas}
+% \begin{tabular}{ll}
+% 	ACID    & Atomicidade, Consistência, Isolamento e Durabilidade \\
+%             & (\emph{Atomicity, Consistency, Isolation and Durability})\\
+%     SGBD	& Sistema Gerenciador de Banco de Dados\\
+% 	2PC		& Efetivação em Duas Fases (\emph{Two-Phase Commit})\\
+% 	TCP/IP	& Conjunto de protocolos de comunicação utilizado na Internet\\
+% 			& (\emph{Transmition Control Protocol} e \emph{Internet Protocol})\\
+% \end{tabular}
 
 \listoffigures
-\listoftables
+% \listoftables
 \listofalgorithms
 
 \mainmatter
@@ -188,29 +189,29 @@ The proposal of this work is to implement a distributed systems infrastructure t
 
 \chapter{Introdução}
 \label{chap:introducao}
-Há diversos motivos para construir uma aplicação de forma distribuída, como por exemplo o compartilhamento de recursos, tolerância a falhas e escalabilidade. Embora o compartilhamento de recursos e dados, tolerância a falhas parciais do sistema e aumento da disponibilidade sejam características altamente desejáveis de um sistema, tornar operante um sistema distribuído com essas características pode ser difícil. Múltiplos fatores fazem com que o desenvolvimento de aplicações distribuídas exija um esforço adicional em relação a sistemas convencionais. Dentre estes fatores podemos mencionar diferentes plataformas de hardware, diferentes sistemas operacionais, comunicação não síncrona entre as máquinas, falhas parciais do sistema e conhecimento parcial de estado.
+Há diversos motivos para construir uma aplicação de forma distribuída, como por exemplo o compartilhamento de recursos, tolerância a falhas e escalabilidade. Embora o compartilhamento de recursos e dados, tolerância a falhas parciais do sistema e aumento da disponibilidade sejam características altamente desejáveis de um sistema, tornar operante um sistema distribuído com essas características pode ser difícil. Múltiplos fatores fazem com que o desenvolvimento de aplicações distribuídas exija um esforço adicional em relação a sistemas convencionais. Dentre estes fatores podemos mencionar diferentes plataformas de hardware, diferentes sistemas operacionais, comunicação não síncrona entre as máquinas, falhas parciais do sistema e conhecimento parcial do estado do sistema.
 
-De forma geral, um sistema distribuído é uma coleção de dispositivos computacionais individuais que podem se comunicar uns com os outros \cite{tanenbaum, distributed_computing}. Essa definição engloba uma gama de sistemas computacionais atuais, desde placas de circutos integrados contendo diversos processadores até a \emph{Internet}. Os sistemas distribuídos a que este trabalho se refere situam-se mais próximos da \emph{Internet}, sendo constituídos por diversos computadores interligados por uma rede de comunicação. Nesses sistemas, cada processador tem acesso somente ao seu próprio sistema de armazenamento (memória e disco), e a única forma desses processadores compartilharem informação é por meio da troca de dados por uma rede de comunicação (modelo de comunicação é baseado na troca de mensagens, e não em memória compartilhada).
+De forma geral, um sistema distribuído é uma coleção de dispositivos computacionais individuais que podem se comunicar uns com os outros \cite{tanenbaum, distributed_computing}. Essa definição engloba uma gama de sistemas computacionais atuais, desde placas de circutos integrados contendo diversos processadores até a \emph{Internet}. Os sistemas distribuídos a que este trabalho se refere situam-se mais próximos da \emph{Internet}, sendo constituídos por diversos computadores interligados por uma rede de comunicação. Nesses sistemas, cada processador tem acesso somente ao seu próprio sistema de armazenamento (memória e disco), e a única forma desses processadores compartilharem informação é por meio da troca de dados por uma rede de comunicação (o modelo de comunicação é baseado na troca de mensagens, e não em memória compartilhada).
 
-Implementar o compartilhamento de estado da aplicação (o conjunto de informações que define o funcionamento do sistema) utilizando a troca de dados na rede não é trivial, em especial quando os dados possuem restrições semânticas que precisam ser mantidas e validadas. Se considerarmos o exemplo clássico de um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e uma solicitação de transferência entre contas que estão em duas máquinas diferentes seja feita, é esperado que essa transferência subtraia uma certa quantia da conta de origem e adicione a mesma quantia na conta de destino, sem alterar o valor total das contas envolvidas. Se a máquina da conta de destino falhar, a quantia subtraída da conta de origem deve ser reposta.
+Implementar o compartilhamento de estado da aplicação (o conjunto de informações que define o funcionamento do sistema) utilizando a troca de dados na rede não é trivial, em especial quando os dados possuem restrições semânticas que precisam ser mantidas e validadas. Se considerarmos o exemplo clássico de um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e que temos uma solicitação de transferência entre contas que estão em duas máquinas diferentes, é esperado que essa transferência subtraia uma certa quantia da conta de origem e adicione essa mesma quantia na conta de destino, sem alterar o valor total das contas envolvidas. Se a máquina da conta de destino falhar, a quantia subtraída da conta de origem deve ser reposta.
 
-O problema descrito acima exige que as operações efetuadas em cada máquina sejam consideradas como uma única operação lógica, ou uma transação,. Para satisfazer essa exigência pode ser utilizado o protocolo de efetivação em duas fases (\emph{two-phase commit} ou \emph{2PC}). O \emph{2PC} coordena a efetivação de operações executadas em diversas máquinas e garante que todas as operações em todas as máquinas serão efetivadas somente se todas as máquinas concordarem com a efetivação. Com a utilização do \emph{2PC}, são necessárias duas rodadas adicionais de comunicação entre as máquinas, aumentando o tempo e a complexidade de uma transação.
+O problema descrito acima exige que as operações efetuadas em cada máquina sejam consideradas como uma única operação lógica, ou uma transação. Para satisfazer essa exigência pode ser utilizado o protocolo de efetivação em duas fases (\emph{two-phase commit} ou \emph{2PC}). O \emph{2PC} coordena a efetivação de operações executadas em diversas máquinas e garante que todas as operações em todas as máquinas serão efetivadas somente se todas as máquinas concordarem com a efetivação. Com a utilização do \emph{2PC} são necessárias duas rodadas adicionais de comunicação entre as máquinas, aumentando o tempo e a complexidade de uma transação.
 
-Neste trabalho propomos a utilização de minitransações para construir uma infraestrutura para o desenvolvimento de aplicações distribuídas. Uma minitransação é uma primitiva que aglutina a execução das operações de uma transação na primeira fase do \emph{2PC}, permitindo que as operações sejam executadas e efetivadas com apenas duas rodadas de comunicação entre as máquinas. Essa abordagem diminui o escopo em que as minitransações podem ser utilizadas, mas oferece ao desenvolvedor uma alternativa menos custosa para a execução de transações em um ambiente distribuído.
+Neste trabalho propomos a utilização de minitransações para construir uma infraestrutura para o desenvolvimento de aplicações distribuídas. Uma minitransação é uma primitiva que aglutina as operações de uma transação na primeira fase do \emph{2PC}, permitindo que as operações sejam executadas e efetivadas com apenas duas rodadas de comunicação entre as máquinas. Essa abordagem diminui o escopo em que as minitransações podem ser utilizadas, mas oferece ao desenvolvedor uma alternativa menos custosa para a execução de transações em um ambiente distribuído.
 
 \section{Objetivo}
 \label{sec:objetivo}
-A proposta deste trabalho é implementar uma infraestrutura para sistemas distribuídos que ofereça uma abstração de estado compartilhado entre as máquinas do sistema utilizando minitransações para garantir a atomicidade de grupos de operações sobre esse repositório. Ao invés de trocarem mensagens explicitamente, as máquinas verão um repositório que pode crescer de forma a acomodar grandes quantidades de dados e que permite que todas as máquinas tenham sempre acesso a dados consistentes. Assim, esperamos que o desenvolvimento das aplicações distribuídas seja mais simples e ajude os desenvolvedores a focar nas necessidades reais das aplicações.
+A proposta deste trabalho é implementar uma infraestrutura para sistemas distribuídos que ofereça uma abstração de estado compartilhado entre as máquinas na forma de uma repositório de dados utilizando minitransações para garantir a atomicidade de grupos de operações sobre esse repositório. Ao invés de trocarem mensagens explicitamente, as máquinas verão um repositório que pode crescer de forma a acomodar grandes quantidades de dados e que permite que todas as máquinas tenham sempre acesso a dados consistentes. Assim, esperamos que o desenvolvimento das aplicações distribuídas seja mais simples e ajude os desenvolvedores a focar nas necessidades reais das aplicações.
 
 Essa infraestrutura será composta por máquinas que formam o repositório de dados e implementam o protocolo de minitransações. O acesso a essas máquinas será feito pela rede, utilizando um protocolo simples da camada de aplicação da pilha TCP/IP, de forma a possibilitar que qualquer sistema que implemente a pilha TCP/IP possa utilizar a infraestrutura.
 
 \section{Organização do texto}
 \label{sec:organizacao_do_texto}
-O capítulo \ref{chap:conceitos} inicia com uma revisão sobre transações e sua utilidade, uma revisão do conceito de transações distribuídas e explica em detalhes o protocolo 2PC, ponto de partida para a derivação do procolo de minitransações. O capítulo \ref{chap:implementacao} apresenta a implementação da infraestrutura e detalha sua arquitetura e os algoritmos e protocolos de execução das minitransações. O capítulo \ref{chap:cronograma} apresenta o andamento do trabalho e as expectativas em relação a datas para o término do trabalho.
+O capítulo \ref{chap:conceitos} inicia com uma revisão sobre transações e sua utilidade, uma revisão do conceito de transações distribuídas e explica o protocolo \emph{2PC} e o conceito original de minitransação. O capítulo \ref{chap:implementacao} apresenta a implementação da infraestrutura e detalha sua arquitetura e os algoritmos e protocolos de execução das minitransações. O capítulo \ref{chap:cronograma} apresenta o andamento do trabalho e as expectativas em relação a datas para o término do trabalho.
 
 \chapter{Conceitos}
 \label{chap:conceitos}
-Como as minitransações são uma extensão do protocolo 2PC, este capítulo irá apresentar uma revisão dos conceitos relacionados a transações, transações distribuídas e, por fim, uma detalhada explicação sobre as minitransações.
+Como as minitransações são uma extensão do protocolo \emph{2PC}, este capítulo irá apresentar uma revisão dos conceitos relacionados a transações, transações distribuídas e, por fim, uma detalhada explicação sobre as minitransações.
 
 \section{Transações}
 \label{sec:transacoes}
@@ -221,17 +222,19 @@ O algoritmo irá obter uma referência às contas, verificar se o saldo da conta
 \begin{algorithm}
 \caption{Transferência de valores}
 \label{alg:transferencia_valores_sem_transacao}
-\begin{algorithmic}[1]
-\State $O \gets \text{Recurso referente à conta de origem}$
-\State $D \gets \text{Recurso referente à conta de destino}$
-\State $V \gets \text{Valor a ser transferido}$
-\State $V_O \gets Ler(O)$
-\If{$V_O >= V$}
-    \State $V_D \gets Ler(D)$
-    \State $Escrever(O, V_O - V)$
-    \State $Escrever(D, V_D + V)$
-\EndIf
-\end{algorithmic}
+\dontprintsemicolon
+\Inicio{
+    $O \gets \text{Recurso referente à conta de origem}$\;
+    $D \gets \text{Recurso referente à conta de destino}$\;
+    $V \gets \text{Valor a ser transferido}$\;
+    $V_O \gets Ler(O)$\;
+    \Se{$V_O >= V$}
+    {
+        $V_D \gets Ler(D)$\;
+        $Escrever(O, V_O - V)$\;
+        $Escrever(D, V_D + V)$\;
+    }
+}
 \end{algorithm}
 
 Como alternativa poderíamos fazer com que as funções $Ler$ e $Escrever$ não abortassem o programa caso algum erro ocorra, e que tivéssemos acesso a uma função, $HouveErro()$, que pode ser usada para checar se a última operação $Ler$ ou $Escrever$ falhou. Assim, poderíamos implementar uma nova versão do algoritmo para transferência (Algoritmo \ref{alg:transferencia_valores_checar_erro}), efetuando novas operações para desfazer alterações no estado do sistema.
@@ -239,30 +242,36 @@ Como alternativa poderíamos fazer com que as funções $Ler$ e $Escrever$ não 
 \begin{algorithm}
 \caption{Transferência de valores - tratamento de erros}
 \label{alg:transferencia_valores_checar_erro}
-\begin{algorithmic}[1]
-\State $O \gets \text{Recurso referente à conta de origem}$
-\State $D \gets \text{Recurso referente à conta de destino}$
-\State $V \gets \text{Valor a ser transferido}$
-\State $V_O \gets Ler(O)$
-\If{$V_O >= V$}
-    \State $V_D \gets Ler(D)$
-    \State $Escrever(O, V_O - V)$
-    \If{$HouveErro()$}
-        \State $Imprimir($ERRO - não foi possível debitar valor$)$
-    \Else
-        \State $Escrever(D, V_D + V)$
-        \If{$HouveErro()$}
-            \State $Escrever(O, V_O + V)$
-            \If{$HouveErro()$}
-                \State $Imprimir($ERRO - dados ficarão inconsistentes!$)$
-            \EndIf
-        \EndIf
-    \EndIf
-\EndIf
-\end{algorithmic}
+\dontprintsemicolon
+\Inicio{
+    $O \gets \text{Recurso referente à conta de origem}$\;
+    $D \gets \text{Recurso referente à conta de destino}$\;
+    $V \gets \text{Valor a ser transferido}$\;
+    $V_O \gets Ler(O)$\;
+    \Se{$V_O >= V$}
+    {
+        $V_D \gets Ler(D)$\;
+        $Escrever(O, V_O - V)$\;
+        \eSe{$HouveErro()$}
+        {
+            $Imprimir($ERRO - não foi possível debitar valor$)$\;
+        }
+        {
+            $Escrever(D, V_D + V)$\;
+            \Se{$HouveErro()$}
+            {   
+                $Escrever(O, V_O + V)$\;
+                \Se{$HouveErro()$}
+                {
+                    $Imprimir($ERRO - dados ficarão inconsistentes!$)$\;
+                }
+            }
+        }
+    }
+}
 \end{algorithm}
 
-O Algoritmo \ref{alg:transferencia_valores_checar_erro} demonstra duas coisas: mesmo que todos os erros sejam tratados, ainda é possível que os dados fiquem em um estado inconsistente (linha 15); e que as operações executadas pela aplicação não são isoladas, mas fazem parte de uma operação lógica mais abrangente, a transferência de valores, que só pode ocorrer por completo caso todas as operações que a constituem sejam executadas corretamente. Essa operação lógica constituída por um conjunto de operações sobre os recursos do sistema é chamada de \textbf{transação}. O uso mais clássico e difundido de transações é feito na área de banco de dados, em que uma transação é a unidade de execução de operações, composta por uma sequência de comandos de leitura e escrita de dados \cite{garcia-molina, vaca}.
+O Algoritmo \ref{alg:transferencia_valores_checar_erro} demonstra duas coisas: mesmo que todos os erros sejam tratados, ainda é possível que os dados fiquem em um estado inconsistente (linha 15); e que as operações executadas pela aplicação não são isoladas, mas fazem parte de uma operação lógica mais abrangente, a transferência de valores, que só pode ocorrer por completo caso todas as operações que a constituem sejam finalizadas corretamente. Essa operação lógica constituída por um conjunto de operações sobre os recursos do sistema é chamada de \textbf{transação}. O uso mais clássico e difundido de transações é feito na área de banco de dados, em que uma transação é a unidade de execução de operações, composta por uma sequência de comandos de leitura e escrita de dados \cite{garcia-molina, vaca}.
 
 O uso de transações para o desenvolvimento de aplicativos facilita a maneira como o aplicativo pode ser implementado. Por exemplo, digamos que a transferência de valores do Algoritmo \ref{alg:transferencia_valores_sem_transacao} possa ser agora implementada utilizando um gerenciador de recursos que suporte o agrupamento de operações em uma transação, como no Algoritmo \ref{alg:transferencia_valores_transacao}. 
 
@@ -271,48 +280,68 @@ Nesse algoritmo introduzimos três novas funções: $IniciarTransacao$, para cri
 \begin{algorithm}
 \caption{Transferência de valores - uso de transações}
 \label{alg:transferencia_valores_transacao}
-\begin{algorithmic}[1]
-\State $O \gets \text{Recurso referente à conta de origem}$
-\State $D \gets \text{Recurso referente à conta de destino}$
-\State $V \gets \text{Valor a ser transferido}$
-\State $T \gets IniciarTransacao()$
-\State $V_O \gets Ler(T, O)$
-\If{$V_O >= V$}
-    \State $V_D \gets Ler(T, D)$
-    \State $Escrever(T, O, V_O - V)$
-    \State $Escrever(T, D, V_D + V)$
-    \State $Efetivar(T)$
-\Else
-    \State $Abortar(T)$
-\EndIf
-\end{algorithmic}
+\dontprintsemicolon
+\Inicio{
+    $O \gets \text{Recurso referente à conta de origem}$\;
+    $D \gets \text{Recurso referente à conta de destino}$\;
+    $V \gets \text{Valor a ser transferido}$\;
+    $T \gets IniciarTransacao()$\;
+    $V_O \gets Ler(T, O)$\;
+    \eSe{$V_O >= V$}
+    {    
+        $V_D \gets Ler(T, D)$\;
+        $Escrever(T, O, V_O - V)$\;
+        $Escrever(T, D, V_D + V)$\;
+        $Efetivar(T)$\;
+    }
+    {
+        $Abortar(T)$\;
+    }
+}
 \end{algorithm}
 
-\section{Transações distribuídas}
+O uso da transação permitiu que o formato o Algoritmo \ref{alg:transferencia_valores_transacao} ficasse muito parecido com o do Algoritmo \ref{alg:transferencia_valores_sem_transacao}. As únicas diferenças são relacionadas à criação da transação, para demarcar o início das operações que devem ser executadas de forma atômica, e os momentos da efetivação ou cancelamento. No caso de efetivação, nenhum erro ocorreu e o gerenciador de recursos irá efetivar as alterações efetuadas pelas operações da transação. Caso a conta de origem não possua saldo suficiente, a transação será cancelada. 
+
+Nesse algoritmo o comportamento das funções $Ler$ e $Escrever$ é parecido com o comportamento apresentado no Algoritmo \ref{alg:transferencia_valores_sem_transacao}: se ocorrer um erro, o programa é terminado. Agora, porém, antes de terminar o programa, as funções irão abortar a transação à qual estão relacionadas, mantendo os dados inalterados. 
+
+\section{Transações distribuídas e o Protocolo de efetivação em duas fases}
 \label{sec:transacoes_distribuidas}
-Uma transação distribuída é uma transação que engloba operações que executam em diversos gerenciadores de recursos na forma de subtransações, subordinadas à transação, e que é finalizada por uma requisição para efetivar ou abortar a transação \cite{gray-lamport}. Por exemplo, vamos considerar novamente o problema da transferência entre contas, como descrito na seção \ref{sec:transacoes}, porém agora as contas estão em dois gerenciadores de recursos transacionais distintos ($G_O$ e $G_D$), como na figura \ref{fig:transacao_distribuida}. 
+\label{sec:2pc}
+Uma transação distribuída é uma transação que engloba operações que executam em diversos gerenciadores de recursos na forma de subtransações, subordinadas à transação, e que é finalizada por uma requisição para efetivar ou abortar a transação \cite{gray-lamport}. Por exemplo, vamos considerar novamente o problema da transferência entre contas, como descrito na Seção \ref{sec:transacoes}, porém agora as contas estão em dois gerenciadores de recursos transacionais distintos ($G_O$ e $G_D$), como na Figura \ref{fig:transacao_distribuida}. A efetivação das subtransações geradas em $G_O$ e $G_D$ precisa agora levar em conta que mais coisas podem dar errado em relação ao que podia acontecer no caso não distribuído. 
 
-No Algoritmo \ref{alg:transferencia_valores_contas_distribuidas} alteramos a função $IniciarTransacao$ para podermos especificar os gerenciadores de recursos que participarão da transação. Cada operação de leitura e escrita é executada na máquina responsável pela conta sendo lida ou alterada.
+% No Algoritmo \ref{alg:transferencia_valores_contas_distribuidas} alteramos a função $IniciarTransacao$ para podermos especificar os gerenciadores de recursos que participarão da transação. Cada operação de leitura e escrita é executada na máquina responsável pela conta sendo lida ou alterada.
 
-\begin{algorithm}
-\caption{Transferência de valores - contas distribuídas}
-\label{alg:transferencia_valores_contas_distribuidas}
-\begin{algorithmic}[1]
-\State $O \gets \text{Recurso referente à conta de origem}$
-\State $D \gets \text{Recurso referente à conta de destino}$
-\State $V \gets \text{Valor a ser transferido}$
-\State $T \gets IniciarTransacao(G_O, G_D)$
-\State $V_O \gets Ler(T, O)$
-\If{$V_O >= V$}
-    \State $V_D \gets Ler(T, D)$
-    \State $Escrever(T, O, V_O - V)$
-    \State $Escrever(T, D, V_D + V)$
-\EndIf
-\State $TerminarTransacao(T)$
-\end{algorithmic}
-\end{algorithm}
+% O Algoritmo \ref{alg:transferencia_valores_contas_distribuidas} utiliza a primitiva de transação criada na seção anterior para criar duas transações isoladas, uma em cada gerenciador de recurso, e efetuar a transferência dos valores. O comportamento das funções $Ler$ e $Escrever$ é o mesmo apresentado no Algoritmo \ref{alg:transferencia_valores_transacao} (a ocorrência de um erro aborta a transação e termina o programa). Se ocorrer um problema ao efetivar a transação $T_D$ (por exemplo, se a conexão de rede com a máquina de destino for perdida), a transação $T_O$ já terá sido efetivada, e assim os dados ficarão incorretos.
 
-No caso do Algoritmo \ref{alg:transferencia_valores_contas_distribuidas}, $TerminarTransacao$ precisa sinalizar aos dois gerenciadores de recursos que as operações efetuadas podem ser efetivadas. Neste ponto chegamos a um problema: o que acontece se $G_O$ falhar após a escrita da linha 8? A transação só pode ser efetivada se todas as subtransações puderem ser efetivadas, e para garantir que isso aconteça é necessário a utilização de um protocolo de efetivação como o \emph{2PC}, descrito na seção \ref{sec:2pc}.
+A efetivação da transação deve efetivar as duas subtransações de forma atômica, ou seja, ou as duas efetivações ocorrem corretamente ou as duas subtransações são abortadas. Para que a efetivação das subtransações ocorra, é necessário o uso de um protocolo que irá coordenar a efetivação da transação distribuída e garantir que a transação distribuída só será considerada efetivada se todas as subtransações forem efetivadas. O mais conhecido desses protocolos é o protocolo de efetivação em duas fases (\emph{two-phase commit protocol} ou \emph{2PC}).
+
+% \begin{algorithm}
+% \caption{Transferência de valores - contas distribuídas}
+% \label{alg:transferencia_valores_contas_distribuidas}
+% \dontprintsemicolon
+% \Inicio{
+%     $O \gets \text{Recurso referente à conta de origem}$\;
+%     $D \gets \text{Recurso referente à conta de destino}$\;
+%     $V \gets \text{Valor a ser transferido}$\;
+%     $T_O \gets IniciarTransacao(G_O)$\;
+%     $T_D \gets IniciarTransacao(G_D)$\;
+%     $V_O \gets Ler(T_O, O)$\;
+%     \eSe{$V_O >= V$}
+%     {
+%         $V_D \gets Ler(T_D, D)$\;
+%         $Escrever(T_O, O, V_O - V)$\;
+%         $Escrever(T_D, D, V_D + V)$\;
+%         $Efetivar(T_O)$\;
+%         $Efetivar(T_D)$\;
+%     }
+%     {
+%         $Abortar(T_O)$\;
+%         $Abortar(T_D)$\;
+%     }
+% }
+% \end{algorithm}
+
+% No caso do Algoritmo \ref{alg:transferencia_valores_contas_distribuidas}, $TerminarTransacao$ precisa sinalizar aos dois gerenciadores de recursos que as operações efetuadas podem ser efetivadas. Neste ponto chegamos a um problema: o que acontece se $G_O$ falhar após a escrita da linha 8? A transação só pode ser efetivada se todas as subtransações puderem ser efetivadas, e para garantir que isso aconteça é necessário a utilização de um protocolo de efetivação como o \emph{2PC}, descrito na seção \ref{sec:2pc}.
 
 \begin{figure}
   \centering
@@ -321,11 +350,11 @@ No caso do Algoritmo \ref{alg:transferencia_valores_contas_distribuidas}, $Termi
   \label{fig:transacao_distribuida} 
 \end{figure}
 
-\section{Protocolo de efetivação em duas fases}
-\label{sec:2pc}
-A idéia desse protocolo é simples e utilizada a bastante tempo \cite{2pc}: verificar se todos gerenciadores de recurso envolvidos em uma transação estão aptos a efetivar suas respectivas subtransações. Se estiverem, a transação será efetivada. Se algum gerenciador não puder efetivar, por qualquer motivo, a transação será abortada. Este protocolo necessita de um gerenciador que atue como o \textbf{coordenador} da transação, responsável por gerenciar a execução do protocolo e tomar a decisão sobre efetivar ou abortar a transação comunicando-se com os outros \textbf{participantes}, que executam as subtransações associadas à transação. O coordenador pode ser também um participante da transação.
+% \section{Protocolo de efetivação em duas fases}
+% \label{sec:2pc}
+A idéia desse protocolo é simples e utilizada a bastante tempo \cite{2pc}: verificar se todos os gerenciadores de recurso envolvidos em uma transação estão aptos a efetivar suas respectivas subtransações. Se estiverem, a transação será efetivada. Se algum gerenciador não puder efetivar, por qualquer motivo, a transação será abortada. Este protocolo necessita de um gerenciador que atue como o \textbf{coordenador} da transação, responsável por gerenciar a execução do protocolo e tomar a decisão sobre efetivar ou abortar a transação comunicando-se com os outros \textbf{participantes}, que executam as subtransações associadas à transação. O coordenador pode ser também um participante da transação.
 
-Como seu nome diz, o protocolo é dividido em duas fases, ou rodadas. Na primeira fase o coordenador solicita que os participantes enviem seus votos, indicando se estão aptos a efetivar a subtransação executada. Os votos são coletados e o coordenador avalia seus valores, decidindo se a transação pode ser efetivada (caso todos os participantes tenham votado de acordo) ou se deve ser abortada (caso algum participante tenha votado para não efetivar a transação). Decidido o resultado da votação, o coordenador efetua a segunda fase, em que os participantes são notificados do resultado da votação. 
+Como seu nome diz, o protocolo é dividido em duas fases, ou rodadas. Na primeira fase o coordenador solicita que os participantes enviem seus votos, indicando se estão aptos a efetivar a subtransação executada. Os votos são coletados e o coordenador decide se a transação pode ser efetivada (caso todos os participantes tenham votado de acordo) ou se deve ser abortada (caso algum participante tenha votado para não efetivar a transação). Decidido o resultado da votação, o coordenador efetua a segunda fase, em que os participantes são notificados do resultado da votação. 
 
 De forma mais detalhada, o \emph{2PC} pode ser descrito pelos algoritmos \ref{alg:2pc_coordenador}, \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2}. O algoritmo \ref{alg:2pc_coordenador} descreve as ações do coordenador ao ser notificado que o protocolo deve iniciar. Os algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} descrevem as ações executadas pelos participantes ao receberem uma solicitação de votação (primeira fase) e o resultado da votação (segunda fase), respectivamente. 
 
@@ -334,47 +363,56 @@ Uma estrutura de dados essencial na execução do \emph{2PC} é o registro de op
 \begin{algorithm}
 \caption{Coordenador 2PC}
 \label{alg:2pc_coordenador}
-\begin{algorithmic}[1]
-\State $Adicionar(log_c, (PREPARAR, T))$
-\ForAll{$p_i \in Participantes$}
-	\State $Enviar(p_i, (PREPARAR, T))$
-\EndFor
-\State $d \gets EFETIVAR$
-\ForAll{$p_i \in Participantes$}
-	\State $v \gets Receber(p_i)$
-	\If{$v = ABORTAR$}
-		\State $d \gets ABORTAR$
-	\EndIf
-\EndFor
-\State $Adicionar(log_c, (d, T))$
-\ForAll{$p_i \in Participantes$}
-	\State $Enviar(p_i, (d, T))$
-\EndFor
-\end{algorithmic}
+\dontprintsemicolon
+\Inicio{
+    $Adicionar(log_c, (PREPARAR, T))$\;
+    \ParaTodo{$p_i \in Participantes$}
+    {
+    	$Enviar(p_i, (PREPARAR, T))$\;
+    }
+    $d \gets EFETIVAR$\;
+    \ParaTodo{$p_i \in Participantes$}
+    {    
+        $v \gets Receber(p_i)$\;
+        \Se{$v = ABORTAR$}
+        {
+            $d \gets ABORTAR$\;
+        }
+    }
+    $Adicionar(log_c, (d, T))$\;
+    \ParaTodo{$p_i \in Participantes$}
+    {
+    	$Enviar(p_i, (d, T))$\;
+    }
+}
 \end{algorithm}
 
 \begin{algorithm}
 \caption{Votação 2PC - $p_i$ recebe $(PREPARAR, T)$ de $c$}
 \label{alg:2pc_participante1}
-\begin{algorithmic}[1]
-\State $v \gets Decidir(T)$
-\State $Adicionar(log_i, (v, T))$
-\State $Enviar(c, v)$
-\end{algorithmic}
+\dontprintsemicolon
+\Inicio{
+    $v \gets Decidir(T)$\;
+    $Adicionar(log_i, (v, T))$\;
+    $Enviar(c, v)$\;
+}
 \end{algorithm}
 
 \begin{algorithm}
 \caption{Notificação 2PC - $p_i$ recebe $(d, T)$ de $c$}
 \label{alg:2pc_participante2}
-\begin{algorithmic}[1]
-\If{$d = EFETIVAR$}
-	\State $Efetivar(T)$
-	\State $Adicionar(log_i, (EFETIVAR, T))$
-\Else
-	\State $Abortar(T)$
-	\State $Adicionar(log_i, (ABORTAR, T))$
-\EndIf
-\end{algorithmic}
+\dontprintsemicolon
+\Inicio{
+    \eSe{$d = EFETIVAR$}
+    {
+        $Efetivar(T)$\;
+        $Adicionar(log_i, (EFETIVAR, T))$\;
+    }
+    {
+    	$Abortar(T)$\;
+    	$Adicionar(log_i, (ABORTAR, T))$\;
+    }
+}
 \end{algorithm}
 
 A premissa que norteia o protocolo é que qualquer gerenciador envolvido na transação pode decidir abortá-la de forma unilateral, exigindo assim unanimidade na decisão pela efetivação da transação. As mensagens enviadas durante a execução do protocolo indicam uma decisão do remetente, e para garantir que essa decisão sobreviva a falhas no gerenciador que enviou a mensagem, os dados do \emph{log} são gravados em um meio de armazenamento estável, como um disco rígido, antes da mensagem ser enviada. A transação $T$ é considerada oficialmente efetivada (ou abortada) no momento que o registro de $(EFETIVAR, T)$ (ou $(ABORTAR, T)$) do \emph{log} do coordenador for escrito para a área de armazenamento estável da máquina. Falhas posteriores não podem mudar a decisão do coordenador registrada em seu \emph{log} e gravada em disco.
@@ -397,25 +435,27 @@ A premissa que norteia o protocolo é que qualquer gerenciador envolvido na tran
 
 \section{Minitransações}
 \label{sec:minitransacoes}
-Minitransação é uma primitiva que permite que as operações de uma transação sejam executadas durante o protocolo de efetivação. Esse protocolo de efetivação é uma modificação do \emph{2PC}, e oferece um mecanismo simples para ler e alterar dados em um ambiente distribuído garantindo atomicidade na execução das operações \cite{sinfonia}. Desta forma, o número de mensagens e o tempo de execução da transação são reduzidos. Porém, o uso das minitransações impõe certas restrições em relação ao que pode ser feito, diminuindo sua aplicabilidade.
+Minitransação é uma primitiva que permite que as operações de uma transação sejam executadas durante o protocolo de efetivação. Esse protocolo de efetivação é uma modificação do \emph{2PC}, e oferece um mecanismo simples para ler e alterar dados de forma condicional em um ambiente distribuído garantindo atomicidade na execução das operações \cite{sinfonia}. Dessa forma, o número de mensagens e o tempo de execução da transação são reduzidos. 
 
-Em \ref{subsec:derivando-minitransacoes} é apresentado como o protocolo 2PC pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações e em \ref{subsec:estrutura-minitransacoes} é descrita a estrutura e o protocolo de execução de uma minitransação.
+Porém, o uso das minitransações impõe certas restrições em relação ao que pode ser feito, diminuindo sua aplicabilidade. Por exemplo, o condicionamento das operações de leitura e escrita é baseado somente em comparações de igualdade, e a única forma da aplicação cliente abortar a minitransação é se essa comparação, como será detalhado. Com as minitransações originais não é possível efetuar a transferência entre contas distribuídas como no Algoritmo \ref{alg:transferencia_valores_transacao}, pois a comparação de maior ou igual ($>=$) não pode ser feita. A nossa infraestrutura irá permitir que essas outras comparações sejam feitas.
 
-\subsection{Otimização do 2PC}
+Em \ref{subsec:derivando-minitransacoes} é apresentado como o protocolo \emph{2PC} pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações e em \ref{subsec:estrutura-minitransacoes} é descrita a estrutura e o protocolo de execução de uma minitransação.
+
+\subsection{Otimização do \emph{2PC}}
 \label{subsec:derivando-minitransacoes}
-A decisão pela efetivação ou cancelamento de uma transação distribuída depende tanto de aspectos operacionais, relacionados ao ambiente de execução, quanto de aspectos semânticos, específicos do domínio da aplicação. A falha na execução de uma subtransação em alguma máquina do ambiente inviabiliza a efetivação da transação como um todo, e por isso o coordenador é forçado a cancelar a transação. Este tipo de falha operacional não está ligada ao domínio da aplicação, mas sim ao ambiente em que esta aplicação está rodando e está, portanto, fora do controle do coordenador, que pode somente cancelar a transação e, opcionalmente, tentar executá-la novamente. Por outro lado, o aspecto semântico envolvido na decisão pela efetivação ou cancelamento da transação é específico de cada aplicação e depende, direta ou indiretamente, dos dados do sistema.
+A decisão pela efetivação ou cancelamento de uma transação distribuída depende tanto de aspectos operacionais, relacionados ao ambiente de execução, quanto de aspectos semânticos, específicos do domínio da aplicação. A falha na execução de uma subtransação em alguma máquina do ambiente inviabiliza a efetivação da transação como um todo, e por isso o coordenador é forçado a cancelar a transação. Esse tipo de falha operacional não está ligada ao domínio da aplicação, mas sim ao ambiente em que essa aplicação está rodando e está, portanto, fora do controle do coordenador, que pode somente cancelar a transação e, opcionalmente, tentar executá-la novamente. Por outro lado, o aspecto semântico envolvido na decisão pela efetivação ou cancelamento da transação é específico de cada aplicação e depende, direta ou indiretamente, dos dados do sistema.
 
-Considerando novamente o sistema bancário e a operação de transferência de uma determinada quantia entre uma conta de origem e de destino, a transferência só pode ocorrer se o saldo na conta de origem da transferência for maior ou igual à quantia a ser transferida. Essa checagem deve ser feita pela aplicação após a leitura da informação da máquina que armazena os dados da conta de origem, e a decisão pelo cancelamento ou não da transação fica subordinada à semântica dada aos dados do sistema. Isso exige que uma requisição de leitura seja feita e uma resposta seja enviada, para só então a aplicação decidir se vai efetivar e então, após a execução do restante da transação, iniciar a primeira fase do protocolo 2PC (votação).
+Considerando novamente o sistema bancário e a operação de transferência de uma determinada quantia entre uma conta de origem e de destino, a transferência só pode ocorrer se o saldo na conta de origem da transferência for maior ou igual à quantia a ser transferida. Essa checagem deve ser feita pela aplicação após a leitura da informação da máquina que armazena os dados da conta de origem, e a decisão pelo cancelamento ou não da transação fica subordinada à semântica dada aos dados do sistema. Isso exige que uma requisição de leitura seja feita e uma resposta seja enviada, para só então a aplicação decidir se vai efetivar e então, após a execução do restante da transação, iniciar a primeira fase do protocolo \emph{2PC} (votação).
 
-Podemos ver que, do ponto de vista semântico, as operações que influenciam na decisão pela possível efetivação ou pelo cancelamento da transação são operações de leitura. As operações de escrita não influenciam nessa decisão, a não ser pelo ponto de vista operacional, ou seja, se ocorrer realmente um erro na operação de escrita. Assim, se tivermos uma transação cuja última ação não afete a decisão do coordenador sobre efetivar a transação, podemos embutir essa última ação na mensagem de votação da primeira fase do protocolo, economizando uma mensagem.
+Podemos ver que, do ponto de vista semântico, as operações que influenciam na decisão pela possível efetivação ou pelo cancelamento da transação são operações de leitura. As operações de escrita não influenciam nessa decisão, a não ser pelo ponto de vista operacional, ou seja, se ocorrer realmente um erro na operação de escrita. Assim, se tivermos uma transação cuja última ação não afete a decisão do coordenador sobre efetivar a transação, podemos embutir essa última ação na mensagem de votação da primeira fase do protocolo de efetivação.
 
-O aspecto semântico da transação em relação aos dados pode ser tratado também nos participantes, e não somente no coordenador, caso o participante saiba como o coordenador irá utilizar o dado para fazer sua decisão sobre efetivar ou cancelar a transação. Se isso for possível, podemos então embutir também operações de leitura que influenciam a decisão do coordenador no protocolo de efetivação e fazer o participante adequar seu voto à maneira como o coordenador faria ao analisar o dado retornado.
+O aspecto semântico da transação em relação aos dados pode ser tratado nos participantes também, e não somente no coordenador, caso o participante saiba como o coordenador irá utilizar o dado para fazer sua decisão sobre efetivar ou cancelar a transação. Se isso for possível, podemos então embutir também operações de leitura que influenciam a decisão do coordenador no protocolo de efetivação e fazer o participante adequar seu voto à maneira como o coordenador faria ao analisar o dado retornado.
 
-As minitransações surgem no contexto em que todas as operações de uma subtransação podem ser embutidas dentro do protocolo de efetivação, utilizando somente as trocas de mensagens que ocorreriam no protocolo de efetivação, após a execução dos comandos. Para que isso possa ocorrer, as mensagens do protocolo 2PC precisam ser alteradas, como veremos na próxima seção.
+As minitransações surgem no contexto em que todas as operações de uma subtransação podem ser embutidas dentro do protocolo de efetivação, utilizando somente as trocas de mensagens que ocorreriam no protocolo de efetivação, após a execução dos comandos. Para que isso possa ocorrer, as mensagens do protocolo \emph{2PC} precisam ser alteradas.
 
 \subsection{Estrutura e execução}
 \label{subsec:estrutura-minitransacoes}
-Uma minitransação é composta por três conjuntos: itens de comparação, itens de leitura e itens de escrita, como pode ser visto na figura \ref{fig:estrutura_minitransacao}. Todos os itens possuem uma referência a qual dado deve ser utilizado, e os itens de comparação e escrita incluem também dados, que serão comparados com ou substituirão os dados armazenados. 
+Uma minitransação é composta por três conjuntos: itens de comparação, itens de leitura e itens de escrita, como pode ser visto na figura \ref{fig:estrutura_minitransacao}. Todos os itens possuem uma referência a qual dado deve ser utilizado, e os itens de comparação e escrita incluem também dados, que serão comparados com ou substituirão os dados armazenados \cite{sinfonia}. 
 
 \begin{figure}
   \centering
@@ -426,29 +466,29 @@ Uma minitransação é composta por três conjuntos: itens de comparação, iten
 
 Formalmente, uma minitransação pode ser vista como uma tupla na forma $(I_t, C, L, E)$. $I_t$ é o identificador da minitransação, permitindo aos participantes diferenciar e tratar minitransações simultâneas. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((Id, Dado)\), em que \(Id\) é o identificador do dado e \(Dado\) é o valor para se comparar com o valor identificado por $Id$ ou para substituí-lo.
 
-Para cada \(P_j\) é construída uma minitransação \(M_j = (I_t, C_j, L_j, E_j)\) tal que:
+Para cada participante \(P_j\) da transação é construída uma minitransação \(M_j = (I_t, C_j, L_j, E_j)\) tal que:
 
 \begin{itemize}
-\item $\forall i_l \in L_j, i_l \in K_j$;
-\item $\forall i_c \in Id[C_j], i_c \in K_j$; e
-\item $Id[E_j] \supseteq K_j$
+    \item $\forall i_l \in L_j, i_l \in K_j$;
+    \item $\forall i_c \in Id[C_j], i_c \in K_j$; e
+    \item $Id[E_j] \supseteq K_j$
 \end{itemize}
 
 Na notação acima, $K_j$ é o conjunto de identificadores de dados armazenados em $P_j$ e $Id[X]$ representa o conjunto formado pelo elemento $Id$ de todas as tuplas no formato $(Id, Valor)$ do conjunto $X$. Os identificadores de $E_j$ são tratados como um superconjunto de $K_j$ pois a operação de escrita pode inserir novos dados no sistema, e não somente alterar dados que já existem.
 
 Sendo uma extensão do \emph{2PC}, o protocolo de minitransações possui também um coordenador responsável por iniciar e gerenciar a execução do protocolo entre os participantes da transação. O protocolo de minitransações é composto também por duas fases, mas agora a primeira fase passa a ser uma fase de execução, em que as minitransações são executadas em cada participante e seus votos são enviados para o coordenador. O coordenador coleta os votos de todos os participantes e, como no protocolo original, irá decidir por efetivar a transação somente se os votos forem unânimes. Na segunda fase os participantes são notificados da decisão do coordenador. 
 
-Um conjunto, $Participantes$, que contém todo os nós de memória que participarão da transação, é determinado a partir do conjunto de identificadores $L \cup Id[C] \cup Id[E]$ da transação. As minitransações são enviadas pelo coordenador para cada participante $p_j \in Participantes$, que irá esperar pela execução e resposta de cada participante. Ao receber uma minitransação, cada participante irá tentar ler os dados identificados por $Id[C_j]$ e compará-los com os respectivos $Dado[C_j]$. Caso a comparação não seja bem sucedida, o participante votará então por abortar a minitransação, indicando isso em sua resposta, e nem tentará ler ou modificar os dados em $L_j$ e $E_j$.
+Um conjunto, $Participantes$, que contém todo os nós de memória que participarão da transação, é determinado a partir do conjunto de identificadores $L \cup Id[C] \cup Id[E]$ da transação. As minitransações são enviadas pelo coordenador para cada participante $P_j \in Participantes$, que irá esperar pela execução e resposta de cada participante. Ao receber uma minitransação, cada participante irá tentar ler os dados identificados por $Id[C_j]$ e compará-los com os respectivos $Dado[C_j]$. Caso a comparação não seja bem sucedida, o participante votará para abortar a minitransação, indicando isso em sua resposta, e nem tentará ler ou modificar os dados em $L_j$ e $E_j$.
 
-Se a comparação for bem sucedida para todos os elementos de $Id[C_j]$, então o participante irá ler os dados identificados por $L_J$ e agrupá-los no conjunto $R_l$. Os dados $Dado[E_j]$ identificados por $Id[E_j]$ serão inseridos no conjunto de dados ou irão alterar algum dado já existente. O participante envia então a sua resposta, junto com o conjunto $R_l$, para o coordenador. Ao coletar todas as resposta, o coordenador irá apurar os votos de cada participante. Para cada resposta $EFETIVAR$ há um conjunto, possivelmente vazio, de elementos lidos. O coordenador agrega todos esses conjuntos para as minitransações que votaram por efetivar a transação em um conjunto $R$. Se uma das respostas for $ABORTAR$, a transação precisa ser abortada. A decisão sobre efetivação ou cancelamento da transação é então comunicada a cada participante, que irá finalmente efetivar as operações que a minitransação executou ou abortá-las. 
+Se a comparação for bem sucedida para todos os elementos de $Id[C_j]$, então o participante irá ler os dados identificados por $L_J$ e agrupá-los no conjunto $R_l$. Os dados $Dado[E_j]$ identificados por $Id[E_j]$ serão inseridos no conjunto de dados ou irão alterar algum dado já existente. O participante envia então a sua resposta, junto com o conjunto $R_l$, para o coordenador. Ao coletar todas as resposta, o coordenador irá apurar os votos de cada participante. Para cada resposta $EFETIVAR$ há um conjunto, possivelmente vazio, de elementos lidos. O coordenador agrega todos esses conjuntos para as minitransações que votaram por efetivar a transação em um conjunto $R$. Se uma das respostas for $ABORTAR$, a transação precisa ser abortada. A decisão sobre efetivação ou cancelamento da transação é então comunicada a cada participante.
 
 \chapter{A infraestrutura}
 \label{chap:implementacao}
 Neste capítulo apresentamos uma visão detalhada da infraestrutura desenvolvida. A arquitetura e a interface de acesso serão discutidas na seção \ref{sec:arquitetura}. A seção \ref{sec:algoritmos} descreve as estruturas de dados e algoritmos utilizados para implementar a execução das minitransações. Na seção \ref{sec:trabalhos_relacionados} são apresentados os trabalhos que compartilham características de nossa infraestrutura, assim como suas diferenças em relação à nossa infraestrutura. 
 
-No trabalho descrito em \cite{sinfonia} as minitransações podem ser compostas por apenas três tipos de operações: Leitura, Escrita e Comparação por igualdade. Esta estrutura permite que uma grande quantidade de transações possam ser descritas como uma minitransação, mas exclui uma série de outros tipos de transação. Por esse motivo, a nossa infraestrutura extenderá o conceito original de minitransação e permitirá que operações sejam definidas e utilizadas pelos usuários, de maneira semelhante à utilização de um procedimento armazenado (\emph{stored procedure}) de um banco de dados convencional. Esses comandos serão chamados daqui em diante de Comandos de Extensão ou Extensões.
+No trabalho descrito em \cite{sinfonia} as minitransações podem ser compostas por apenas três tipos de operações: Leitura, Escrita e Comparação por igualdade. Essa estrutura permite que uma grande quantidade de transações possam ser descritas como uma minitransação, mas exclui uma série de outros tipos de transação. Por esse motivo, a nossa infraestrutura extenderá o conceito original de minitransação e permitirá que operações sejam definidas e utilizadas pelos usuários, de maneira semelhante à utilização de um procedimento armazenado (\emph{stored procedure}) de um banco de dados convencional. Esses comandos serão chamados daqui em diante de Comandos de Extensão ou Extensões.
 
-Assim, esperamos flexibilizar a utilização e aumentar o número de cenários em que a infraestrutura pode ser utilizada. Portanto, a estrutura das minitransações descrita neste capítulo difere um pouco da estrutura descrita em \ref{subsec:estrutura-minitransacoes}. As operações de leitura e escrita originais serão mantidas pois possuem uma semântica diferenciada. A operação de comparação original (comparação de igualdade) será implementada como uma extensão em nossa infraestrutura.
+Assim, esperamos flexibilizar a utilização e aumentar o número de cenários em que a infraestrutura pode ser utilizada. Portanto, a estrutura das minitransações descrita neste capítulo difere um pouco da estrutura descrita em \ref{subsec:estrutura-minitransacoes}. As operações de leitura e escrita originais serão mantidas pois possuem uma semântica diferenciada. A operação de comparação original (comparação por igualdade) será implementada como uma extensão em nossa infraestrutura.
 
 \section{Arquitetura e interface de acesso}
 \label{sec:arquitetura}
@@ -466,7 +506,7 @@ A figura \ref{fig:overview_arquitetura} ilustra a relação entre os componentes
   \label{fig:overview_arquitetura} 
 \end{figure}
 
-A interface de acesso oferecida aos clientes da infraestrutura é a de uma tabela associativa chave-valor: os nós de memória armazenam uma sequência de bytes (valor) nomeados por uma outra sequência de bytes (chave). Cada chave é única e o número de bytes utilizados para armazenar o valor é, teoricamente, ilimitado. Os componentes de acesso são responsáveis por efetuar o mapeamento entre as chaves de dados e os nós de memória que armazenam esses dados, utilizando uma função de espalhamento consistente (\emph{consistent hashing} \cite{consistent_hashing}) aplicada à chave acessada. Como pode ser visto na Figura \ref{fig:funcao_espalhamento}, o componente de acesso irá aplicar uma função de espalhamento consistente \textbf{$F$} à $Chave$, resultando em um número que indica que $Valor$ deve ser armazenado no nó de memória 2. 
+A interface de acesso oferecida aos clientes da infraestrutura é a de uma tabela associativa chave-valor: os nós de memória armazenam uma sequência de bytes (valor) nomeados por uma outra sequência de bytes (chave). Cada chave é única e o número de bytes utilizados para armazenar o valor é, teoricamente, ilimitado. Os componentes de acesso são responsáveis por efetuar o mapeamento entre as chaves e os nós de memória que armazenam esses dados, utilizando uma função de espalhamento consistente (\emph{consistent hashing} \cite{consistent_hashing}) aplicada à chave acessada. Como pode ser visto na Figura \ref{fig:funcao_espalhamento}, o componente de acesso irá aplicar uma função de espalhamento consistente \textbf{$F$} à $Chave$, resultando em um número que indica que $Valor$ deve ser armazenado no nó de memória 2. 
 
 \begin{figure}
   \centering
@@ -489,7 +529,7 @@ Os comandos do protocolo são separados em linhas e são compostos por uma letra
 \begin{itemize}
     \item \textbf{M}(\textit{Identificador}): indica a criação ou execução de uma minitransação com identificador \textit{Identificador}. É composto por subcomandos, como leitura ou escrita, e o seu escopo é delimitado por chaves (\{ e \}).
 
-    \item \textbf{L} \textit{Tamanho} \textit{Chave}: indica a leitura dos bytes associados à chave \textit{Chave}. \textit{Tamanho} indica o número de bytes de \textit{Chave}.
+    \item \textbf{L} \textit{TamanhoChave} \textit{Chave}: indica a leitura dos bytes associados à chave \textit{Chave}. \textit{TamanhoChave} indica o número de bytes de \textit{Chave}.
 
     \item \textbf{E} \textit{TamanhoChave} \textit{Chave} \textit{TamanhoDado} \textit{Dado}: indica a escrita de \textit{Dado}, cujo número de bytes é \textit{TamanhoDado}, no valor associado à \textit{Chave}.
 
@@ -500,32 +540,32 @@ Os comandos do protocolo são separados em linhas e são compostos por uma letra
     \item \textbf{P} \textit{TamanhoDescrição} \textit{Descrição}: indica que ocorreu um erro e que a minitransação não pode ser executada. \textit{Descrição} contém informações sobre o erro ocorrido.
 \end{itemize}
 
-A Figura \ref{fig:protocolo} ilustra a interação entre a aplicação e o coordenador para a execução de uma minitransação cujo identificador é \textit{123} (\textbf{M}(\textit{123})). Essa minitransação possui dois subcomandos: a leitura da chave ``Chave-Leitura'' (\textbf{L} \textit{13 Chave-Leitura}) e a escrita de ``Teste'' na chave ``Chave-Escrita'' (\textbf{E} \textit{13 Chave-Escrita 5 Teste}). Como as chaves são formadas por uma sequência de bytes arbitrária, é necessário que seja expecificado quantos bytes fazem parte da chave. Pelo mesmo motivo é necessário também informar o número de bytes do valor do campo ``Dado''.
+A Figura \ref{fig:protocolo} ilustra a interação entre a aplicação e o coordenador para a execução de uma minitransação cujo identificador é \textit{123} (\textbf{M}(\textit{123})). Essa minitransação possui dois subcomandos: a leitura da chave ``Chave-Leitura'' (\textbf{L} \textit{13 Chave-Leitura}) e a escrita de ``Teste'' na chave ``Chave-Escrita'' (\textbf{E} \textit{13 Chave-Escrita 5 Teste}). Como as chaves são formadas por uma sequência de bytes arbitrária, é necessário que seja especificado quantos bytes fazem parte da chave. Pelo mesmo motivo é necessário também informar o número de bytes do valor do campo ``Dado''.
 
 No exemplo podemos ver os dois cenários de resposta. Em \textbf{a}, a execução da minitransação é bem sucedida e o participante retorna um subcomando de resposta de leitura (\textbf{R} \textit{13 Chave-Leitura 5 Valor}). 
 No cenário \textbf{b}, a execução não foi bem sucedida e o coordenador notifica a aplicação através do comando \textbf{P}, descrevendo o erro ocorrido.
 
-O protocolo de execução de minitransações usado internamente entre os componentes de acesso e os nós de memória é uma extensão do protocolo descrito anteriormente, em que comandos para a efetivação da transação são incluídos, como segue:
+O protocolo de execução de minitransações usado internamente entre os componentes de acesso e os nós de memória é composto por um superconjunto dos comandos do protocolo descrito anteriormente. Os comandos adicionais são:
 
 \begin{itemize}
-    \item \textbf{S}: Este comando sem parâmetros indica que a minitransação foi executada com sucesso no nó de memória, e essa minitransação está pronta para ser efetivada.
+    \item \textbf{S}: Esse comando sem parâmetros indica que a minitransação foi executada com sucesso no nó de memória, e essa minitransação está pronta para ser efetivada.
 
-    \item \textbf{N} \textit{TamanhoDescrição} \textit{Descrição}: Este comando indica que a execução da minitransação não foi bem sucedida e a transação precisa ser cancelada. O parâmetro \textit{Descrição} contém informações relevantes sobre o problema encontrado ao executar a minitransação.
+    \item \textbf{N} \textit{TamanhoDescrição} \textit{Descrição}: Esse comando indica que a execução da minitransação não foi bem sucedida e a transação precisa ser cancelada. O parâmetro \textit{Descrição} contém informações relevantes sobre o problema encontrado ao executar a minitransação.
 
-    \item \textbf{F}: é o comando enviado pelo coordenador para os participantes para informar que a transação foi bem sucedida em todos os nós e que deve ser efetivada.
+    \item \textbf{F}: É o comando enviado pelo coordenador para os participantes para informar que a transação foi bem sucedida em todos os nós e que deve ser efetivada.
 
-    \item \textbf{A}: indica que a transação foi abortada e que os nós de memória devem descartar as possíveis alterações executadas pela minitransação.
+    \item \textbf{A}: Indica que a transação foi abortada e que os nós de memória devem descartar as possíveis alterações executadas pela minitransação.
 \end{itemize}
 
-Os dois primeiros comandos, \textbf{S} e \textbf{N}, são as possíveis respostas dos nós de memória à fase de execução do protocolo indicando, respectivamente, que a transação pode ou não pode ser efetivada. No caso negativo, o nó de memória irá informar no parâmetro \textit{Descrição} o motivo. Os comandos \textbf{F} e \textbf{A} são enviados do coordenador para os nós de memória para indicar que a transação foi ou não efetivada, ficando a cargo dos nós de memória os procedimentos para efetivar ou cancelar as alterações executadas pelas minitransações.
+Os dois primeiros comandos, \textbf{S} e \textbf{N}, são as possíveis respostas dos nós de memória à fase de execução do protocolo indicando, respectivamente, que a transação pode ou não pode ser efetivada. No caso negativo, o nó de memória irá informar no parâmetro \textit{Descrição} o motivo. Os comandos \textbf{F} e \textbf{A} são enviados do coordenador para os nós de memória para indicar que a transação foi ou não efetivada, ficando a cargo dos nós de memória os procedimentos para efetivar ou cancelar as alterações efetuadas pelas minitransações.
 
 \section{Algoritmos e estruturas de dados}
 \label{sec:algoritmos}
-Iremos considerar que os dados da infraestrutura estão distribuídos em $n$ nós de memória $P_1, P_2, \dotsc, P_n$. Cada $P_i$ armazena um conjunto de informações $D_i$. O conjunto de dados $D = \bigcup_{i=1}^n D_i$ representa então o estado do sistema, e os elementos de cada $D_i$ são disjuntos. Existem duas estruturas de dados principais para efetuar a execução das minitransações, e mais duas estruturas adicionais para o controle de concorrência e de falhas:
+Iremos considerar que os dados da infraestrutura estão distribuídos em $n$ nós de memória $P_1, P_2, \dotsc, P_n$. Cada $P_i$ armazena um conjunto de informações $D_i$. O conjunto de dados $D = \bigcup_{i=1}^n D_i$ representa então o estado do sistema, e os elementos de cada $D_i$ são disjuntos. Existem duas estruturas de dados principais utilizadas pelos nós de memória e mais duas estruturas adicionais para o controle de concorrência e de falhas:
 
 \begin{itemize}
 
-    \item \textbf{Tabela de dados}: Cada conjunto \(D_i\) é representado por uma tabela associativa, que pode ser vista como uma função que associa um identificador a um valor, representados respectivamente por \(Id(X)\) e \(Dado(X)\), onde \(X \in D_i\). Esta tabela suporta as seguintes operações:
+    \item \textbf{Tabela de dados}: Cada conjunto \(D_i\) é representado por uma tabela associativa, que pode ser vista como uma função que associa um identificador a um valor, representados respectivamente por \(Id(X)\) e \(Dado(X)\), onde \(X \in D_i\). Essa tabela suporta as seguintes operações:
 
     \begin{enumerate}
         \item $Ler(Id(X))$, que retorna $Dado(X)$ ou um valor especial ($NULO$) caso $X \notin D_i$
@@ -533,7 +573,7 @@ Iremos considerar que os dados da infraestrutura estão distribuídos em $n$ nó
         \item $Escrever(Id(X), V)$, que atribui a $Dado(X)$ o valor $V$ caso $X \in D_i$ ou que insere $X$ em $D_i$ ($D_i \gets D_i \cup \{X\}$) caso contrário. 
     \end{enumerate}
  
-    \item \textbf{Registro de operações} (\emph{log}): É uma lista ordenada de operações de escrita sobre os dados. Os elementos dessa lista estão no formato $(I_t,$ $Id(X),$ $Dado(X),$ $Dado'(X))$ onde $I_t$ é o identificador da minitransação executada, $Id(X)$ e $Dado(X)$ são o identificador e o valor do elemento $X$ armazenado na tabela de dados, e $Dado'(X)$ é o novo valor do elemento $X$ que deve ser associado a $Dado(X)$ caso a minitransação $I_t$ seja efetivada. Essa estrutura permite que as operações de transações efetivadas sejam aplicadas corretamente e permite que o sistema se recupere de falhas. As seguintes operações são suportadas pelo \emph{log}:
+    \item \textbf{Registro de operações} (\emph{log}): É uma lista ordenada de operações de escrita sobre os dados. Os elementos dessa lista estão no formato $(Id(X),$ $Dado(X),$ $Dado'(X))$ onde $Id(X)$ e $Dado(X)$ são o identificador e o valor do elemento $X$ armazenado na tabela de dados, e $Dado'(X)$ é o novo valor do elemento $X$ que deve ser associado a $Dado(X)$ caso a minitransação $I_t$ seja efetivada. Essa estrutura permite que as operações de transações efetivadas sejam aplicadas corretamente e permite que o sistema se recupere de falhas. As seguintes operações são suportadas pelo \emph{log}:
 
         \begin{enumerate}
             \item $Adicionar(l, t, o)$, que adiciona uma operação $o$ da transação $t$ ao final da lista de operações identificada por $l$.
@@ -543,9 +583,9 @@ Iremos considerar que os dados da infraestrutura estão distribuídos em $n$ nó
             \item $Gravar(l)$, que força que o registro de operações identificado por $l$ seja gravado em alguma forma de armazenamento persistente, como um disco rígido.
         \end{enumerate}
 
-    \item \textbf{Tabela de minitransações}: registra a situação de uma determinada minitransação identificada por $I_t$. As possíveis situações de uma minitransação podem ser $AGUARDANDO$, $EFETIVADA$ ou $CANCELADA$.
+    \item \textbf{Tabela de minitransações}: É um conjunto que registra a situação de uma determinada minitransação identificada por $I_t$. As possíveis situações de uma minitransação podem ser $AGUARDANDO$, $EFETIVADA$ ou $CANCELADA$.
 
-    \item \textbf{Tabela de travas}: associa a uma chave $c$ dois possíveis valores, chamados travas: $LEITURA$ e $ESCRITA$. A função $Travar(I_t, L, E)$ tenta associar aos elementos de $L$ a trava $LEITURA$ e aos elementos de $E$ a trava $ESCRITA$, retornando $TRAVOU$ caso seja possível, ou $FALHOU$ caso contrário. A função $Liberar(I_t)$ retira todas as travas associadas à transação $I_t$.
+    \item \textbf{Tabela de travas}: Associa a uma chave $c$ dois possíveis valores, chamados travas: $LEITURA$ e $ESCRITA$. A função $Travar(I_t, L, E)$ tenta associar aos elementos de $L$ a trava $LEITURA$ e aos elementos de $E$ a trava $ESCRITA$, retornando $TRAVOU$ caso seja possível, ou $FALHOU$ caso contrário. A função $Liberar(I_t)$ retira todas as travas associadas à transação $I_t$.
 \end{itemize}
 
 Um exemplo das operações sobre as estruturas principais e a relação entre elas pode ser visto na figura \ref{fig:estruturas}. Nessa figura, são executadas duas operações: uma leitura de ``Chave 1'', resultando em ``Dado 1'', e uma escrita em ``Chave N'', resultando na alteração do valor associado à essa chave para ``ABC''. Antes que essas duas operações possam ocorrer, são obtidas duas travas---uma de leitura para a chave ``Chave 1'' e uma de escrita para a chave ``Chave N''. O registro $(I_T, Chave N, Dado N, ABC)$ é adicionado ao \emph{log} de operações, e o elemento $\{I_t, AGUARDANDO\}$ é incluído na tabela de minitransações.
@@ -557,108 +597,139 @@ Um exemplo das operações sobre as estruturas principais e a relação entre el
   \label{fig:estruturas} 
 \end{figure}
 
-A execução da transação $(I, C, L, E)$ é efetuada de maneira distribuída entre o coordenador da transação e o participante. O comportamento do coordenador é descrito pelo Algoritmo \ref{alg:mini_coordenador}. $I_t$ é o identificador da transação, e é unicamente determinado pelo coordenador, relacionado com o identificador $I$ enviado pelo cliente. $C$ é o conjunto de comandos de extensão --- esses comandos indicarão ao nó de memória se a minitransação pode ser efetivada ou não, de forma análoga à operação de comparaçao das minitransações originais. $L$ é o conjunto de itens a serem lidos e $E$ é o conjunto de dados a serem atualizados ou inseridos. $L_j, Id[C_j]\text{ e } Id[E_j] \in D_j$ são os conjuntos de identificadores da transação que estão armazenados em $P_j$. Além disso, $Op(c)$ indica a operação associada ao comando $c \in C_j$ e $Parametros(c)$ representa a lista de parâmetros de $c$. Cada participante $p_j$ mantém um \emph{log} de operações $log_{p_j}$, uma tabela de minitransações $mt_{p_j}$ e uma tabela de travas $travas_{p_j}$.
+O comportamento do coordenador é descrito pelo Algoritmo \ref{alg:mini_coordenador}. $I_t$ é o identificador da transação, e é unicamente determinado pelo coordenador, relacionado com o identificador $I$ enviado pelo cliente. $C$ é o conjunto de comandos de extensão --- esses comandos indicarão ao nó de memória se a minitransação pode ser efetivada ou não, de forma análoga à operação de comparaçao das minitransações originais. $L$ é o conjunto de itens a serem lidos e $E$ é o conjunto de dados a serem atualizados ou inseridos. $L_j, Id[C_j]\text{ e } Id[E_j]$ são os conjuntos de identificadores da transação que estão armazenados em $P_j$, onde $L_j\text{ e }Id[C_J] \in D_j\text{ e }Id[E_j] \supseteq D_j$. $Op(c)$ indica a operação associada ao comando $c \in C_j$ e $Parametros(c)$ representa a lista de parâmetros de $c$. Cada participante $p_j$ mantém um \emph{log} de operações $log_{p_j}$, uma tabela de minitransações $mt_{p_j}$ e uma tabela de travas $travas_{p_j}$.
 
 \begin{algorithm}
     \caption{Coordenador - recebe uma transação no formato $(I, C, L, E)$}
     \label{alg:mini_coordenador}
-    \begin{algorithmic}[1]
-        \State $repetir \gets false$
-        \Repeat
-            \State $I_t \gets GerarIdentificador(I)$
-            \ForAll{$p_j \in Participantes(C, L, E)$}
-                \State $Enviar(p_j, (I_t, C_j, L_j, E_j))$
-            \EndFor
-            \State $d \gets EFETIVAR$
-            \State $R \gets \{\}$
-            \ForAll{$p_j \in Participantes$}
-                \State $(v_j, r_j) \gets Receber(p_j)$
-                \If{$v_j = FALHOU\_AO\_TRAVAR$}
-                    \State $repetir \gets true$
-                    \State $d \gets ABORTAR$
-                \ElsIf{$v_j = ABORTAR$}
-                    \State $repetir \gets false$
-                    \State $d \gets ABORTAR$
-                    \State $P \gets$ Descrição do Problema
-                \Else 
-                    \State $repetir \gets false$
-                    \State $R \gets r_j \cup R$
-                \EndIf
-            \EndFor
-            \ForAll{$p_j \in Participantes$}
-                \State $Enviar(p_j, (d, I_t))$
-            \EndFor
-        \Until{$repetir$}
-        \If{$d \neq ABORTAR$}
-            \State $Enviar(Cliente, (I, R))$
-        \Else
-            \State $Enviar(Cliente, (I, P))$
-        \EndIf
-    \end{algorithmic}
+    \dontprintsemicolon
+    \Inicio
+    {    
+        $repetir \gets false$\;
+        \Repita{$repetir = false$}
+        {
+            $I_t \gets GerarIdentificador(I)$\;
+            \ParaTodo{$p_j \in Participantes(C, L, E)$}
+            {
+                $Enviar(p_j, (I_t, C_j, L_j, E_j))$\;
+            }
+            $d \gets EFETIVAR$\;
+            $R \gets \{\}$\;
+            \ParaTodo{$p_j \in Participantes$}
+            {
+                $(v_j, r_j) \gets Receber(p_j)$\;
+                \uSe{$v_j = FALHOU\_AO\_TRAVAR$}
+                {    
+                    $repetir \gets true$\;
+                    $d \gets ABORTAR$\;
+                }
+                \uSenaoSe{$v_j = ABORTAR$}
+                {
+                    $repetir \gets false$\;
+                    $d \gets ABORTAR$\;
+                    $P \gets$ Descrição do Problema\;
+                }
+                \Senao 
+                {
+                    $repetir \gets false$\;
+                    $R \gets r_j \cup R$\;
+                }
+            }
+            \ParaTodo{$p_j \in Participantes$}
+            {
+                $Enviar(p_j, (d, I_t))$\;
+            }
+        }
+        \eSe{$d \neq ABORTAR$}
+        {
+            $Enviar(Cliente, (I, R))$\;
+        }
+        {
+            $Enviar(Cliente, (I, P))$\;
+        }
+    }
 \end{algorithm}
 
 \begin{algorithm}
     \caption{Execução - $p_j$ recebe $(I_t, C_j, L_j, E_j)$ de $c$}
     \label{alg:mini_participante1}
-    \begin{algorithmic}[1]
-        \State $mt_{p_j} \gets (I_t, AGUARDANDO) \cup mt_{p_j}$
-        \If{$Travar(C_j \cup L_j, E_j) = FALHOU$}
-            \State $Enviar(c, (FALHOU\_AO\_TRAVAR))$
-        \ElsIf{$(I_t, CANCELADA) \in mt_{p_j}$}
-            \State $Enviar(c, (ABORTAR, $``Cancelado pelo gerenciador''$))$
-        \Else
-            \State $d \gets EFETIVAR$
-            \ForAll{$c \in C_j$}
-                \If{$Executar(Op(c), Id(c), Parametros(c)) = Erro$}
-                    \State $d \gets ABORTAR$
-                \EndIf
-            \EndFor
-            \State $R_l \gets \{\}$
-            \If{$d = EFETIVAR$}
-                \ForAll{$l \in L_j$}
-                    \State $R_l \gets Ler(Id(l)) \cup R_l$
-                \EndFor
+    \dontprintsemicolon
+    \Inicio
+    {
+        \uSe{$Travar(C_j \cup L_j, E_j) = FALHOU$}
+        {
+            $Enviar(c, (FALHOU\_AO\_TRAVAR))$\;
+        }
+        \uSenaoSe{$(I_t, CANCELADA) \in mt_{p_j}$}
+        {
+            $Enviar(c, (ABORTAR, $``Cancelado pelo gerenciador''$))$\;
+        }
+        \Senao
+        {
+            $mt_{p_j} \gets (I_t, AGUARDANDO) \cup mt_{p_j}$\;
+            $d \gets EFETIVAR$\;
+            \ParaTodo{$c \in C_j$}
+            {
+                \Se{$Executar(Op(c), Id(c), Parametros(c)) = Erro$}
+                {
+                    $d \gets ABORTAR$\;
+                }
+            }
+            $R_l \gets \{\}$\;
+            \Se{$d = EFETIVAR$}
+            {
+                \ParaTodo{$l \in L_j$}
+                {
+                    $R_l \gets Ler(Id(l)) \cup R_l$\;
+                }
                 
-                \ForAll{$e \in E_j$}
-                    \State $Adicionar(log_{p_j}, I_t, (Id(e), Ler(Id(e)), Dado(e)) )$
-                \EndFor
+                \ParaTodo{$e \in E_j$}
+                {
+                    $Adicionar(log_{p_j}, I_t, (Id(e), Ler(Id(e)), Dado(e)) )$\;
+                }
 
-                \State $Gravar(log_{p_j})$
-            \Else
-                \State $Liberar(I_t)$
-            \EndIf
-            \State $Enviar(c, (d, R_l))$
-        \EndIf
-    \end{algorithmic}
+                $Gravar(log_{p_j})$\;
+            }
+            {
+                $Liberar(I_t)$\;
+            }
+            $Enviar(c, (d, R_l))$\;
+        }
+    }
 \end{algorithm}
 
 \begin{algorithm}
     \caption{Confirmação - $p_j$ recebe $(d, I_t)$ de $c$}
     \label{alg:mini_participante2}
-    \begin{algorithmic}[1]
-        \If{$d = EFETIVAR$}
-            \ForAll{$(Id(X),Dado(X),Dado'(X)) \in Selecionar(log_{p_j}, I_t)$}
-                \State $Escrever(Id(X), Dado'(X))$
-            \EndFor
-            \State $mt_{p_j} \gets (I_t, EFETIVADA) \cup mt_{p_j}$
-        \Else
-            \State $mt_{p_j} \gets (I_t, CANCELADA) \cup mt_{p_j}$
-        \EndIf
-        \State $Adicionar(log_{p_j}, I_t, d)$
-        \State $Gravar(log_{p_j})$
-        \State $Liberar(I_t)$
-    \end{algorithmic}
+    \dontprintsemicolon
+    \Inicio
+    {
+        \eSe{$d = EFETIVAR$}
+        {    
+            \ParaTodo{$(Id(X),Dado(X),Dado'(X)) \in Selecionar(log_{p_j}, I_t)$}
+            {    
+                $Escrever(Id(X), Dado'(X))$\;
+            }
+            $mt_{p_j} \gets (I_t, EFETIVADA) \cup mt_{p_j}$\;
+        }
+        {
+            $mt_{p_j} \gets (I_t, CANCELADA) \cup mt_{p_j}$\;
+        }
+        $Adicionar(log_{p_j}, I_t, d)$\;
+        $Gravar(log_{p_j})$\;
+        $Liberar(I_t)$\;
+    }
 \end{algorithm}
 
 Todos os nós de memória que irão participar da transação são identificadas através do conjunto de identificadores dos dados dos conjuntos $C$, $L$ e $E$ da transação por meio da função $Participantes$. O algoritmo envia uma minitransação com identificador $I_t$ para cada participante. Ao receber a minitransação, cada nó de memória segue o procedimento descrito no Algoritmo \ref{alg:mini_participante1}, primeiro adicionando a nova minitransação no conjunto de minitransações. Depois o nó de memória tenta obter todas as travas para acessar os dados especificados na minitransação---essa estratégia é usada para evitar problemas de esperas cíclicas (\emph{deadlocks}) entre diferentes minitransações. Uma resposta especial, $FALHOU\_AO\_TRAVAR$ é enviada caso não tenha sido possível obter alguma trava. Se conseguiu obter todas as travas, o nó de memória vai executar os comandos de extensão, e se algum deles retornar $ERRO$, a minitransação será abortada.
 
- Após a execução, os participantes respondem à primeira fase do protocolo para o coordenador, que analisa cada resposta para descobrir o resultado da transação. Caso uma das respostas seja $FALHOU\_AO\_TRAVAR$, o coordenador deve abortar a transação em todos os participantes e iniciar novamente a execução. Uma resposta $ABORTAR$ indica que algum comando de extensão não foi bem sucedido, a transação é cancelada em todos os nós e o protocolo termina. Se todos os nós responderem com $EFETIVAR$, as respostas aos comandos de leitura são agregadas no conjunto $R$ e retornadas para a aplicação cliente. 
+Após a execução, os participantes respondem à primeira fase do protocolo para o coordenador, que analisa cada resposta para descobrir o resultado da transação. Caso uma das respostas seja $FALHOU\_AO\_TRAVAR$, o coordenador deve abortar a transação em todos os participantes e iniciar novamente a execução. Uma resposta $ABORTAR$ indica que algum comando de extensão não foi bem sucedido, a transação é cancelada em todos os nós e o protocolo termina. Se todos os nós responderem com $EFETIVAR$, as respostas aos comandos de leitura são agregadas no conjunto $R$ e retornadas para a aplicação cliente. 
 
- A decisão sobre a efetivação ou cancelamento da transação é comunicada a cada nó de memória, que segue o procedimento descrito no Algoritmo \ref{alg:mini_participante2}. Caso a decisão tenha sido para efetivar a minitransação, o participante irá vasculhar o seu \emph{log} por operações relacionadas à transação $I_t$ e irá executar essas transações, alterando a tabela de dados caso operações de escrita tenham sido especificadas na minitransação. A decisão sobre a efetivação ou cancelamento da minitransação é registrada no \emph{log} de cada participante e esse \emph{log} é gravado em disco.
+A decisão sobre a efetivação ou cancelamento da transação é comunicada a cada nó de memória, que segue o procedimento descrito no Algoritmo \ref{alg:mini_participante2}. Caso a decisão tenha sido para efetivar a minitransação, o participante irá vasculhar o seu \emph{log} por operações relacionadas à transação $I_t$ e irá executar essas transações, alterando a tabela de dados caso operações de escrita tenham sido especificadas na minitransação. A decisão sobre a efetivação ou cancelamento da minitransação é registrada no \emph{log} de cada participante e esse \emph{log} é gravado em disco.
 
-Notamos que, de forma contrária ao que ocorre no \emph{2PC}, o coordenador nunca escreve em um \emph{log}. Como os componentes de acesso estarão em geral nas mesmas máquinas que as aplicações cliente, e essas máquinas são consideradas menos confiáveis que as máquinas em que os nós de memória estarão, essa abordagem permite que a execução de uma minitransação possa continuar caso o coordenador fique indisponível. O procedimento para recuperação em casos de falhas nesse cenário é mais complexo do que o caso centralizado do 2PC, em que a recuperação de falhas é feita a partir do \emph{log} do coordenador.
+Diferentemente do que ocorre no \emph{2PC}, o coordenador nunca escreve em um \emph{log}. Como os componentes de acesso estarão em geral nas mesmas máquinas que as aplicações cliente, e essas máquinas são consideradas menos confiáveis que as máquinas em que os nós de memória estarão, essa abordagem permite que a execução de uma minitransação possa continuar caso o coordenador fique indisponível. O procedimento para recuperação em casos de falhas nesse cenário é mais complexo do que o caso centralizado do 2PC, em que a recuperação de falhas é feita a partir do \emph{log} do coordenador.
 
-A recuperação de falhas na nossa infraestrutura será efetuada pelo nó de gerenciamento. Esse procedimento pode ser ativado tanto manualmente quanto de forma automática. O nó de gerenciamento consulta os nós de memória sobre minitransações que estejam na situação $AGUARDANDO$ por mais que um determinado período de tempo e, caso haja alguma, o nó irá solicitar que essa minitransação seja abortada. Nesse caso, o participante irá mudar a situação da minitransação para $CANCELADA$, e o algoritmo \ref{alg:mini_participante1} irá validar essa situação. Nos algoritmos descritos é assumido que a operação de união de conjuntos considerará a unicidade do elemento baseado no identificador da transação. Por exemplo, se o conjunto $mt_{p_j}$ já possuir um elemento $(k, S)$, sendo $k$ um identificador e $S$ uma situação, se tentarmos efetuar a operação $mt_{p_j} \cup (k, S_1)$, essa dupla irá substituir a dupla $(k,S)$ em $mt_{p_j}$.
+A recuperação de falhas na nossa infraestrutura será efetuada pelo nó de gerenciamento. Esse procedimento pode ser ativado tanto manualmente quanto de forma automática. O nó de gerenciamento consulta os nós de memória sobre minitransações que estejam na situação $AGUARDANDO$ por mais que um determinado período de tempo e, caso haja alguma, o nó irá solicitar que essa minitransação seja abortada. Nesse caso, o participante irá mudar a situação da minitransação para $CANCELADA$, e o algoritmo \ref{alg:mini_participante1} irá validar essa situação (linha 4). Nos algoritmos descritos é assumido que a operação de união de conjuntos considerará a unicidade do elemento baseado no identificador da transação. Por exemplo, se o conjunto $mt_{p_j}$ já possuir um elemento $(k, S)$, sendo $k$ um identificador e $S$ uma situação, se tentarmos efetuar a operação $mt_{p_j} \cup (k, S_1)$, essa dupla irá substituir a dupla $(k,S)$ em $mt_{p_j}$.
 
 O controle de concorrência efetuado pelos nós de memória visa oferecer uma forma de sequenciamento entre as operações de minitransações concorrentes que, de forma similar às transações sequencíaveis de bancos de dados convencionais \cite{vaca}, tem o efeito de garantir que as operações de uma minitransação não interfiram nas operações de outras minitransações. Para efetuar a leitura da chave $c$, o nó de memória deve primeiro tentar associar uma trava $LEITURA$ à chave $c$ na tabela de travas. Essa associação só pode ocorrer se não houver nenhuma trava do tipo $ESCRITA$ associada a essa chave. A associação de uma trava $ESCRITA$ só pode ocorrer se não houver nenhuma trava $LEITURA$ ou $ESCRITA$ associada à chave $c$.
 
@@ -666,21 +737,21 @@ O controle de concorrência efetuado pelos nós de memória visa oferecer uma fo
 \label{sec:trabalhos_relacionados}
 O conceito de minitransações é introduzido como base para a construção de \emph{Sinfonia} \cite{sinfonia}, um sistema cujo foco é prover a base para o desenvolvimento de sistemas distribuídos de baixo nível, como sistemas de arquivos distribuídos, gerenciadores de travas ou serviços de comunicação de grupos de computadores, enquanto que o objetivo deste trabalho é utilizar as minitransações como base para a construção de uma infraestrutura que facilite o desenvolvimento de aplicações distribuídas de alto nível, como sistemas de comércio eletrônico ou redes sociais. 
 
-\emph{Sinfonia} é composto também por nós de memória que armazenam os dados, mas a interface exposta por estes componentes é diferente: cada nó de memória mantém uma sequência de bytes puros, sem dar interpretação específica a esses bytes. Estes bytes são organizados como em um espaço de endereçamento linear, sem nenhuma estrutura. Cada nó de memória possui um espaço de endereçamento separado de forma que os dados são referenciados por um par que especifica o nó de memória e o endereço deste dado. Em nossa infraestrutura, o acesso é feito através de uma única chave, que é um conjunto de bytes que faça sentido para a aplicação.
+\emph{Sinfonia} é composto também por nós de memória que armazenam os dados, mas a interface exposta por estes componentes é diferente: cada nó de memória mantém uma sequência de bytes puros, organizados em um espaço de endereçamento linear, sem nenhuma estrutura. Cada nó de memória possui um espaço de endereçamento separado de forma que os dados são referenciados por um par que especifica o nó de memória e o endereço deste dado. Em nossa infraestrutura, o acesso é feito através de uma única chave, que é um conjunto de bytes que faça sentido para a aplicação.
 
-Ao invés de utilizar um componente de acesso como em nossa infraestrutura, \emph{Sinfonia} disponibiliza uma biblioteca que é compilada junto ao aplicativo cliente, e o acesso aos nós de memória são efetuados por esta biblioteca. Em nosso infraestrutura, o componente de acesso permite isolar a aplicação de detalhes da distribuição dos dados entre os nós de memória, e pode ser acessado pela rede. Acreditamos que esta abordagem seja mais efetiva que a abordagem que utiliza uma biblioteca, pois qualquer linguagem que permita a utilização da pilha TCP/IP poderá utilizar nossa infraestrutura, ao passo que se disponibilizarmos uma biblioteca, somente as linguagens para as quais uma biblioteca for escrita poderão usufruir da infraestrutra.
+Ao invés de utilizar um componente de acesso como em nossa infraestrutura, \emph{Sinfonia} disponibiliza uma biblioteca que é compilada junto ao aplicativo cliente, e o acesso aos nós de memória é feito por meio dessa biblioteca. Em nossa infraestrutura, o componente de acesso permite isolar a aplicação de detalhes da distribuição dos dados entre os nós de memória, e pode ser acessado pela rede. Acreditamos que esta abordagem seja mais efetiva que a abordagem que utiliza uma biblioteca, pois qualquer linguagem que permita a utilização da pilha TCP/IP poderá utilizar nossa infraestrutura, ao passo que se disponibilizarmos uma biblioteca, somente as linguagens para as quais uma biblioteca for escrita poderão usufruir da infraestrutra.
 
-\cite{padilha} apresenta um sistema de armazenamento baseado em minitransações tolerante a falhas bizantinas. Em sistemas que toleram somente componentes com falhas simples (\emph{fail-stop components}), é assumido que um componente pode estar em dois estados: ativo e inativo. Se estiver em um estado ativo, o componente se comportará de acordo com a especificação do sistema. Se estiver inativo, o componente simplesmente para de interagir com o sistema. Está é uma simples e um tanto simplificada de lidar com falhas no sistema, mas é a forma utilizada por diversos sistemas, entre ele \emph{Sinfonia} e a nossa infraestrutura. A maneira mais geral de lidar com falhas é através de falhas bizantinas (\cite{byzantine}). Em sistemas que lidam com este tipo de falha, um componente ativo pode se comportar de forma incorreta, enviando mensagens com conteúdo aleatório (correto ou incorreto), ou não enviando mensagem nenhuma. O tratamento de falhas bizantinas não será discutido neste trabalho.
+\cite{padilha} apresenta um sistema de armazenamento baseado em minitransações tolerante a falhas bizantinas. Em sistemas que toleram somente componentes com falhas simples (\emph{fail-stop components}), é assumido que um componente pode estar em dois estados: ativo e inativo. Se estiver em um estado ativo, o componente se comportará de acordo com a especificação do sistema. Se estiver inativo, o componente simplesmente para de interagir com o sistema. Essa é uma maneira simples e um tanto simplificada de lidar com falhas no sistema, mas é a forma utilizada por diversos sistemas, entre ele \emph{Sinfonia} e a nossa infraestrutura. A maneira mais geral de lidar com falhas é através de falhas bizantinas (\cite{byzantine}). Em sistemas que lidam com esse tipo de falha, um componente ativo pode se comportar de forma incorreta, enviando mensagens com conteúdo aleatório (correto ou incorreto), ou não enviando mensagem nenhuma. O tratamento de falhas bizantinas não será discutido neste trabalho.
 
 Como nosso sistema, gerenciadores de bancos de dados relacionais também permitem a execução de transações, como Oracle e MySQL. O tipo de transação oferecida por esses sistemas é normalmente chamada de ACID (Atomicidade, Consistência, Isolamento e Durabilidade) \cite{vaca}. Essas transações podem ser usadas em cenários nos quais não conseguimos utilizar as minitransações, sendo portanto muito mais gerais. Porém, devido às propriedades que devem garantir, o uso dessas transações não permite escalar o banco de dados para um grande número de máquinas, algo que as minitransações permitem.
 
-Existem diversos sistemas que visam o armazenamento escalável de informações e a disponibilização de serviços para facilitar o desenvolvimento de sistemas distribuídos, em geral tendo em vista a utilização para prover serviços a aplicações de internet de larga escala. Entre eles, podemos citar Bigtable (\cite{bigtable}), Dynamo (\cite{dynamo}), ZooKeeper (\cite{zookeeper}), PNUTS (\cite{pnuts}), entre outros. 
+Existem diversos sistemas que visam o armazenamento escalável de informações e a disponibilização de serviços para facilitar o desenvolvimento de sistemas distribuídos, visando em geral a utilização em aplicações de internet de larga escala. Entre eles, podemos citar Bigtable (\cite{bigtable}), Dynamo (\cite{dynamo}), ZooKeeper (\cite{zookeeper}), PNUTS (\cite{pnuts}), entre outros. 
 
-Bigtable é o sistema de armazenamento distribuído do Google que oferece uma abstração de um mapa ordenado, multi-dimensional, esparço e distribuído. Dynamo, da Amazon, uma sistema de armazenamento chave-valor que visa oferecer alta disponibilidade à aplicações. Esses dois sistemas permitem que dados sejam particionados e replicados para obter melhor performance e disponibilidade, mas permitem que diferentes máquinas possam ter versões diferentes de uma mesma informação. 
+Bigtable é o sistema de armazenamento distribuído do Google que oferece uma abstração de um mapa ordenado, multi-dimensional, esparço e distribuído. Dynamo, da Amazon, é um sistema de armazenamento chave-valor que visa oferecer alta disponibilidade à aplicações. Esses dois sistemas permitem que dados sejam particionados e replicados para obter melhor performance e disponibilidade, mas permitem que diferentes máquinas possam ter versões diferentes de uma mesma informação. 
 
-ZooKeeper é um sistema que provê serviços de coordenação e sincronização para a construção de sistemas distribuídos que utiliza o algoritmo Paxos (\cite{paxos}) para garantir consistência entre as operações. Como o foco do ZooKeeper é permitir a coordenação entre componentes de uma sistema distribuído, sua capacidade de armazenamento é limitada (em um megabyte), e portanto não é utilizável como um repositório de dados.
+ZooKeeper é um sistema que provê serviços de coordenação e sincronização para a construção de sistemas distribuídos que utiliza o algoritmo Paxos (\cite{paxos}) para garantir consistência entre as operações. Como o foco do ZooKeeper é permitir a coordenação entre componentes de um sistema distribuído, sua capacidade de armazenamento é limitada (em um megabyte), e portanto não é utilizável como um repositório de dados.
 
-PNUTS é o serviço de armazenamento de dados do Yahoo! que garante que todas as réplicas de um determinado dado armazenado executam as mesmas alterações, na mesma ordem. PNUTS permite a existência de várias versões de um dado, e oferece uma primitiva \emph{test-and-set-write}, que efetua uma escrita de dados somente se uma determinada versão do dado for encontrada.
+PNUTS é o serviço de armazenamento de dados do Yahoo! que garante que todas as réplicas de um determinado dado armazenado executam as mesmas alterações, na mesma ordem. PNUTS permite a existência de várias versões de um dado, e oferece uma primitiva \emph{test-and-set-write}, que efetua uma escrita de dados somente se uma determinada versão do dado for encontrada, semelhante ao mecanismo das minitransações.
 
 Por último, Hazelcast (\cite{hazelcast}) e Akka (\cite{akka}) são ferramentas para o desenvolvimento de sistemas distribuídos que visam eliminar a necessidade de comunicação explícita entre os participantes do sistema, oferecendo abstrações como estruturas de dados distribuídas ou memória transacional. Hazelcast oferece a programas rodando na \emph{JVM Java} implementações distribuídas das coleções da biblioteca padrão (\emph{Collection, Set, List e Map}). Akka permite a utilização de memória transacional por \emph{software} (\cite{stm}), uma abordagem que emprega o conceito de transação discutido neste trabalho em operações de leitura e escrita na memória principal do computador.
 
