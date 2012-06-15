@@ -43,7 +43,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -72,25 +72,20 @@
        sodipodi:cy="460"
        sodipodi:rx="152.85715"
        sodipodi:ry="65.714287"
-       d="m 391.42857,460 a 152.85715,65.714287 0 1 1 -305.714291,0 152.85715,65.714287 0 1 1 305.714291,0 z"
+       d="m 391.42857,460 c 0,36.293 -68.43647,65.71429 -152.85714,65.71429 -84.42067,0 -152.857151,-29.42129 -152.857151,-65.71429 0,-36.293 68.436481,-65.71429 152.857151,-65.71429 84.42067,0 152.85714,29.42129 152.85714,65.71429 z"
        transform="matrix(0.6795891,0,0,0.49926159,-53.55911,620.7733)" />
     <text
        xml:space="preserve"
        style="font-size:28px;font-style:normal;font-weight:bold;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
-       x="574.81372"
-       y="844.46619"
+       x="576.81372"
+       y="860.46619"
        id="text4501"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan4503"
-         x="574.81372"
-         y="844.46619"
-         style="fill:#803300">Componente</tspan><tspan
-         sodipodi:role="line"
-         x="574.81372"
-         y="879.46619"
+         x="576.81372"
+         y="860.46619"
          id="tspan4505"
-         style="fill:#803300">de Acesso</tspan></text>
+         style="fill:#803300">Coordenador</tspan></text>
     <rect
        style="fill:none;stroke:#803300;stroke-width:4.20759821;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:1.0023999"
        id="rect4507"
