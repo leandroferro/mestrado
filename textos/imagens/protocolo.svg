@@ -47,27 +47,6 @@
      inkscape:groupmode="layer"
      inkscape:label="protocolo"
      transform="matrix(1.25,0,0,-1.25,0,710)"><g
-   id="g3293"
-   transform="translate(30.4,-1.6)"><text
-   id="text3295"
-   transform="matrix(0.993579,0,0,-1,195.436,477.52)"><tspan
-     id="tspan3297"
-     y="0"
-     x="0"
-     style="font-size:28.89290047px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#000080;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans-Bold">M</tspan></text>
-
-</g><g
-   id="g3299"
-   transform="translate(30.4,-1.6)"><text
-   id="text3301"
-   transform="matrix(0.993579,0,0,-1,224.032,477.52)"><tspan
-     id="tspan3303"
-     sodipodi:role="line"
-     y="0"
-     x="0 11.264496 29.662323 48.031845 66.429672 77.694168"
-     style="font-size:28.89290047px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">(123){</tspan></text>
-
-</g><g
    id="g3305"
    transform="translate(30.4,-1.6)"><text
    id="text3307"
@@ -76,6 +55,7 @@
      y="0"
      x="0"
      style="font-size:28.89290047px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#000080;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans-Bold">L</tspan></text>
+
 
 </g><g
    id="g3311"
@@ -88,6 +68,7 @@
      x="0 18.369127 45.926163 66.115227 84.439713 102.15706 119.23858 137.00098 147.40677 162.97649 180.73889 188.74709 200.07036 218.39444 230.29439"
      style="font-size:28.89290047px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">13Chave-Leitura</tspan></text>
 
+
 </g><g
    id="g3317"
    transform="translate(30.4,-1.6)"><text
@@ -97,6 +78,7 @@
      y="0"
      x="0"
      style="font-size:28.89290047px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#000080;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans-Bold">E</tspan></text>
+
 
 </g><g
    id="g3323"
@@ -113,6 +95,7 @@
      x="-59.9305"
      style="font-size:28.89290047px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">}</tspan></text>
 
+
 </g><path
    inkscape:connector-curvature="0"
    id="path3331"
@@ -127,6 +110,7 @@
      y="0"
      x="0 17.510401 33.766399 40.857418 47.97422 62.080002 77.772797 87.807999 94.924797 110.08"
      style="font-size:25.60000038px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">Aplicativo</tspan></text>
+
 
 </g><path
    inkscape:connector-curvature="0"
@@ -153,27 +137,6 @@
    id="path3349"
    style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
    d="m 772.818,429.01 -21.457,-10.653 0,21.305 21.457,-10.652 z" /><g
-   id="g3351"
-   transform="translate(30.4,-17.6)"><text
-   id="text3353"
-   transform="matrix(0.993579,0,0,-1,196.142,297.704)"><tspan
-     id="tspan3355"
-     y="0"
-     x="0"
-     style="font-size:28.89290047px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans-Bold">M</tspan></text>
-
-</g><g
-   id="g3357"
-   transform="translate(30.4,-17.6)"><text
-   id="text3359"
-   transform="matrix(0.993579,0,0,-1,224.737,297.704)"><tspan
-     id="tspan3361"
-     sodipodi:role="line"
-     y="0"
-     x="0 11.268231 29.672937 48.048824 66.453674 77.721909 86.938896 105.31478"
-     style="font-size:28.89290047px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">(123) { </tspan></text>
-
-</g><g
    id="g3363"
    transform="translate(30.4,-17.6)"><text
    id="text3365"
@@ -182,6 +145,7 @@
      y="0"
      x="0"
      style="font-size:28.89290047px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans-Bold">R</tspan></text>
+
 
 </g><g
    id="g3369"
@@ -197,6 +161,7 @@
      y="36.116001"
      x="-61.5275"
      style="font-size:28.89290047px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">}</tspan></text>
+
 
 </g><path
    inkscape:connector-curvature="0"
@@ -251,6 +216,7 @@
      x="702.86823"
      y="-532.51898">Coordenador</tspan></text>
 
+
 <text
    id="text3401"
    transform="matrix(1,0,0,-1,396.422,159.61)"><tspan
@@ -260,32 +226,12 @@
      x="0 19.040001"
      style="font-size:22.39999962px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans-Bold">OU</tspan></text>
 
+
 </g><path
    inkscape:connector-curvature="0"
    id="path3405"
    style="fill:none;stroke:#000000;stroke-width:2.00480008;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:2.0048, 2.0048;stroke-dashoffset:0.80192"
    d="m 219.365,13.2 459.457,0 0,127.793 -459.457,0 0,-127.793 z" /><g
-   id="g3407"
-   transform="translate(30.4,11.2)"><text
-   id="text3409"
-   transform="matrix(1,0,0,-1,198.732,91.6484)"><tspan
-     id="tspan3411"
-     y="0"
-     x="0"
-     style="font-size:28.79999924px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans-Bold">M</tspan></text>
-
-</g><g
-   id="g3413"
-   transform="translate(30.4,11.2)"><text
-   id="text3415"
-   transform="matrix(1,0,0,-1,227.42,91.6484)"><tspan
-     id="tspan3417"
-     sodipodi:role="line"
-     y="0"
-     x="0 11.232 29.577705 47.894505 66.240211 77.472214"
-     style="font-size:28.79999924px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">(123){</tspan></text>
-
-</g><g
    id="g3419"
    transform="translate(30.4,11.2)"><text
    id="text3421"
@@ -294,6 +240,7 @@
      y="0"
      x="0"
      style="font-size:28.79999924px;font-variant:normal;font-weight:bold;writing-mode:lr-tb;fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans-Bold">P</tspan></text>
+
 
 </g><g
    id="g3425"
@@ -310,6 +257,7 @@
      x="-60.2897"
      style="font-size:28.79999924px;font-variant:normal;font-weight:normal;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVuSans">}</tspan></text>
 
+
 </g><text
    xml:space="preserve"
    style="font-size:22.39999962px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000080;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
@@ -322,6 +270,7 @@
      id="tspan3454"
      x="735.03754"
      y="-277.20963">a</tspan></text>
+
 
 <text
    xml:space="preserve"
@@ -336,4 +285,47 @@
      x="734.11877"
      y="-105.40069">b</tspan></text>
 
+
+<text
+   xml:space="preserve"
+   style="font-size:25.60000038px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+   x="229.08234"
+   y="-479.5571"
+   id="text3275"
+   sodipodi:linespacing="125%"
+   transform="scale(1,-1)"><tspan
+     sodipodi:role="line"
+     id="tspan3277"
+     x="229.08234"
+     y="-479.5571"><tspan
+   style="font-weight:bold;fill:#000080;-inkscape-font-specification:Sans Bold"
+   id="tspan3279">M</tspan> 3 123 {</tspan></text>
+<text
+   transform="scale(1,-1)"
+   sodipodi:linespacing="125%"
+   id="text3283"
+   y="-284.35709"
+   x="229.08234"
+   style="font-size:25.60000038px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+   xml:space="preserve"><tspan
+     y="-284.35709"
+     x="229.08234"
+     id="tspan3285"
+     sodipodi:role="line"><tspan
+   id="tspan3287"
+   style="font-weight:bold;fill:#008000;-inkscape-font-specification:Sans Bold">M</tspan> 3 123 {</tspan></text>
+<text
+   xml:space="preserve"
+   style="font-size:25.60000038px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+   x="229.08234"
+   y="-106.7571"
+   id="text3289"
+   sodipodi:linespacing="125%"
+   transform="scale(1,-1)"><tspan
+     sodipodi:role="line"
+     id="tspan3291"
+     x="229.08234"
+     y="-106.7571"><tspan
+   style="font-weight:bold;fill:#550000;-inkscape-font-specification:Sans Bold"
+   id="tspan3293">M</tspan> 3 123 {</tspan></text>
 </g></svg>
