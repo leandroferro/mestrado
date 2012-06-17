@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.0 r9654"
-   sodipodi:docname="transacao_distribuida.pdf">
+   sodipodi:docname="transacao_distribuida.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -45,7 +45,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -91,7 +91,9 @@
            y="567.2558"
            x="46.80851"
            id="tspan3238"
-           sodipodi:role="line">Máquina i</tspan></text>
+           sodipodi:role="line">G<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan3153">O</tspan></tspan></text>
     </g>
     <g
        id="g3253"
@@ -132,7 +134,9 @@
            y="571.38342"
            x="363.82977"
            id="tspan3242"
-           sodipodi:role="line">Máquina j</tspan></text>
+           sodipodi:role="line">G<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan3155">D</tspan></tspan></text>
     </g>
     <g
        id="g3359-1"
@@ -200,7 +204,9 @@
          sodipodi:role="line"
          id="tspan3312"
          x="279.31915"
-         y="276.79578">VO</tspan></text>
+         y="276.79578">V<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan3145">O</tspan></tspan></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
@@ -211,7 +217,9 @@
          sodipodi:role="line"
          id="tspan3316"
          x="430.21277"
-         y="277.36218">VD</tspan></text>
+         y="277.36218">V<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan3147">D</tspan></tspan></text>
     <g
        id="g3244-1"
        transform="translate(-33.62311,296.22113)">
@@ -250,7 +258,9 @@
            y="567.2558"
            x="46.80851"
            id="tspan3238-2"
-           sodipodi:role="line">Máquina i</tspan></text>
+           sodipodi:role="line">G<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan3157">O</tspan></tspan></text>
     </g>
     <g
        id="g3253-7"
@@ -291,7 +301,9 @@
            y="571.38342"
            x="363.82977"
            id="tspan3242-2"
-           sodipodi:role="line">Máquina j</tspan></text>
+           sodipodi:role="line">G<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan3159">D</tspan></tspan></text>
     </g>
     <g
        id="g3359-1-2"
@@ -359,7 +371,9 @@
          sodipodi:role="line"
          id="tspan3312-5"
          x="139.69604"
-         y="596.79578">VO - V</tspan></text>
+         y="596.79578">V<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan3149">O</tspan> - V</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:italic;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
@@ -370,7 +384,9 @@
          sodipodi:role="line"
          id="tspan3316-5"
          x="496.58966"
-         y="597.36218">VD + V</tspan></text>
+         y="597.36218">V<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan3151">D</tspan> + V</tspan></text>
     <g
        id="g3555"
        transform="translate(24,-22)">
