@@ -54,4 +54,12 @@ public class OkProcessingResult extends ProcessingResult {
 		return "OkProcessingResult [readResultItems=" + readResultItems + "]";
 	}
 
+	public List<ReadResultItem> getReadResults() {
+		return readResultItems;
+	}
+
+	public void addReadResultItem(ReadResultItem readResult) {
+		this.readResultItems.add(readResult);
+	}
+
 }

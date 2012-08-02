@@ -39,6 +39,7 @@ public class ClientAndCoordinatorTest {
 		serverSocket = new ServerSocket();
 		serverSocket.bind(coordinatorAddress);
 		coordinator = new Coordinator(serverSocket);
+		
 		executor.execute(new Runnable() {
 			public void run() {
 				coordinator.start();
@@ -123,7 +124,7 @@ public class ClientAndCoordinatorTest {
 	}
 	
 	@Test
-	public void shouldEchoAcceptSpaceInsideId() throws UnknownHostException,
+	public void shouldAcceptSpaceInsideId() throws UnknownHostException,
 			IOException {
 		String minitransaction[] = new String[]{"M 3 1 3 {", "}"};
 		LoggingService.logErr("C", join(minitransaction, "\n"));

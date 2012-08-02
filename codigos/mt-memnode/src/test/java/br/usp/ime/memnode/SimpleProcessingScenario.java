@@ -16,7 +16,6 @@ public class SimpleProcessingScenario {
 	private DataStore dataStore;
 	private MinitransactionProcessor processor;
 
-	@Before
 	public void setUp() {
 		minitransaction = new Minitransaction(ID);
 		
@@ -26,7 +25,6 @@ public class SimpleProcessingScenario {
 		when(dataStore.read(SOME_KEY)).thenReturn(SOME_VALUE);
 	}
 	
-	@Test
 	public void shouldReturnAnEmptyResult() {
 		ProcessingResult expected = new OkProcessingResult(minitransaction);
 		ProcessingResult actual = processor.process(minitransaction);
@@ -34,7 +32,6 @@ public class SimpleProcessingScenario {
 		Assert.assertEquals(expected, actual);
 	}
 	
-	@Test
 	public void shouldReturnReadItems() {
 		minitransaction.add(new ReadCommand(SOME_KEY));
 		

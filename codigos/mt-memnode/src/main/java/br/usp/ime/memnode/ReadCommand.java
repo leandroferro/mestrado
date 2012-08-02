@@ -37,5 +37,9 @@ public class ReadCommand {
 	public String toString() {
 		return "ReadCommand [key=" + key + "]";
 	}
+
+	public byte[] getKey() {
+		return key;
+	}
 	
 }

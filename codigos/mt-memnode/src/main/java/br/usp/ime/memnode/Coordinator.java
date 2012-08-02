@@ -11,12 +11,23 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.Parser;
 
 public class Coordinator {
 
@@ -34,8 +45,11 @@ public class Coordinator {
 
 	private boolean stopped = false;
 
+	private final List<MemnodeReference> memnodeReferences;
+
 	public Coordinator(ServerSocket serverSocket) {
 		this.serverSocket = serverSocket;
+		memnodeReferences = new ArrayList<MemnodeReference>();
 	}
 
 	public void start() {
@@ -160,4 +174,58 @@ public class Coordinator {
 		}
 	}
 
+	public static void main(String[] args) {
+		Options options = new Options();
+		
+		Option bindAddress = new Option("b", true, "Bind address: <IP ADDRESS> ou <IP ADDRESS>:<PORT> - default port is 6969");
+		bindAddress.setRequired(true);
+		options.addOption(bindAddress);
+
+		BasicParser parser = new BasicParser();
+		CommandLine parse;
+		try {
+			parse = parser.parse(options, args);
+			System.out.println( parse.getOptionValue(bindAddress.getOpt()) );
+		} catch (ParseException e) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("coordinator", options);
+		}
+	}
+
+	public void addMemnodeReference(MemnodeReference memnodeReference) {
+		memnodeReferences.add(memnodeReference);
+	}
+
+	public ProcessingResult execute(Minitransaction minitransaction) {
+		
+		List<Minitransaction> minitransactions = new ArrayList<Minitransaction>(memnodeReferences.size());
+		
+		for( ReadCommand readCommand : minitransaction.getReadCommands() ) {
+			int referenceIndex = readCommand.hashCode() % memnodeReferences.size();
+			Minitransaction mt = minitransactions.get(referenceIndex);
+			if(mt == null) {
+				mt = new Minitransaction(minitransaction.getId());
+			}
+			mt.add(readCommand);
+		}
+		
+		FailedProcessingResult failedProcessingResult = null;
+		OkProcessingResult okProcessingResult = new OkProcessingResult(minitransaction);
+		for(int i = 0; i < memnodeReferences.size(); i++) {
+			MemnodeReference memnodeReference = memnodeReferences.get(i);
+			ProcessingResult processingResult = memnodeReference.execute(minitransactions.get(i));
+			if( processingResult instanceof FailedProcessingResult )
+				failedProcessingResult = (FailedProcessingResult)processingResult;
+			else {
+				OkProcessingResult ok2 = (OkProcessingResult)okProcessingResult;
+				for(ReadResultItem readResult : ok2.getReadResults()){
+					okProcessingResult.addReadResultItem(readResult);
+				}
+			}
+		}
+		if( failedProcessingResult != null )
+			return failedProcessingResult;
+		else
+			return okProcessingResult;
+	}
 }
