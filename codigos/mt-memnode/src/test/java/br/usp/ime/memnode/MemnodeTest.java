@@ -216,22 +216,6 @@ public class MemnodeTest {
 		Assert.assertEquals(expected, actual);
 	}
 	
-//	@Test(timeout=5000)
-//	public void testAbortWhenWriteFails() throws UnknownHostException {
-//		logger.trace("Populating dataStore...");
-//		Mockito.doThrow(RuntimeException.class).when(dataStore).write(CHAVE, VALOR);
-//
-//		Command minitransaction = CommandBuilder.minitransaction(MT_ID).withWriteCommand(new WriteCommand(CHAVE, VALOR))
-//				.build();
-//
-//		client.send(minitransaction);
-//		
-//		Command expected = CommandBuilder.minitransaction(MT_ID).withProblem(new Problem(bytes("ABORT"))).build();
-//		Command actual = client.receive();
-//		
-//		Assert.assertEquals(expected, actual);
-//	}
-	
 	@Test(timeout=5000)
 	public void testAbortWhenReadFailsForComparison() throws UnknownHostException {
 		Mockito.when(dataStore.read(CHAVE)).thenThrow(RuntimeException.class);

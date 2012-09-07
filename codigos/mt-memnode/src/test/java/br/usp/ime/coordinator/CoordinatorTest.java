@@ -16,12 +16,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import br.usp.ime.DummyClient;
 import br.usp.ime.protocol.command.Command;
 import br.usp.ime.protocol.command.CommandBuilder;
+import br.usp.ime.protocol.command.Problem;
+import br.usp.ime.protocol.command.ReadCommand;
+import br.usp.ime.protocol.command.ResultCommand;
 
 public class CoordinatorTest {
 
@@ -39,14 +43,21 @@ public class CoordinatorTest {
 
 	private static ExecutorService executor = Executors
 			.newSingleThreadExecutor();
+	
 	private static Coordinator coordinator;
+	
+	private static MemnodeDispatcher dispatcher;
 
 	@BeforeClass
 	public static void startCoordinator() {
+		
+		dispatcher = Mockito.mock(MemnodeDispatcher.class);
+		
+		coordinator = new Coordinator(COORDINATOR_ADDRESS, dispatcher);
+		
 		executor.execute(new Runnable() {
 
 			public void run() {
-				coordinator = new Coordinator(COORDINATOR_ADDRESS);
 				
 				logger.trace("Starting {} in another thread", coordinator);
 				
@@ -77,6 +88,8 @@ public class CoordinatorTest {
 		logger.trace("Connecting...");
 		client.connect();
 		logger.trace("Connected!");
+		
+		Mockito.reset(dispatcher);
 	}
 
 	@After
@@ -87,7 +100,7 @@ public class CoordinatorTest {
 	}
 
 	@Test(timeout=5000)
-	public void testExecuteEmptyMinitransaction() throws UnknownHostException {
+	public void testExecuteEmptyMinitransaction() {
 
 		Command minitransaction = CommandBuilder.minitransaction(bytes("abc"))
 				.build();
@@ -100,4 +113,43 @@ public class CoordinatorTest {
 		Assert.assertEquals(expected, actual);
 	}
 
+	@Test(timeout=5000)
+	public void testCommitReadOnlyMinitransaction() {
+
+		Command minitransaction = CommandBuilder.minitransaction(bytes("abc"))
+				.withReadCommand(new ReadCommand(bytes("<<CHAVE_1>>"))).withReadCommand(new ReadCommand(bytes("<<CHAVE_2>>"))).build();
+
+		Command collected = CommandBuilder.minitransaction(bytes("abc")).withResultCommand(new ResultCommand(bytes("<<CHAVE_1>>"),  bytes("<<DATA_1>>"))).withResultCommand(new ResultCommand(bytes("<<CHAVE_2>>"), bytes("<<DATA_2>>"))).build();
+		Mockito.when(dispatcher.dispatchAndCollect(minitransaction)).thenReturn(collected);
+		
+		client.send(minitransaction);
+		
+		Command expected = CommandBuilder.minitransaction(bytes("abc")).withResultCommand(new ResultCommand(bytes("<<CHAVE_1>>"),  bytes("<<DATA_1>>"))).withResultCommand(new ResultCommand(bytes("<<CHAVE_2>>"), bytes("<<DATA_2>>"))).withCommitCommand().build();
+		Command actual = client.receive();
+		
+		Assert.assertEquals(expected, actual);
+		Mockito.verify(dispatcher).dispatch(CommandBuilder.minitransaction(bytes("abc")).withFinishCommand().build());
+		
+	}
+	
+	@Test(timeout=5000)
+	public void testReportProblemWithReadOnlyMinitransaction() {
+
+		Command minitransaction = CommandBuilder.minitransaction(bytes("abc"))
+				.withReadCommand(new ReadCommand(bytes("<<CHAVE_1>>"))).withReadCommand(new ReadCommand(bytes("<<CHAVE_2>>"))).build();
+
+		Command collected = CommandBuilder.minitransaction(bytes("abc")).withResultCommand(new ResultCommand(bytes("<<CHAVE_1>>"),  bytes("<<DATA_1>>"))).withProblem(new Problem(bytes("<<ERRO>>"))).build();
+		Mockito.when(dispatcher.dispatchAndCollect(minitransaction)).thenReturn(collected);
+		
+		client.send(minitransaction);
+		
+		Command expected = CommandBuilder.minitransaction(bytes("abc")).withProblem(new Problem(bytes("<<ERRO>>"))).build();
+		Command actual = client.receive();
+		
+		Assert.assertEquals(expected, actual);
+		Mockito.verify(dispatcher).dispatch(CommandBuilder.minitransaction(bytes("abc")).withAbortCommand().build());
+	
+	}
+	
+	// TODO testes da parte de escrita e de comparação, que é onde o bicho pega...
 }

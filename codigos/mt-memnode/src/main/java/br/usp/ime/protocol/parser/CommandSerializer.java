@@ -1,5 +1,6 @@
 package br.usp.ime.protocol.parser;
 
+import br.usp.ime.protocol.command.AbortCommand;
 import br.usp.ime.protocol.command.Command;
 import br.usp.ime.protocol.command.CommitCommand;
 import br.usp.ime.protocol.command.ExtensionCommand;
@@ -55,6 +56,8 @@ public abstract class CommandSerializer {
 				builder.append(serialize(minitransaction.getCommitCommand()));
 				
 				builder.append(serialize(minitransaction.getFinishCommand()));
+				
+				builder.append(serialize(minitransaction.getAbortCommand()));
 				
 				builder.append( "}" );
 			}
@@ -133,6 +136,9 @@ public abstract class CommandSerializer {
 			}
 			else if (command instanceof FinishCommand) {
 				builder.append("F").append("\n");
+			}
+			else if (command instanceof AbortCommand) {
+				builder.append("A").append("\n");
 			}
 			
 			return builder.toString();

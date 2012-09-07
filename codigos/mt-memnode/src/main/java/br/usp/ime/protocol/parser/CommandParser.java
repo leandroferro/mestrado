@@ -93,8 +93,7 @@ public final class CommandParser {
 			if (__currentToken == null) {
 				logger.debug("Trying to read next token");
 				return __currentToken = tokenizer.next();
-			}
-			else {
+			} else {
 				logger.debug("Returning cached token {}", __currentToken);
 				return __currentToken;
 			}
@@ -125,10 +124,10 @@ public final class CommandParser {
 		Token cmd = readAndCheck(EnumSet.of(TokenType.MINITRANSACTION,
 				TokenType.PROBLEM, TokenType.UNRECOGNIZED));
 
-		if(cmd == Token.EMPTY) {
+		if (cmd == Token.EMPTY) {
 			return null;
 		}
-		
+
 		final Token param = loadParam();
 
 		final CommandBuilder builder;
@@ -155,10 +154,11 @@ public final class CommandParser {
 	private void parseMinitransaction(CommandBuilder builder) {
 		readAndCheck(EnumSet.of(TokenType.OPENING_CURLY_BRACE));
 
-		EnumSet<TokenType> types = EnumSet.of(
-				TokenType.CLOSING_CURLY_BRACE, TokenType.PROBLEM,
-				TokenType.READ, TokenType.WRITE, TokenType.EXTENSION_COMMAND, TokenType.COMMIT, TokenType.RESULT, TokenType.FINISH);
-		
+		EnumSet<TokenType> types = EnumSet.of(TokenType.CLOSING_CURLY_BRACE,
+				TokenType.PROBLEM, TokenType.READ, TokenType.WRITE,
+				TokenType.EXTENSION_COMMAND, TokenType.COMMIT,
+				TokenType.RESULT, TokenType.FINISH, TokenType.ABORT);
+
 		for (Token subCommand = readAndCheck(types); //
 		subCommand.getType() != TokenType.CLOSING_CURLY_BRACE; //
 		subCommand = readAndCheck(types)) {
@@ -187,6 +187,8 @@ public final class CommandParser {
 				builder.withCommitCommand();
 			} else if (subCommand.getType() == TokenType.FINISH) {
 				builder.withFinishCommand();
+			} else if (subCommand.getType() == TokenType.ABORT) {
+				builder.withAbortCommand();
 			} else {
 
 				final Token param = loadParam();
@@ -199,9 +201,9 @@ public final class CommandParser {
 					builder.withWriteCommand(new WriteCommand(param.getValue(),
 							loadParam().getValue()));
 				} else if (subCommand.getType() == TokenType.RESULT) {
-					builder.withResultCommand(new ResultCommand(param.getValue(),
-							loadParam().getValue()));
-				} 
+					builder.withResultCommand(new ResultCommand(param
+							.getValue(), loadParam().getValue()));
+				}
 			}
 		}
 

@@ -36,6 +36,7 @@ public abstract class CommandBuilder {
 		private CommitCommand commitCommand;
 		private final List<ResultCommand> resultCommands = new ArrayList<ResultCommand>();
 		private FinishCommand finishCommand;
+		private AbortCommand abortCommand;
 
 		public MinitransactionBuilder(byte[] id) {
 			this.id = id;
@@ -85,8 +86,14 @@ public abstract class CommandBuilder {
 		}
 
 		@Override
+		public CommandBuilder withAbortCommand() {
+			abortCommand = AbortCommand.instance();
+			return this;
+		}
+
+		@Override
 		public Command build() {
-			return new Minitransaction(id, problem, readCommands, writeCommands, extensionCommands, commitCommand, resultCommands, finishCommand);
+			return new Minitransaction(id, problem, readCommands, writeCommands, extensionCommands, commitCommand, resultCommands, finishCommand, abortCommand);
 		}
 
 	}
@@ -132,6 +139,10 @@ public abstract class CommandBuilder {
 	}
 
 	public CommandBuilder withFinishCommand() {
+		throw new IllegalStateException();
+	}
+
+	public CommandBuilder withAbortCommand() {
 		throw new IllegalStateException();
 	}
 

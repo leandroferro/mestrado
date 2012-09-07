@@ -3,14 +3,12 @@ package br.usp.ime.protocol.command;
 import java.util.Arrays;
 import java.util.List;
 
-
-
 public class Minitransaction implements Command {
 
 	private final byte[] id;
 
 	private final Problem problem;
-	
+
 	private final List<ReadCommand> readCommands;
 
 	private final List<WriteCommand> writeCommands;
@@ -23,8 +21,13 @@ public class Minitransaction implements Command {
 
 	private final FinishCommand finishCommand;
 
+	private final AbortCommand abortCommand;
+
 	public Minitransaction(byte[] id, Problem problem,
-			List<ReadCommand> readCommands, List<WriteCommand> writeCommands, List<ExtensionCommand> extensionCommands, CommitCommand commitCommand, List<ResultCommand> resultCommands, FinishCommand finishCommand) {
+			List<ReadCommand> readCommands, List<WriteCommand> writeCommands,
+			List<ExtensionCommand> extensionCommands,
+			CommitCommand commitCommand, List<ResultCommand> resultCommands,
+			FinishCommand finishCommand, AbortCommand abortCommand) {
 		this.id = id;
 		this.problem = problem;
 		this.readCommands = readCommands;
@@ -33,6 +36,7 @@ public class Minitransaction implements Command {
 		this.commitCommand = commitCommand;
 		this.resultCommands = resultCommands;
 		this.finishCommand = finishCommand;
+		this.abortCommand = abortCommand;
 	}
 
 	@Override
@@ -147,6 +151,10 @@ public class Minitransaction implements Command {
 
 	public Command getFinishCommand() {
 		return finishCommand;
+	}
+
+	public AbortCommand getAbortCommand() {
+		return abortCommand;
 	}
 
 }

@@ -47,6 +47,14 @@ public class CommandParserTest {
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("a")).withFinishCommand().build(),
 				requestParser.parseNext());
 	}
+	
+	@Test
+	public void shouldParseMinitransactionWithAbortCommand()
+			throws UnexpectedTokenException {
+		CommandParser requestParser = new CommandParser(stream("M 1 a {\nA\n}"));
+		Assert.assertEquals(CommandBuilder.minitransaction(bytes("a")).withAbortCommand().build(),
+				requestParser.parseNext());
+	}
 
 	@Test
 	public void shouldParseMinitransactionWithSpaceInsideTheId()

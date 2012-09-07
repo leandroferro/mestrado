@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import br.usp.ime.protocol.command.Command;
 import br.usp.ime.protocol.command.CommandBuilder;
 import br.usp.ime.protocol.command.Minitransaction;
+import br.usp.ime.protocol.command.ResultCommand;
 import br.usp.ime.protocol.parser.CommandParser;
 import br.usp.ime.protocol.parser.CommandSerializer;
 
@@ -30,8 +31,11 @@ public class Coordinator {
 
 	private int timeout = 500;
 
-	public Coordinator(SocketAddress address) {
+	private final MemnodeDispatcher dispatcher;
+
+	public Coordinator(SocketAddress address, MemnodeDispatcher dispatcher) {
 		this.address = address;
+		this.dispatcher = dispatcher;
 	}
 
 	public void start() {
@@ -66,8 +70,32 @@ public class Coordinator {
 					
 					if( command instanceof Minitransaction ) {
 						Minitransaction minitransaction =  (Minitransaction)command;
+						CommandBuilder finishOrAbortBuilder = CommandBuilder.minitransaction(minitransaction.getId());
 						
-						writer.append(CommandSerializer.serialize(CommandBuilder.minitransaction(minitransaction.getId()).withCommitCommand().build()));
+						if( minitransaction.getReadCommands().size() > 0 ) {
+							Command collect = dispatcher.dispatchAndCollect(minitransaction);
+							CommandBuilder builder = CommandBuilder.minitransaction(minitransaction.getId());
+							
+							Minitransaction mCollect = (Minitransaction) collect;
+							
+							if( mCollect.getProblem() != null ) {
+								builder = builder.withProblem(mCollect.getProblem());
+								finishOrAbortBuilder = finishOrAbortBuilder.withAbortCommand();
+							}
+							else {
+								for (ResultCommand r : mCollect.getResultCommands()) {
+									builder = builder.withResultCommand(r);
+								}
+								
+								builder = builder.withCommitCommand();
+								finishOrAbortBuilder = finishOrAbortBuilder.withFinishCommand();
+							}
+							writer.append(CommandSerializer.serialize(builder.build()));
+							dispatcher.dispatch(finishOrAbortBuilder.build());
+						}
+						else {
+							writer.append(CommandSerializer.serialize(CommandBuilder.minitransaction(minitransaction.getId()).withCommitCommand().build()));
+						}
 					}
 					else {
 						writer.append(CommandSerializer.serialize(CommandBuilder.problem("Unknown command".getBytes()).build()));
@@ -75,6 +103,7 @@ public class Coordinator {
 					writer.append("\n");
 					writer.flush();
 
+					
 				} catch (SocketTimeoutException e) {
 					logger.trace("Timeout waiting for connection");
 				}
