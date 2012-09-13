@@ -23,18 +23,21 @@ public class Minitransaction implements Command {
 
 	private final AbortCommand abortCommand;
 
+	private final NotCommitCommand notCommitCommand;
+
 	public Minitransaction(byte[] id, Problem problem,
 			List<ReadCommand> readCommands, List<WriteCommand> writeCommands,
 			List<ExtensionCommand> extensionCommands,
-			CommitCommand commitCommand, List<ResultCommand> resultCommands,
+			List<ResultCommand> resultCommands, CommitCommand commitCommand, NotCommitCommand notCommitCommand,
 			FinishCommand finishCommand, AbortCommand abortCommand) {
 		this.id = id;
 		this.problem = problem;
 		this.readCommands = readCommands;
 		this.writeCommands = writeCommands;
 		this.extensionCommands = extensionCommands;
-		this.commitCommand = commitCommand;
 		this.resultCommands = resultCommands;
+		this.commitCommand = commitCommand;
+		this.notCommitCommand = notCommitCommand;
 		this.finishCommand = finishCommand;
 		this.abortCommand = abortCommand;
 	}
@@ -155,6 +158,14 @@ public class Minitransaction implements Command {
 
 	public AbortCommand getAbortCommand() {
 		return abortCommand;
+	}
+
+	public boolean hasActionCommands() {
+		return readCommands.size() > 0 || writeCommands.size() > 0 || extensionCommands.size() > 0;
+	}
+
+	public Command getNotCommitCommand() {
+		return notCommitCommand;
 	}
 
 }

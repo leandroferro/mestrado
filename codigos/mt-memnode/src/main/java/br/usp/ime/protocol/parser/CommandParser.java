@@ -156,8 +156,9 @@ public final class CommandParser {
 
 		EnumSet<TokenType> types = EnumSet.of(TokenType.CLOSING_CURLY_BRACE,
 				TokenType.PROBLEM, TokenType.READ, TokenType.WRITE,
-				TokenType.EXTENSION_COMMAND, TokenType.COMMIT,
-				TokenType.RESULT, TokenType.FINISH, TokenType.ABORT);
+				TokenType.EXTENSION_COMMAND, TokenType.RESULT,
+				TokenType.COMMIT, TokenType.NOT_COMMIT, TokenType.FINISH,
+				TokenType.ABORT);
 
 		for (Token subCommand = readAndCheck(types); //
 		subCommand.getType() != TokenType.CLOSING_CURLY_BRACE; //
@@ -185,6 +186,8 @@ public final class CommandParser {
 						.getValue(), params));
 			} else if (subCommand.getType() == TokenType.COMMIT) {
 				builder.withCommitCommand();
+			} else if (subCommand.getType() == TokenType.NOT_COMMIT) {
+				builder.withNotCommitCommand();
 			} else if (subCommand.getType() == TokenType.FINISH) {
 				builder.withFinishCommand();
 			} else if (subCommand.getType() == TokenType.ABORT) {

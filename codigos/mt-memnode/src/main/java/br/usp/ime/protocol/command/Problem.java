@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 public class Problem implements Command {
 
+	public static final Problem CANNOT_COMMIT = new Problem("Cannot commit transaction".getBytes());
+	
 	private final byte[] description;
 
 	public Problem(byte[] description) {

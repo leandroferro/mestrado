@@ -37,6 +37,7 @@ public abstract class CommandBuilder {
 		private final List<ResultCommand> resultCommands = new ArrayList<ResultCommand>();
 		private FinishCommand finishCommand;
 		private AbortCommand abortCommand;
+		private NotCommitCommand notCommitCommand;
 
 		public MinitransactionBuilder(byte[] id) {
 			this.id = id;
@@ -74,6 +75,12 @@ public abstract class CommandBuilder {
 		}
 
 		@Override
+		public CommandBuilder withNotCommitCommand() {
+			this.notCommitCommand = NotCommitCommand.instance();
+			return this;
+		}
+
+		@Override
 		public CommandBuilder withResultCommand(ResultCommand resultCommand) {
 			resultCommands.add( resultCommand );
 			return this;
@@ -93,7 +100,7 @@ public abstract class CommandBuilder {
 
 		@Override
 		public Command build() {
-			return new Minitransaction(id, problem, readCommands, writeCommands, extensionCommands, commitCommand, resultCommands, finishCommand, abortCommand);
+			return new Minitransaction(id, problem, readCommands, writeCommands, extensionCommands, resultCommands, commitCommand, notCommitCommand, finishCommand, abortCommand);
 		}
 
 	}
@@ -144,6 +151,66 @@ public abstract class CommandBuilder {
 
 	public CommandBuilder withAbortCommand() {
 		throw new IllegalStateException();
+	}
+
+	public CommandBuilder withNotCommitCommand() {
+		throw new IllegalStateException();
+	}
+
+	public CommandBuilder withCommands(List<? extends Command> commands) {
+		
+		for (Command command : commands) {
+			if(command instanceof Minitransaction) {
+				Minitransaction minitransaction = (Minitransaction) command;
+				
+				withCommands(minitransaction.getReadCommands());
+				withCommands(minitransaction.getWriteCommands());
+				withCommands(minitransaction.getExtensionCommands());
+				withCommands(minitransaction.getResultCommands());
+				
+				if(minitransaction.getAbortCommand() != null)
+					withAbortCommand();
+				
+				if(minitransaction.getFinishCommand() != null)
+					withFinishCommand();
+				
+				if(minitransaction.getNotCommitCommand() != null)
+					withNotCommitCommand();
+				
+				if(minitransaction.getCommitCommand() != null)
+					withCommitCommand();
+				
+				if(minitransaction.getProblem() != null)
+					withProblem(minitransaction.getProblem());
+				
+			}
+			else if( command instanceof ReadCommand ) {
+				withReadCommand((ReadCommand) command);
+			}
+			else if(command instanceof WriteCommand) {
+				withWriteCommand((WriteCommand) command);
+			}
+			else if(command instanceof ExtensionCommand) {
+				withExtensionCommand((ExtensionCommand) command);
+			}
+			else if(command instanceof ResultCommand) {
+				withResultCommand((ResultCommand) command);
+			}
+			else if(command instanceof FinishCommand) {
+				withFinishCommand();
+			}
+			else if(command instanceof AbortCommand) {
+				withAbortCommand();
+			}
+			else if(command instanceof CommitCommand) {
+				withCommitCommand();
+			}
+			else if(command instanceof NotCommitCommand) {
+				withNotCommitCommand();
+			}
+		}
+		
+		return this;
 	}
 
 }

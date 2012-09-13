@@ -41,6 +41,14 @@ public class CommandParserTest {
 	}
 	
 	@Test
+	public void shouldParseMinitransactionWithNotCommitCommand()
+			throws UnexpectedTokenException {
+		CommandParser requestParser = new CommandParser(stream("M 1 a {\nN\n}"));
+		Assert.assertEquals(CommandBuilder.minitransaction(bytes("a")).withNotCommitCommand().build(),
+				requestParser.parseNext());
+	}
+	
+	@Test
 	public void shouldParseMinitransactionWithFinishCommand()
 			throws UnexpectedTokenException {
 		CommandParser requestParser = new CommandParser(stream("M 1 a {\nF\n}"));

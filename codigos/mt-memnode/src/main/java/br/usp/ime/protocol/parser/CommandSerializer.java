@@ -6,6 +6,7 @@ import br.usp.ime.protocol.command.CommitCommand;
 import br.usp.ime.protocol.command.ExtensionCommand;
 import br.usp.ime.protocol.command.FinishCommand;
 import br.usp.ime.protocol.command.Minitransaction;
+import br.usp.ime.protocol.command.NotCommitCommand;
 import br.usp.ime.protocol.command.Param;
 import br.usp.ime.protocol.command.Problem;
 import br.usp.ime.protocol.command.ReadCommand;
@@ -54,6 +55,8 @@ public abstract class CommandSerializer {
 				}
 				
 				builder.append(serialize(minitransaction.getCommitCommand()));
+				
+				builder.append(serialize(minitransaction.getNotCommitCommand()));
 				
 				builder.append(serialize(minitransaction.getFinishCommand()));
 				
@@ -133,6 +136,9 @@ public abstract class CommandSerializer {
 			}
 			else if (command instanceof CommitCommand) {
 				builder.append("S").append("\n");
+			}
+			else if (command instanceof NotCommitCommand) {
+				builder.append("N").append("\n");
 			}
 			else if (command instanceof FinishCommand) {
 				builder.append("F").append("\n");

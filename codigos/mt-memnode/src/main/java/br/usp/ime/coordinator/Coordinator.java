@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import br.usp.ime.protocol.command.Command;
 import br.usp.ime.protocol.command.CommandBuilder;
 import br.usp.ime.protocol.command.Minitransaction;
+import br.usp.ime.protocol.command.Problem;
 import br.usp.ime.protocol.command.ResultCommand;
 import br.usp.ime.protocol.parser.CommandParser;
 import br.usp.ime.protocol.parser.CommandSerializer;
@@ -72,7 +73,7 @@ public class Coordinator {
 						Minitransaction minitransaction =  (Minitransaction)command;
 						CommandBuilder finishOrAbortBuilder = CommandBuilder.minitransaction(minitransaction.getId());
 						
-						if( minitransaction.getReadCommands().size() > 0 ) {
+						if( minitransaction.hasActionCommands() ) {
 							Command collect = dispatcher.dispatchAndCollect(minitransaction);
 							CommandBuilder builder = CommandBuilder.minitransaction(minitransaction.getId());
 							
@@ -80,6 +81,10 @@ public class Coordinator {
 							
 							if( mCollect.getProblem() != null ) {
 								builder = builder.withProblem(mCollect.getProblem());
+								finishOrAbortBuilder = finishOrAbortBuilder.withAbortCommand();
+							}
+							else if( mCollect.getNotCommitCommand() != null ) {
+								builder = builder.withProblem(Problem.CANNOT_COMMIT);
 								finishOrAbortBuilder = finishOrAbortBuilder.withAbortCommand();
 							}
 							else {

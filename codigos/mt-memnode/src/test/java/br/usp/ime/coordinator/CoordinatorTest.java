@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -23,9 +24,12 @@ import org.slf4j.LoggerFactory;
 import br.usp.ime.DummyClient;
 import br.usp.ime.protocol.command.Command;
 import br.usp.ime.protocol.command.CommandBuilder;
+import br.usp.ime.protocol.command.ExtensionCommand;
+import br.usp.ime.protocol.command.Param;
 import br.usp.ime.protocol.command.Problem;
 import br.usp.ime.protocol.command.ReadCommand;
 import br.usp.ime.protocol.command.ResultCommand;
+import br.usp.ime.protocol.command.WriteCommand;
 
 public class CoordinatorTest {
 
@@ -151,5 +155,99 @@ public class CoordinatorTest {
 	
 	}
 	
-	// TODO testes da parte de escrita e de comparação, que é onde o bicho pega...
+	@Test(timeout=5000)
+	public void testCommitWriteMinitransaction() {
+
+		Command minitransaction = CommandBuilder.minitransaction(bytes("abc"))
+				.withWriteCommand(new WriteCommand(bytes("<<CHAVE_1>>"), bytes("<<DADOS_1>>"))).withWriteCommand(new WriteCommand(bytes("<<CHAVE_2>>"), bytes("<<DADOS_2>>"))).build();
+
+		Command collected = CommandBuilder.minitransaction(bytes("abc")).withCommitCommand().build();
+		Mockito.when(dispatcher.dispatchAndCollect(minitransaction)).thenReturn(collected);
+		
+		client.send(minitransaction);
+		
+		Command expected = CommandBuilder.minitransaction(bytes("abc")).withCommitCommand().build();
+		Command actual = client.receive();
+		
+		Assert.assertEquals(expected, actual);
+		Mockito.verify(dispatcher).dispatch(CommandBuilder.minitransaction(bytes("abc")).withFinishCommand().build());
+	
+	}
+	
+	@Test(timeout=5000)
+	public void testAbortWriteMinitransaction() {
+
+		Command minitransaction = CommandBuilder.minitransaction(bytes("abc"))
+				.withWriteCommand(new WriteCommand(bytes("<<CHAVE_1>>"), bytes("<<DADOS_1>>"))).withWriteCommand(new WriteCommand(bytes("<<CHAVE_2>>"), bytes("<<DADOS_2>>"))).build();
+
+		Command collected = CommandBuilder.minitransaction(bytes("abc")).withCommitCommand().withProblem(new Problem(bytes("<<PROBLEMA>>"))).build();
+		Mockito.when(dispatcher.dispatchAndCollect(minitransaction)).thenReturn(collected);
+		
+		client.send(minitransaction);
+		
+		Command expected = CommandBuilder.minitransaction(bytes("abc")).withProblem(new Problem(bytes("<<PROBLEMA>>"))).build();
+		Command actual = client.receive();
+		
+		Assert.assertEquals(expected, actual);
+		Mockito.verify(dispatcher).dispatch(CommandBuilder.minitransaction(bytes("abc")).withAbortCommand().build());
+	
+	}
+	
+	@Test(timeout=5000)
+	public void testCommitExtensionMinitransaction() {
+
+		Command minitransaction = CommandBuilder.minitransaction(bytes("abc"))
+				.withExtensionCommand(new ExtensionCommand(bytes("ABCD"), Arrays.asList(new Param(bytes("<<PARAM_1>>")), new Param(bytes("<<PARAM_2>>"))))).withReadCommand(new ReadCommand(bytes("<<CHAVE_1>>"))).withWriteCommand(new WriteCommand(bytes("<<CHAVE_2>>"), bytes("<<DADOS_2>>"))).build();
+
+		Command collected = CommandBuilder.minitransaction(bytes("abc")).withResultCommand(new ResultCommand(bytes("<<CHAVE_1>>"), bytes("<<DADO_1>>"))).withCommitCommand().build();
+		Mockito.when(dispatcher.dispatchAndCollect(minitransaction)).thenReturn(collected);
+		
+		client.send(minitransaction);
+		
+		Command expected = CommandBuilder.minitransaction(bytes("abc")).withResultCommand(new ResultCommand(bytes("<<CHAVE_1>>"), bytes("<<DADO_1>>"))).withCommitCommand().build();
+		Command actual = client.receive();
+		
+		Assert.assertEquals(expected, actual);
+		Mockito.verify(dispatcher).dispatch(CommandBuilder.minitransaction(bytes("abc")).withFinishCommand().build());
+	
+	}
+	
+	@Test(timeout=5000)
+	public void testAbortExtensionMinitransactionWhenProblem() {
+
+		Command minitransaction = CommandBuilder.minitransaction(bytes("abc"))
+				.withExtensionCommand(new ExtensionCommand(bytes("ABCD"), Arrays.asList(new Param(bytes("<<PARAM_1>>")), new Param(bytes("<<PARAM_2>>"))))).withReadCommand(new ReadCommand(bytes("<<CHAVE_1>>"))).withWriteCommand(new WriteCommand(bytes("<<CHAVE_2>>"), bytes("<<DADOS_2>>"))).build();
+
+		Command collected = CommandBuilder.minitransaction(bytes("abc")).withResultCommand(new ResultCommand(bytes("<<CHAVE_1>>"), bytes("<<DADO_1>>"))).withProblem(new Problem(bytes("<<PROBLEMA>>"))).build();
+		Mockito.when(dispatcher.dispatchAndCollect(minitransaction)).thenReturn(collected);
+		
+		client.send(minitransaction);
+		
+		Command expected = CommandBuilder.minitransaction(bytes("abc")).withProblem(new Problem(bytes("<<PROBLEMA>>"))).build();
+		Command actual = client.receive();
+		
+		Assert.assertEquals(expected, actual);
+		Mockito.verify(dispatcher).dispatch(CommandBuilder.minitransaction(bytes("abc")).withAbortCommand().build());
+	
+	}
+	
+	@Test(timeout=5000)
+	public void testAbortExtensionMinitransactionWhenNotCommit() {
+
+		Command minitransaction = CommandBuilder.minitransaction(bytes("abc"))
+				.withExtensionCommand(new ExtensionCommand(bytes("ABCD"), Arrays.asList(new Param(bytes("<<PARAM_1>>")), new Param(bytes("<<PARAM_2>>"))))).withReadCommand(new ReadCommand(bytes("<<CHAVE_1>>"))).withWriteCommand(new WriteCommand(bytes("<<CHAVE_2>>"), bytes("<<DADOS_2>>"))).build();
+
+		Command collected = CommandBuilder.minitransaction(bytes("abc")).withResultCommand(new ResultCommand(bytes("<<CHAVE_1>>"), bytes("<<DADO_1>>"))).withNotCommitCommand().build();
+		Mockito.when(dispatcher.dispatchAndCollect(minitransaction)).thenReturn(collected);
+		
+		client.send(minitransaction);
+		
+		Command expected = CommandBuilder.minitransaction(bytes("abc")).withProblem(Problem.CANNOT_COMMIT).build();
+		Command actual = client.receive();
+		
+		Assert.assertEquals(expected, actual);
+		Mockito.verify(dispatcher).dispatch(CommandBuilder.minitransaction(bytes("abc")).withAbortCommand().build());
+	
+	}
+
 }
