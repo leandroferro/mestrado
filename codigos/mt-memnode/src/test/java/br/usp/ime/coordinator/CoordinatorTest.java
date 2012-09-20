@@ -35,7 +35,7 @@ public class CoordinatorTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(CoordinatorTest.class);
 			
-	private static final SocketAddress COORDINATOR_ADDRESS;
+	private static final InetSocketAddress COORDINATOR_ADDRESS;
 	static {
 		try {
 			COORDINATOR_ADDRESS = new InetSocketAddress(

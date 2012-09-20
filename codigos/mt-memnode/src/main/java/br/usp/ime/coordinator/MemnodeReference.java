@@ -10,6 +10,10 @@ public class MemnodeReference {
 		this.address = address;
 	}
 
+	public InetSocketAddress getAddress() {
+		return address;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -40,5 +44,4 @@ public class MemnodeReference {
 		return "MemnodeReference [address=" + address + "]";
 	}
 
-	
 }

@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import br.usp.ime.protocol.command.Command;
-import br.usp.ime.protocol.parser.CommandParser;
-import br.usp.ime.protocol.parser.CommandSerializer;
+import br.usp.ime.protocol.parser.DefaultCommandParser;
+import br.usp.ime.protocol.parser.DefaultCommandSerializer;
 
 public class DummyClient {
 
@@ -40,7 +40,7 @@ public class DummyClient {
 	public void send(Command command) {
 		try {
 			
-			String serialize = CommandSerializer.serialize(command) + "\n";
+			String serialize = DefaultCommandSerializer.serializeCommand(command) + "\n";
 			logger.trace("Sending {}", serialize);
 			
 			socket.getOutputStream().write(serialize.getBytes());
@@ -56,7 +56,7 @@ public class DummyClient {
 		try {
 			InputStream inputStream = socket.getInputStream();
 			
-			CommandParser parser = new CommandParser(inputStream);
+			DefaultCommandParser parser = new DefaultCommandParser(inputStream);
 			
 			Command command = parser.parseNext();
 			

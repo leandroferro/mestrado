@@ -29,8 +29,8 @@ import br.usp.ime.protocol.command.Problem;
 import br.usp.ime.protocol.command.ReadCommand;
 import br.usp.ime.protocol.command.ResultCommand;
 import br.usp.ime.protocol.command.WriteCommand;
-import br.usp.ime.protocol.parser.CommandParser;
-import br.usp.ime.protocol.parser.CommandSerializer;
+import br.usp.ime.protocol.parser.DefaultCommandParser;
+import br.usp.ime.protocol.parser.DefaultCommandSerializer;
 
 public class Memnode {
 
@@ -70,7 +70,7 @@ public class Memnode {
 					InputStream inputStream = client.getInputStream();
 					OutputStream outputStream = client.getOutputStream();
 
-					CommandParser cmdParser = new CommandParser(inputStream);
+					DefaultCommandParser cmdParser = new DefaultCommandParser(inputStream);
 
 					OutputStreamWriter writer = new OutputStreamWriter(
 							outputStream);
@@ -161,11 +161,11 @@ public class Memnode {
 										"ABORT".getBytes()));
 							}
 
-							writer.append(CommandSerializer.serialize(builder
+							writer.append(DefaultCommandSerializer.serializeCommand(builder
 									.build()));
 						} else {
-							writer.append(CommandSerializer
-									.serialize(CommandBuilder.problem(
+							writer.append(DefaultCommandSerializer
+									.serializeCommand(CommandBuilder.problem(
 											"Unknown command".getBytes())
 											.build()));
 						}

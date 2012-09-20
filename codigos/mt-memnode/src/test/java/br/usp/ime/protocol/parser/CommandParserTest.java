@@ -20,14 +20,14 @@ public class CommandParserTest {
 	@Test
 	public void shouldReturnNullWhenEmptyStream()
 			throws UnexpectedTokenException {
-		CommandParser requestParser = new CommandParser(stream(""));
+		DefaultCommandParser requestParser = new DefaultCommandParser(stream(""));
 		Assert.assertNull(requestParser.parseNext());
 	}
 	
 	@Test
 	public void shouldParseEmptyMinitransaction()
 			throws UnexpectedTokenException {
-		CommandParser requestParser = new CommandParser(stream("M 1 a {\n}"));
+		DefaultCommandParser requestParser = new DefaultCommandParser(stream("M 1 a {\n}"));
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("a")).build(),
 				requestParser.parseNext());
 	}
@@ -35,7 +35,7 @@ public class CommandParserTest {
 	@Test
 	public void shouldParseMinitransactionWithCommitCommand()
 			throws UnexpectedTokenException {
-		CommandParser requestParser = new CommandParser(stream("M 1 a {\nS\n}"));
+		DefaultCommandParser requestParser = new DefaultCommandParser(stream("M 1 a {\nS\n}"));
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("a")).withCommitCommand().build(),
 				requestParser.parseNext());
 	}
@@ -43,7 +43,7 @@ public class CommandParserTest {
 	@Test
 	public void shouldParseMinitransactionWithNotCommitCommand()
 			throws UnexpectedTokenException {
-		CommandParser requestParser = new CommandParser(stream("M 1 a {\nN\n}"));
+		DefaultCommandParser requestParser = new DefaultCommandParser(stream("M 1 a {\nN\n}"));
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("a")).withNotCommitCommand().build(),
 				requestParser.parseNext());
 	}
@@ -51,7 +51,7 @@ public class CommandParserTest {
 	@Test
 	public void shouldParseMinitransactionWithFinishCommand()
 			throws UnexpectedTokenException {
-		CommandParser requestParser = new CommandParser(stream("M 1 a {\nF\n}"));
+		DefaultCommandParser requestParser = new DefaultCommandParser(stream("M 1 a {\nF\n}"));
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("a")).withFinishCommand().build(),
 				requestParser.parseNext());
 	}
@@ -59,7 +59,7 @@ public class CommandParserTest {
 	@Test
 	public void shouldParseMinitransactionWithAbortCommand()
 			throws UnexpectedTokenException {
-		CommandParser requestParser = new CommandParser(stream("M 1 a {\nA\n}"));
+		DefaultCommandParser requestParser = new DefaultCommandParser(stream("M 1 a {\nA\n}"));
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("a")).withAbortCommand().build(),
 				requestParser.parseNext());
 	}
@@ -67,7 +67,7 @@ public class CommandParserTest {
 	@Test
 	public void shouldParseMinitransactionWithSpaceInsideTheId()
 			throws UnexpectedTokenException {
-		CommandParser requestParser = new CommandParser(stream("M 3 a b {\n}"));
+		DefaultCommandParser requestParser = new DefaultCommandParser(stream("M 3 a b {\n}"));
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("a b"))
 				.build(), requestParser.parseNext());
 	}
@@ -75,7 +75,7 @@ public class CommandParserTest {
 	@Test
 	public void shouldParseProblem() throws UnexpectedTokenException {
 		String hwhap = "Houston, we have a problem!";
-		CommandParser requestParser = new CommandParser(stream("P "
+		DefaultCommandParser requestParser = new DefaultCommandParser(stream("P "
 				+ hwhap.length() + " " + hwhap));
 		Assert.assertEquals(CommandBuilder.problem(bytes(hwhap)).build(),
 				requestParser.parseNext());
@@ -84,7 +84,7 @@ public class CommandParserTest {
 	@Test
 	public void shouldParseProblemInsideMinitransaction()
 			throws UnexpectedTokenException {
-		CommandParser requestParser = new CommandParser(
+		DefaultCommandParser requestParser = new DefaultCommandParser(
 				stream("M 1 a {\nP 1 b\n}"));
 
 		CommandBuilder builder = CommandBuilder.minitransaction(bytes("a"))
@@ -95,7 +95,7 @@ public class CommandParserTest {
 
 	@Test
 	public void shouldParseTwoMinitransactionsInTheSameStream() {
-		CommandParser requestParser = new CommandParser(
+		DefaultCommandParser requestParser = new DefaultCommandParser(
 				stream("M 1 x {\n}\n   M 2 qw {\n\n}\n"));
 
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("x")).build(),
@@ -107,7 +107,7 @@ public class CommandParserTest {
 
 	@Test
 	public void shouldParseReadCommand() {
-		CommandParser requestParser = new CommandParser(
+		DefaultCommandParser requestParser = new DefaultCommandParser(
 				stream("M 1 x {\nL 1 y\n}"));
 
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("x"))
@@ -117,7 +117,7 @@ public class CommandParserTest {
 
 	@Test
 	public void shouldParseReadCommands() {
-		CommandParser requestParser = new CommandParser(
+		DefaultCommandParser requestParser = new DefaultCommandParser(
 				stream("M 1 x {\nL 1 y\nL 1 z\n}"));
 
 		Assert.assertEquals(
@@ -129,7 +129,7 @@ public class CommandParserTest {
 
 	@Test
 	public void shouldParseWriteCommand() {
-		CommandParser requestParser = new CommandParser(
+		DefaultCommandParser requestParser = new DefaultCommandParser(
 				stream("M 1 x {\nE 1 y 2 zz\n}"));
 
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("x"))
@@ -139,7 +139,7 @@ public class CommandParserTest {
 
 	@Test
 	public void shouldParseWriteCommands() {
-		CommandParser requestParser = new CommandParser(
+		DefaultCommandParser requestParser = new DefaultCommandParser(
 				stream("M 1 x {\nE 1 y 2 zz\n E 2 zz 1 y}"));
 
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("x"))
@@ -150,7 +150,7 @@ public class CommandParserTest {
 	
 	@Test
 	public void shouldParseResultCommand() {
-		CommandParser requestParser = new CommandParser(
+		DefaultCommandParser requestParser = new DefaultCommandParser(
 				stream("M 1 x {\nR 1 y 2 zz\n}"));
 
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("x"))
@@ -160,7 +160,7 @@ public class CommandParserTest {
 
 	@Test
 	public void shouldParseResultCommands() {
-		CommandParser requestParser = new CommandParser(
+		DefaultCommandParser requestParser = new DefaultCommandParser(
 				stream("M 1 x {\nR 1 y 2 zz\n R 2 zz 1 y}"));
 
 		Assert.assertEquals(CommandBuilder.minitransaction(bytes("x"))
@@ -171,7 +171,7 @@ public class CommandParserTest {
 
 	@Test
 	public void shouldParseExtensionCommand() {
-		CommandParser requestParser = new CommandParser(
+		DefaultCommandParser requestParser = new DefaultCommandParser(
 				stream("M 1 x {\nC ABCD 1 y 2 zz 3 zzz\n}"));
 
 		Assert.assertEquals(
@@ -187,7 +187,7 @@ public class CommandParserTest {
 
 	@Test
 	public void shouldParseExtensionCommands() {
-		CommandParser requestParser = new CommandParser(
+		DefaultCommandParser requestParser = new DefaultCommandParser(
 				stream("M 1 x {\nC ABCD 1 y 2 zz 3 zzz\nC WXYZ 1 a\n}"));
 
 		Assert.assertEquals(
@@ -206,7 +206,7 @@ public class CommandParserTest {
 
 	@Test
 	public void shouldParseCompleteMinitransaction() {
-		CommandParser requestParser = new CommandParser(
+		DefaultCommandParser requestParser = new DefaultCommandParser(
 				stream("M 1 x {\nC ABCD 1 y 2 zz 3 zzz\nC WXYZ 1 a\nL 3 abc\nE 5 xxxxx 3 olm\nL 2 ui}"));
 
 		Assert.assertEquals(

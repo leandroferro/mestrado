@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -19,14 +20,14 @@ import br.usp.ime.protocol.command.CommandBuilder;
 import br.usp.ime.protocol.command.Minitransaction;
 import br.usp.ime.protocol.command.Problem;
 import br.usp.ime.protocol.command.ResultCommand;
-import br.usp.ime.protocol.parser.CommandParser;
-import br.usp.ime.protocol.parser.CommandSerializer;
+import br.usp.ime.protocol.parser.DefaultCommandParser;
+import br.usp.ime.protocol.parser.DefaultCommandSerializer;
 
 public class Coordinator {
 
 	private static final Logger logger = LoggerFactory.getLogger(Coordinator.class);
 	
-	private final SocketAddress address;
+	private final InetSocketAddress address;
 
 	private boolean shouldContinue;
 
@@ -34,7 +35,7 @@ public class Coordinator {
 
 	private final MemnodeDispatcher dispatcher;
 
-	public Coordinator(SocketAddress address, MemnodeDispatcher dispatcher) {
+	public Coordinator(InetSocketAddress address, MemnodeDispatcher dispatcher) {
 		this.address = address;
 		this.dispatcher = dispatcher;
 	}
@@ -59,7 +60,7 @@ public class Coordinator {
 					InputStream inputStream = client.getInputStream();
 					OutputStream outputStream = client.getOutputStream();
 
-					CommandParser cmdParser = new CommandParser(inputStream);
+					DefaultCommandParser cmdParser = new DefaultCommandParser(inputStream);
 
 					OutputStreamWriter writer = new OutputStreamWriter(outputStream);
 
@@ -95,15 +96,15 @@ public class Coordinator {
 								builder = builder.withCommitCommand();
 								finishOrAbortBuilder = finishOrAbortBuilder.withFinishCommand();
 							}
-							writer.append(CommandSerializer.serialize(builder.build()));
+							writer.append(DefaultCommandSerializer.serializeCommand(builder.build()));
 							dispatcher.dispatch(finishOrAbortBuilder.build());
 						}
 						else {
-							writer.append(CommandSerializer.serialize(CommandBuilder.minitransaction(minitransaction.getId()).withCommitCommand().build()));
+							writer.append(DefaultCommandSerializer.serializeCommand(CommandBuilder.minitransaction(minitransaction.getId()).withCommitCommand().build()));
 						}
 					}
 					else {
-						writer.append(CommandSerializer.serialize(CommandBuilder.problem("Unknown command".getBytes()).build()));
+						writer.append(DefaultCommandSerializer.serializeCommand(CommandBuilder.problem("Unknown command".getBytes()).build()));
 					}
 					writer.append("\n");
 					writer.flush();
@@ -123,4 +124,11 @@ public class Coordinator {
 		this.shouldContinue = false;
 	}
 
+	@Override
+	public String toString() {
+		return "Coordinator [address=" + address + ", dispatcher=" + dispatcher
+				+ "]";
+	}
+
+	
 }

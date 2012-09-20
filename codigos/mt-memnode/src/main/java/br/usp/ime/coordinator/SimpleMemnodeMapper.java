@@ -16,4 +16,10 @@ public class SimpleMemnodeMapper implements MemnodeMapper {
 		return references.get( Arrays.hashCode(bytes) % references.size() );
 	}
 
+	@Override
+	public String toString() {
+		return "SimpleMemnodeMapper [references=" + references + "]";
+	}
+
+	
 }

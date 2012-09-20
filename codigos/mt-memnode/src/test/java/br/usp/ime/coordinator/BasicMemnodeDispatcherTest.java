@@ -20,7 +20,7 @@ import br.usp.ime.protocol.command.ReadCommand;
 import br.usp.ime.protocol.command.ResultCommand;
 import br.usp.ime.protocol.command.WriteCommand;
 
-public class MemnodeDispatcherTest {
+public class BasicMemnodeDispatcherTest {
 
 	@Before
 	public void setUp() throws Exception {
@@ -50,7 +50,7 @@ public class MemnodeDispatcherTest {
 		Mockito.when(mapper.map(bytes("<<CHAVE_2>>"))).thenReturn(ref2);
 		Mockito.when(mapper.map(bytes("<<CHAVE_3>>"))).thenReturn(ref1);
 
-		MemnodeDispatcher dispatcher = new MemnodeDispatcher(mapper, client);
+		BasicMemnodeDispatcher dispatcher = new BasicMemnodeDispatcher(mapper, client);
 
 		Command command = CommandBuilder
 				.minitransaction(bytes("<<ID>>"))
@@ -133,7 +133,7 @@ public class MemnodeDispatcherTest {
 												bytes("<<DADOS_2")))
 								.withCommitCommand().build());
 
-		MemnodeDispatcher dispatcher = new MemnodeDispatcher(mapper, client);
+		BasicMemnodeDispatcher dispatcher = new BasicMemnodeDispatcher(mapper, client);
 
 		Command command = CommandBuilder
 				.minitransaction(bytes("<<ID>>"))

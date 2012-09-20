@@ -25,7 +25,7 @@ public class CommandSerializerTest {
 				.build();
 
 		String expected = "M 3 abc {\n}";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
@@ -35,7 +35,7 @@ public class CommandSerializerTest {
 		Command command = CommandBuilder.problem(Utils.bytes("abc")).build();
 
 		String expected = "P 3 abc\n";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
@@ -45,7 +45,7 @@ public class CommandSerializerTest {
 		Command command = CommandBuilder.minitransaction(Utils.bytes("abc")).withCommitCommand().build();
 
 		String expected = "M 3 abc {\nS\n}";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
@@ -55,7 +55,7 @@ public class CommandSerializerTest {
 		Command command = CommandBuilder.minitransaction(Utils.bytes("abc")).withNotCommitCommand().build();
 
 		String expected = "M 3 abc {\nN\n}";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
@@ -65,7 +65,7 @@ public class CommandSerializerTest {
 		Command command = CommandBuilder.minitransaction(Utils.bytes("abc")).withFinishCommand().build();
 
 		String expected = "M 3 abc {\nF\n}";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
@@ -75,7 +75,7 @@ public class CommandSerializerTest {
 		Command command = CommandBuilder.minitransaction(Utils.bytes("abc")).withAbortCommand().build();
 
 		String expected = "M 3 abc {\nA\n}";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
@@ -86,7 +86,7 @@ public class CommandSerializerTest {
 				.withProblem(new Problem(Utils.bytes("abc"))).build();
 
 		String expected = "M 3 xyz {\nP 3 abc\n}";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
@@ -97,7 +97,7 @@ public class CommandSerializerTest {
 				.withReadCommand(new ReadCommand(Utils.bytes("abc"))).build();
 
 		String expected = "M 3 xyz {\nL 3 abc\n}";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
@@ -111,7 +111,7 @@ public class CommandSerializerTest {
 				.build();
 
 		String expected = "M 3 xyz {\nE 3 abc 3 def\n}";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
@@ -125,7 +125,7 @@ public class CommandSerializerTest {
 				.build();
 
 		String expected = "M 3 xyz {\nR 3 abc 3 def\n}";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
@@ -142,7 +142,7 @@ public class CommandSerializerTest {
 				.build();
 
 		String expected = "M 3 xyz {\nC abc0 3 def 4 ghij 5 klmno\n}";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
@@ -170,7 +170,7 @@ public class CommandSerializerTest {
 				build();
 
 		String expected = "M 1 x {\nC ABCD 1 y 2 zz 3 zzz\nC WXYZ 1 a\nL 3 abc\nL 2 ui\nE 5 xxxxx 3 olm\n}";
-		String actual = CommandSerializer.serialize(command);
+		String actual = DefaultCommandSerializer.serializeCommand(command);
 
 		Assert.assertEquals(expected, actual);
 	}
