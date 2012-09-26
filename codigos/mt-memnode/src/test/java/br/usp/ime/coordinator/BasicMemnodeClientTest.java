@@ -4,6 +4,7 @@ import static br.usp.ime.Utils.bytes;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -39,7 +40,7 @@ public class BasicMemnodeClientTest {
 	}
 
 	@Test
-	public void test() {
+	public void test() throws IOException {
 
 		MemnodeReference reference = new MemnodeReference(ADDRESS);
 		Command toSend = CommandBuilder.minitransaction(bytes("<<TO_SEND>>"))
@@ -73,7 +74,7 @@ public class BasicMemnodeClientTest {
 
 		Command response = client.send(reference, toSend);
 
-		Assert.assertArrayEquals("<<SERIALIZED>>".getBytes(),
+		Assert.assertArrayEquals("<<SERIALIZED>>\n".getBytes(),
 				outputStream.toByteArray());
 		Assert.assertEquals(received, response);
 	}

@@ -1,4 +1,4 @@
-package br.usp.ime.coordinator;
+package br.usp.ime.app;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -16,6 +16,16 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
+import br.usp.ime.coordinator.BasicMemnodeClient;
+import br.usp.ime.coordinator.BasicMemnodeDispatcher;
+import br.usp.ime.coordinator.Coordinator;
+import br.usp.ime.coordinator.DefaultCommandParserFactory;
+import br.usp.ime.coordinator.MemnodeClient;
+import br.usp.ime.coordinator.MemnodeDispatcher;
+import br.usp.ime.coordinator.MemnodeReference;
+import br.usp.ime.coordinator.SimpleMemnodeMapper;
+import br.usp.ime.coordinator.SocketBasedConnectionProvider;
+import br.usp.ime.coordinator.ThreadLocalConnectionFactory;
 import br.usp.ime.protocol.parser.DefaultCommandSerializer;
 
 public class CoordinatorApp {
@@ -54,10 +64,8 @@ public class CoordinatorApp {
 			
 			MemnodeClient client = new BasicMemnodeClient(new DefaultCommandParserFactory(), new ThreadLocalConnectionFactory(new SocketBasedConnectionProvider()), DefaultCommandSerializer.instance);
 			MemnodeDispatcher dispatcher = new BasicMemnodeDispatcher(memnodeMapper, client );
-			Coordinator coordinator = new Coordinator(address, dispatcher);
-			
-			System.out.println( coordinator );
-			
+			Coordinator coordinator = new Coordinator(address, memnodeMapper, dispatcher);
+
 			coordinator.start();
 			
 		} catch (ParseException e) {

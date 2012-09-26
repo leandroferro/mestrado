@@ -60,7 +60,6 @@ public class Memnode {
 			logger.debug("Listening at {}", address);
 
 			shouldContinue = true;
-			logger.debug("Waiting connection");
 			while (shouldContinue) {
 				try {
 					Socket client = serverSocket.accept();
@@ -70,7 +69,8 @@ public class Memnode {
 					InputStream inputStream = client.getInputStream();
 					OutputStream outputStream = client.getOutputStream();
 
-					DefaultCommandParser cmdParser = new DefaultCommandParser(inputStream);
+					DefaultCommandParser cmdParser = new DefaultCommandParser(
+							inputStream);
 
 					OutputStreamWriter writer = new OutputStreamWriter(
 							outputStream);
@@ -79,7 +79,7 @@ public class Memnode {
 
 					for (Command command = cmdParser.parseNext(); shouldContinue
 							&& command != null; command = cmdParser.parseNext()) {
-						logger.debug("Command received: {}", command);
+						logger.info("Command received: {}", command);
 
 						if (command instanceof Minitransaction) {
 							Minitransaction minitransaction = (Minitransaction) command;
@@ -91,23 +91,30 @@ public class Memnode {
 
 							ByteArrayWrapper idWrapper = new ByteArrayWrapper(
 									minitransaction.getId());
-							
+
 							if (minitransaction.getFinishCommand() != null
-									&& stageArea
-											.containsKey(idWrapper)) {
-								for (WriteCommand writeCommand : stageArea.get(idWrapper)) {
+									&& stageArea.containsKey(idWrapper)) {
+								
+								logger.debug("Received finish command and has staged commands to commit for {}", idWrapper);
+								
+								for (WriteCommand writeCommand : stageArea
+										.get(idWrapper)) {
 									try {
+										logger.debug("Executing {}", writeCommand);
 										dataStore.write(writeCommand.getId(),
 												writeCommand.getData());
 									} catch (Exception e) {
+										logger.error("Ops, an error occurred while commiting - aborting", e);
 										commit = false;
 										break;
 									}
 								}
 								stageArea.remove(idWrapper);
+								logger.debug("Stage area cleaned {}", stageArea);
 							} else {
 								for (ExtensionCommand extensionCommand : minitransaction
 										.getExtensionCommands()) {
+									logger.debug("Executing {}", extensionCommand);
 									if ("ECMP".equals(new String(
 											extensionCommand.getId()))) {
 										try {
@@ -122,6 +129,7 @@ public class Memnode {
 												commit = false;
 											}
 										} catch (Exception e) {
+											logger.error("Exception caught while executing extension command - aborting", e);
 											commit = false;
 											break;
 										}
@@ -131,6 +139,7 @@ public class Memnode {
 								if (commit) {
 									for (ReadCommand readCommand : minitransaction
 											.getReadCommands()) {
+										logger.debug("Executing {}", readCommand);
 										try {
 											byte[] data = dataStore
 													.read(readCommand.getKey());
@@ -142,15 +151,17 @@ public class Memnode {
 																data));
 											}
 										} catch (Exception e) {
+											logger.error("Exception caught while reading data - aborting", e);
 											commit = false;
 											break;
 										}
 									}
 								}
 
-								if (commit) {
+								if (commit && minitransaction.hasWriteCommands()) {
 									stageArea.put(idWrapper,
 											minitransaction.getWriteCommands());
+									logger.debug("Write commands staged {}", stageArea);
 								}
 							}
 
@@ -161,8 +172,12 @@ public class Memnode {
 										"ABORT".getBytes()));
 							}
 
-							writer.append(DefaultCommandSerializer.serializeCommand(builder
-									.build()));
+							Command returningCommand = builder.build();
+							
+							logger.debug("Returning {}", returningCommand);
+							
+							writer.append(DefaultCommandSerializer
+									.serializeCommand(returningCommand));
 						} else {
 							writer.append(DefaultCommandSerializer
 									.serializeCommand(CommandBuilder.problem(
@@ -171,7 +186,7 @@ public class Memnode {
 						}
 						writer.append("\n");
 						writer.flush();
-						
+
 						logger.debug("Waiting connection");
 					}
 
@@ -189,9 +204,10 @@ public class Memnode {
 		this.shouldContinue = false;
 	}
 
-	public static void main(String[] args) throws UnknownHostException {
-		Memnode memnode = new Memnode(new InetSocketAddress(InetAddress.getLocalHost(), 6060), new MapDataStore());
-		
-		memnode.start();
+	@Override
+	public String toString() {
+		return "Memnode [address=" + address + ", dataStore=" + dataStore
+				+ ", stageArea=" + stageArea + "]";
 	}
+
 }

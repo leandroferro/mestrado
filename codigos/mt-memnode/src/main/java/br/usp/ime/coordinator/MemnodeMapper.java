@@ -1,7 +1,9 @@
 package br.usp.ime.coordinator;
 
+import br.usp.ime.protocol.command.Minitransaction;
+
 public interface MemnodeMapper {
 
-	MemnodeReference map(byte[] bytes);
+	MemnodeMapping map(Minitransaction minitransaction);
 
 }

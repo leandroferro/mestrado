@@ -112,16 +112,17 @@ public class MemnodeTest {
 
 	@Test(timeout=5000)
 	public void testExecuteEmptyMinitransaction() throws UnknownHostException {
-
-		Command minitransaction = CommandBuilder.minitransaction(MT_ID)
-				.build();
-
-		client.send(minitransaction);
-		
-		Command expected = CommandBuilder.minitransaction(MT_ID).withCommitCommand().build();
-		Command actual = client.receive();
-		
-		Assert.assertEquals(expected, actual);
+		for(byte[] id : Arrays.asList(MT_ID, MT_ID_2, MT_ID_3)){
+			Command minitransaction = CommandBuilder.minitransaction(id)
+					.build();
+			
+			client.send(minitransaction);
+			
+			Command expected = CommandBuilder.minitransaction(id).withCommitCommand().build();
+			Command actual = client.receive();
+			
+			Assert.assertEquals(expected, actual);
+		}
 	}
 	
 	@Test(timeout=5000)
@@ -140,7 +141,7 @@ public class MemnodeTest {
 		Assert.assertEquals(expected, actual);
 	}
 
-	@Test(timeout=5000)
+	@Test()
 	public void shouldWriteJustAfterCommit() throws UnknownHostException {
 		logger.trace("Populating dataStore...");
 		Mockito.when(dataStore.read(CHAVE)).thenReturn(VALOR);
@@ -181,6 +182,20 @@ public class MemnodeTest {
 			
 			Mockito.verify(dataStore).write(CHAVE, OUTRO_VALOR);
 			Mockito.verify(dataStore).write(CHAVE_NAO_EXISTE, VALOR_PARA_CHAVE_NAO_EXISTE);
+		}
+		{
+			Command minitransaction = CommandBuilder.minitransaction(MT_ID_2).withReadCommand(new ReadCommand(CHAVE))
+					.withReadCommand(new ReadCommand(CHAVE_NAO_EXISTE)).build();
+			
+			Mockito.when(dataStore.read(CHAVE)).thenReturn(OUTRO_VALOR);
+			Mockito.when(dataStore.read(CHAVE_NAO_EXISTE)).thenReturn(VALOR_PARA_CHAVE_NAO_EXISTE);
+			
+			client.send(minitransaction);
+			
+			Command expected = CommandBuilder.minitransaction(MT_ID_2).withResultCommand(new ResultCommand(CHAVE, OUTRO_VALOR)).withResultCommand(new ResultCommand(CHAVE_NAO_EXISTE, VALOR_PARA_CHAVE_NAO_EXISTE)).withCommitCommand().build();
+			Command actual = client.receive();
+			
+			Assert.assertEquals(expected, actual);
 		}
 	}
 	

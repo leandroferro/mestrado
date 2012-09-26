@@ -1,14 +1,21 @@
 package br.usp.ime.coordinator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ThreadLocalConnectionFactory implements ConnectionFactory {
 
+	private static final Logger logger = LoggerFactory.getLogger(ThreadLocalConnectionFactory.class);
+			
 	private final ThreadLocal<MemnodeReference> references = new ThreadLocal<MemnodeReference>();
 	
 	private final ThreadLocal<Connection> connections = new ThreadLocal<Connection>() {
 
 		@Override
 		protected Connection initialValue() {
-			return provider.newConnection( references.get() );
+			MemnodeReference reference = references.get();
+			logger.debug("Creating new connection for {}", reference);
+			return provider.newConnection( reference );
 		}
 		
 	};

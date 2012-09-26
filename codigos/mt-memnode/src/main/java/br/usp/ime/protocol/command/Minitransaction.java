@@ -168,4 +168,8 @@ public class Minitransaction implements Command {
 		return notCommitCommand;
 	}
 
+	public boolean hasWriteCommands() {
+		return writeCommands.size() > 0;
+	}
+
 }
