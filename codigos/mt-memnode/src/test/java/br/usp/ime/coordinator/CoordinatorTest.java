@@ -77,7 +77,7 @@ public class CoordinatorTest {
 			ADDR_REFERENCE_2);
 
 	@BeforeClass
-	public static void startCoordinator() {
+	public static void startCoordinator() throws InterruptedException {
 
 		mapper = Mockito.mock(MemnodeMapper.class);
 
@@ -96,7 +96,7 @@ public class CoordinatorTest {
 
 		});
 		logger.trace("Yielding to allow another thread to run");
-		Thread.yield();
+		Thread.sleep(5000);
 	}
 
 	@AfterClass

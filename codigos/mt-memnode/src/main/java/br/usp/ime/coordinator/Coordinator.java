@@ -9,6 +9,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,7 +44,11 @@ public class Coordinator {
 
 	private final MemnodeMapper mapper;
 
-	public Coordinator(InetSocketAddress address, MemnodeMapper mapper, MemnodeDispatcher dispatcher) {
+	private final ExecutorService executorService = Executors
+			.newFixedThreadPool(4);
+
+	public Coordinator(InetSocketAddress address, MemnodeMapper mapper,
+			MemnodeDispatcher dispatcher) {
 		this.address = address;
 		this.mapper = mapper;
 		this.dispatcher = dispatcher;
@@ -57,105 +65,132 @@ public class Coordinator {
 			shouldContinue = true;
 			while (shouldContinue) {
 				try {
-					Socket client = serverSocket.accept();
+
+					final Socket client = serverSocket.accept();
 					client.setTcpNoDelay(true);
-					logger.debug("Connection stablished {}", client);
+					logger.debug(
+							"Connection stablished {} - dispatching to handler",
+							client);
 
-					InputStream inputStream = client.getInputStream();
-					OutputStream outputStream = client.getOutputStream();
+					executorService.execute(new Runnable() {
 
-					DefaultCommandParser cmdParser = new DefaultCommandParser(
-							inputStream);
+						@Override
+						public void run() {
+							try {
 
-					OutputStreamWriter writer = new OutputStreamWriter(
-							outputStream);
+								InputStream inputStream = client
+										.getInputStream();
+								OutputStream outputStream = client
+										.getOutputStream();
 
-					logger.debug("Waiting for command");
+								DefaultCommandParser cmdParser = new DefaultCommandParser(
+										inputStream);
 
-					for (Command command = cmdParser.parseNext(); shouldContinue
-							&& command != null; command = cmdParser.parseNext()) {
-						logger.info("Command received: {}", command);
-						// Command command = cmdParser.parseNext();
+								OutputStreamWriter writer = new OutputStreamWriter(
+										outputStream);
 
-						// logger.debug("Command received: {}", command);
+								logger.debug("Waiting for command");
 
-						if (command instanceof Minitransaction) {
-							Minitransaction minitransaction = (Minitransaction) command;
+								for (Command command = cmdParser.parseNext(); shouldContinue
+										&& command != null; command = cmdParser
+										.parseNext()) {
+									logger.info("Command received: {}", command);
 
-							if (minitransaction.hasActionCommands()) {
-								
-								// TODO vou precisar trazer o mapper pra ca...
-								// Para o dispatcher a gente vai passar o mapeamento e o id da minitransacao...
-								// Vou ter que guardar o id da minitransacao para poder fazer o dispatch do finish/abort
-								
-								MemnodeMapping mapping = mapper.map(minitransaction);
-								
-								MemnodeMapping collected = dispatcher.dispatchAndCollect(mapping);
-								
-//								Command collect = dispatcher
-//										.dispatchAndCollect(minitransaction);
-								
-								logger.debug("Command collected: {}", collected);
-								
-								CommandBuilder builder = CommandBuilder
-										.minitransaction(minitransaction
-												.getId());
+									if (command instanceof Minitransaction) {
+										Minitransaction minitransaction = (Minitransaction) command;
 
-//								Minitransaction mCollect = (Minitransaction) collect;
+										if (minitransaction.hasActionCommands()) {
+											MemnodeMapping mapping = mapper
+													.map(minitransaction);
 
-								boolean finish = true;
-								if (collected.hasProblem()) {
-									Problem problem = collected
-											.getProblem();
-									logger.debug("Problem detected: {}", problem);
-									builder = builder.withProblem(problem);
-									finish = false;
-								} else if (collected.hasNotCommitCommand()) {
-									logger.debug("Not commit command received");
-									builder = builder
-											.withProblem(Problem.CANNOT_COMMIT);
-									finish = false;
-								} else {
-									for (ResultCommand r : collected
-											.getResultCommands()) {
-										builder = builder.withResultCommand(r);
+											MemnodeMapping collected = dispatcher
+													.dispatchAndCollect(mapping);
+
+											logger.debug(
+													"Command collected: {}",
+													collected);
+
+											CommandBuilder builder = CommandBuilder
+													.minitransaction(minitransaction
+															.getId());
+
+											boolean finish = true;
+											if (collected.hasProblem()) {
+												Problem problem = collected
+														.getProblem();
+												logger.debug(
+														"Problem detected: {}",
+														problem);
+												builder = builder
+														.withProblem(problem);
+												finish = false;
+											} else if (collected
+													.hasNotCommitCommand()) {
+												logger.debug("Not commit command received");
+												builder = builder
+														.withProblem(Problem.CANNOT_COMMIT);
+												finish = false;
+											} else {
+												for (ResultCommand r : collected
+														.getResultCommands()) {
+													builder = builder
+															.withResultCommand(r);
+												}
+
+												builder = builder
+														.withCommitCommand();
+											}
+											Command returned = builder.build();
+											logger.info(
+													"Returning {} to client",
+													returned);
+											writer.append(DefaultCommandSerializer
+													.serializeCommand(returned));
+
+											Command finishOrAbortCommand = finish ? FinishCommand
+													.instance() : AbortCommand
+													.instance();
+											logger.info(
+													"Finishing minitransaction with {}",
+													finishOrAbortCommand);
+											MemnodeMapping replacedMapping = mapping
+													.replaceCommands(finishOrAbortCommand);
+											dispatcher
+													.dispatch(replacedMapping);
+										} else {
+											logger.debug("Minitransaction doesn't have actions");
+											writer.append(DefaultCommandSerializer
+													.serializeCommand(CommandBuilder
+															.minitransaction(
+																	minitransaction
+																			.getId())
+															.withCommitCommand()
+															.build()));
+										}
+									} else {
+										writer.append(DefaultCommandSerializer
+												.serializeCommand(CommandBuilder
+														.problem(
+																"Unknown command"
+																		.getBytes())
+														.build()));
 									}
 
-									builder = builder.withCommitCommand();
+									writer.append("\n");
+									writer.flush();
 								}
-								Command returned = builder.build();
-								logger.info("Returning {} to client", returned);
-								writer.append(DefaultCommandSerializer
-										.serializeCommand(returned));
-
-								Command finishOrAbortCommand = finish ? FinishCommand.instance() : AbortCommand.instance();
-								logger.info("Finishing minitransaction with {}", finishOrAbortCommand);
-								MemnodeMapping replacedMapping = mapping.replaceCommands(finishOrAbortCommand);
-								dispatcher.dispatch(replacedMapping);
-							} else {
-								logger.debug("Minitransaction doesn't have actions");
-								writer.append(DefaultCommandSerializer
-										.serializeCommand(CommandBuilder
-												.minitransaction(
-														minitransaction.getId())
-												.withCommitCommand().build()));
+							} catch (IOException e) {
+								throw new RuntimeException(e);
 							}
-						} else {
-							writer.append(DefaultCommandSerializer
-									.serializeCommand(CommandBuilder.problem(
-											"Unknown command".getBytes())
-											.build()));
 						}
 
-						writer.append("\n");
-						writer.flush();
-					}
+					});
 
 				} catch (SocketTimeoutException e) {
 					logger.trace("Timeout waiting for connection");
 				}
 			}
-			logger.debug("Exiting wait block");
+			logger.debug("Leaving wait block");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

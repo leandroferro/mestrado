@@ -45,6 +45,9 @@ public class Memnode {
 	private boolean shouldContinue;
 
 	private int timeout = 500;
+	
+	private final ExecutorService executorService = Executors
+			.newFixedThreadPool(4);
 
 	public Memnode(SocketAddress address, DataStore dataStore) {
 		this.address = address;
@@ -62,133 +65,145 @@ public class Memnode {
 			shouldContinue = true;
 			while (shouldContinue) {
 				try {
-					Socket client = serverSocket.accept();
+					final Socket client = serverSocket.accept();
 					client.setTcpNoDelay(true);
-					logger.debug("Connection stablished {}", client);
+					logger.debug("Connection stablished {} - dispatching to handler", client);
 
-					InputStream inputStream = client.getInputStream();
-					OutputStream outputStream = client.getOutputStream();
+					executorService.execute(new Runnable() {
 
-					DefaultCommandParser cmdParser = new DefaultCommandParser(
-							inputStream);
-
-					OutputStreamWriter writer = new OutputStreamWriter(
-							outputStream);
-
-					logger.debug("Waiting for command");
-
-					for (Command command = cmdParser.parseNext(); shouldContinue
-							&& command != null; command = cmdParser.parseNext()) {
-						logger.info("Command received: {}", command);
-
-						if (command instanceof Minitransaction) {
-							Minitransaction minitransaction = (Minitransaction) command;
-
-							CommandBuilder builder = CommandBuilder
-									.minitransaction(minitransaction.getId());
-
-							boolean commit = true;
-
-							ByteArrayWrapper idWrapper = new ByteArrayWrapper(
-									minitransaction.getId());
-
-							if (minitransaction.getFinishCommand() != null
-									&& stageArea.containsKey(idWrapper)) {
+						@Override
+						public void run() {
+							try{
 								
-								logger.debug("Received finish command and has staged commands to commit for {}", idWrapper);
+								InputStream inputStream = client.getInputStream();
+								OutputStream outputStream = client.getOutputStream();
 								
-								for (WriteCommand writeCommand : stageArea
-										.get(idWrapper)) {
-									try {
-										logger.debug("Executing {}", writeCommand);
-										dataStore.write(writeCommand.getId(),
-												writeCommand.getData());
-									} catch (Exception e) {
-										logger.error("Ops, an error occurred while commiting - aborting", e);
-										commit = false;
-										break;
-									}
-								}
-								stageArea.remove(idWrapper);
-								logger.debug("Stage area cleaned {}", stageArea);
-							} else {
-								for (ExtensionCommand extensionCommand : minitransaction
-										.getExtensionCommands()) {
-									logger.debug("Executing {}", extensionCommand);
-									if ("ECMP".equals(new String(
-											extensionCommand.getId()))) {
-										try {
-											byte[] data = dataStore
-													.read(extensionCommand
-															.getParams().get(0)
-															.getValue());
-											if (!Arrays.equals(data,
-													extensionCommand
-															.getParams().get(1)
-															.getValue())) {
-												commit = false;
+								DefaultCommandParser cmdParser = new DefaultCommandParser(
+										inputStream);
+								
+								OutputStreamWriter writer = new OutputStreamWriter(
+										outputStream);
+								
+								logger.debug("Waiting for command");
+								
+								for (Command command = cmdParser.parseNext(); shouldContinue
+										&& command != null; command = cmdParser.parseNext()) {
+									logger.info("Command received: {}", command);
+									
+									if (command instanceof Minitransaction) {
+										Minitransaction minitransaction = (Minitransaction) command;
+										
+										CommandBuilder builder = CommandBuilder
+												.minitransaction(minitransaction.getId());
+										
+										boolean commit = true;
+										
+										ByteArrayWrapper idWrapper = new ByteArrayWrapper(
+												minitransaction.getId());
+										
+										if (minitransaction.getFinishCommand() != null
+												&& stageArea.containsKey(idWrapper)) {
+											
+											logger.debug("Received finish command and has staged commands to commit for {}", idWrapper);
+											
+											for (WriteCommand writeCommand : stageArea
+													.get(idWrapper)) {
+												try {
+													logger.debug("Executing {}", writeCommand);
+													dataStore.write(writeCommand.getId(),
+															writeCommand.getData());
+												} catch (Exception e) {
+													logger.error("Ops, an error occurred while commiting - aborting", e);
+													commit = false;
+													break;
+												}
 											}
-										} catch (Exception e) {
-											logger.error("Exception caught while executing extension command - aborting", e);
-											commit = false;
-											break;
-										}
-									}
-								}
-
-								if (commit) {
-									for (ReadCommand readCommand : minitransaction
-											.getReadCommands()) {
-										logger.debug("Executing {}", readCommand);
-										try {
-											byte[] data = dataStore
-													.read(readCommand.getKey());
-											if (data != null) {
-												builder = builder
-														.withResultCommand(new ResultCommand(
-																readCommand
-																		.getKey(),
-																data));
+											stageArea.remove(idWrapper);
+											logger.debug("Stage area cleaned {}", stageArea);
+										} else {
+											for (ExtensionCommand extensionCommand : minitransaction
+													.getExtensionCommands()) {
+												logger.debug("Executing {}", extensionCommand);
+												if ("ECMP".equals(new String(
+														extensionCommand.getId()))) {
+													try {
+														byte[] data = dataStore
+																.read(extensionCommand
+																		.getParams().get(0)
+																		.getValue());
+														if (!Arrays.equals(data,
+																extensionCommand
+																.getParams().get(1)
+																.getValue())) {
+															commit = false;
+														}
+													} catch (Exception e) {
+														logger.error("Exception caught while executing extension command - aborting", e);
+														commit = false;
+														break;
+													}
+												}
 											}
-										} catch (Exception e) {
-											logger.error("Exception caught while reading data - aborting", e);
-											commit = false;
-											break;
+											
+											if (commit) {
+												for (ReadCommand readCommand : minitransaction
+														.getReadCommands()) {
+													logger.debug("Executing {}", readCommand);
+													try {
+														byte[] data = dataStore
+																.read(readCommand.getKey());
+														if (data != null) {
+															builder = builder
+																	.withResultCommand(new ResultCommand(
+																			readCommand
+																			.getKey(),
+																			data));
+														}
+													} catch (Exception e) {
+														logger.error("Exception caught while reading data - aborting", e);
+														commit = false;
+														break;
+													}
+												}
+											}
+											
+											if (commit && minitransaction.hasWriteCommands()) {
+												stageArea.put(idWrapper,
+														minitransaction.getWriteCommands());
+												logger.debug("Write commands staged {}", stageArea);
+											}
 										}
+										
+										if (commit) {
+											builder = builder.withCommitCommand();
+										} else {
+											builder = builder.withProblem(new Problem(
+													"ABORT".getBytes()));
+										}
+										
+										Command returningCommand = builder.build();
+										
+										logger.debug("Returning {}", returningCommand);
+										
+										writer.append(DefaultCommandSerializer
+												.serializeCommand(returningCommand));
+									} else {
+										writer.append(DefaultCommandSerializer
+												.serializeCommand(CommandBuilder.problem(
+														"Unknown command".getBytes())
+														.build()));
 									}
-								}
-
-								if (commit && minitransaction.hasWriteCommands()) {
-									stageArea.put(idWrapper,
-											minitransaction.getWriteCommands());
-									logger.debug("Write commands staged {}", stageArea);
+									writer.append("\n");
+									writer.flush();
+									
+									logger.debug("Waiting connection");
 								}
 							}
-
-							if (commit) {
-								builder = builder.withCommitCommand();
-							} else {
-								builder = builder.withProblem(new Problem(
-										"ABORT".getBytes()));
+							catch(IOException e) {
+								throw new RuntimeException(e);
 							}
-
-							Command returningCommand = builder.build();
-							
-							logger.debug("Returning {}", returningCommand);
-							
-							writer.append(DefaultCommandSerializer
-									.serializeCommand(returningCommand));
-						} else {
-							writer.append(DefaultCommandSerializer
-									.serializeCommand(CommandBuilder.problem(
-											"Unknown command".getBytes())
-											.build()));
 						}
-						writer.append("\n");
-						writer.flush();
-
-						logger.debug("Waiting connection");
-					}
+					});
 
 				} catch (SocketTimeoutException e) {
 					logger.trace("Timeout waiting for connection");

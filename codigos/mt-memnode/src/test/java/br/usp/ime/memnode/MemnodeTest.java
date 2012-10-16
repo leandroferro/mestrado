@@ -63,7 +63,7 @@ public class MemnodeTest {
 	
 
 	@BeforeClass
-	public static void startCoordinator() {
+	public static void startCoordinator() throws InterruptedException {
 		dataStore = Mockito.mock(DataStore.class);
 		
 		executor.execute(new Runnable() {
@@ -76,7 +76,7 @@ public class MemnodeTest {
 
 		});
 		logger.trace("Yielding to allow another thread to run");
-		Thread.yield();
+		Thread.sleep(5000);
 	}
 
 	@AfterClass
