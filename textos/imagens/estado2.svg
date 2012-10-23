@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="926.35999"
+   height="493.09"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="estado2.svg">
+  <defs
+     id="defs4">
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect4193"
+       is_visible="true"
+       pattern="M 0,5 10,10 10,0 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect3813"
+       is_visible="true"
+       pattern="M 0,5 10,10 10,0 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect3809"
+       is_visible="true"
+       pattern="M 0,5 10,10 10,0 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.66604697"
+     inkscape:cx="350"
+     inkscape:cy="381.8716"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     width="1052.36px"
+     inkscape:window-width="1366"
+     inkscape:window-height="690"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Camada 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-559.27917)">
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:6.74401426px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 237.01407,949.21932 498.07077,0"
+       id="path3004"
+       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:32px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       x="13.080948"
+       y="603.28296"
+       id="text3803"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3805"
+         x="13.080948"
+         y="603.28296">Alteração de estado</tspan></text>
+    <g
+       id="g5047"
+       transform="matrix(0,0.67789129,-0.77448057,0,819.64912,481.24563)">
+      <path
+         d="m 232.73902,854.12135 198.95883,0 0,-3.07617 -198.95883,0 0,3.07617 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         id="path3343"
+         inkscape:connector-curvature="0" />
+      <path
+         d="m 456.47401,852.4276 -26.82125,13.315 0,-26.63 26.82125,13.315 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         id="path3345"
+         inkscape:connector-curvature="0" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:32px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       x="71.714287"
+       y="850.36218"
+       id="text2987"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2989"
+         x="71.714287"
+         y="850.36218">Máquina 1</tspan></text>
+    <rect
+       style="fill:#c8b7b7;fill-rule:evenodd;stroke:#000000;stroke-width:1.28512204px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="rect3774"
+       width="135.49419"
+       height="163.2093"
+       x="92.031845"
+       y="867.55438" />
+    <text
+       xml:space="preserve"
+       style="font-size:32px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       x="97.576477"
+       y="900.6319"
+       id="text3878"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3880"
+         x="97.576477"
+         y="900.6319"
+         style="font-style:italic;font-weight:normal;text-align:start;text-anchor:start;-inkscape-font-specification:Sans Italic">Estado'</tspan><tspan
+         sodipodi:role="line"
+         x="97.576477"
+         y="940.6319"
+         id="tspan3882"
+         style="text-align:start;text-anchor:start">    ABC</tspan><tspan
+         sodipodi:role="line"
+         x="97.576477"
+         y="980.6319"
+         id="tspan3884"
+         style="text-align:start;text-anchor:start">    DEF</tspan><tspan
+         sodipodi:role="line"
+         x="97.576477"
+         y="1020.6319"
+         id="tspan3886"
+         style="text-align:start;text-anchor:start">    JKL</tspan></text>
+    <g
+       id="g3963"
+       transform="translate(614,116)">
+      <text
+         xml:space="preserve"
+         style="font-size:32px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         x="97.714287"
+         y="734.36218"
+         id="text3965"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan3967"
+           x="97.714287"
+           y="734.36218">Máquina 2</tspan></text>
+      <g
+         id="g3969"
+         transform="translate(38,0)">
+        <rect
+           y="751.55438"
+           x="92.654907"
+           height="163.2093"
+           width="122.87112"
+           id="rect3971"
+           style="fill:#c8b7b7;fill-rule:evenodd;stroke:#000000;stroke-width:1.22379577px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        <text
+           sodipodi:linespacing="125%"
+           id="text3973"
+           y="784.6319"
+           x="99.576477"
+           style="font-size:32px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+           xml:space="preserve"><tspan
+             style="font-style:italic;font-weight:normal;text-align:start;text-anchor:start;-inkscape-font-specification:Sans Italic"
+             y="784.6319"
+             x="99.576477"
+             id="tspan3975"
+             sodipodi:role="line">Estado</tspan><tspan
+             style="text-align:start;text-anchor:start"
+             id="tspan3977"
+             y="824.6319"
+             x="99.576477"
+             sodipodi:role="line">    ABC</tspan><tspan
+             style="text-align:start;text-anchor:start"
+             id="tspan3979"
+             y="864.6319"
+             x="99.576477"
+             sodipodi:role="line">    DEF</tspan><tspan
+             style="text-align:start;text-anchor:start"
+             id="tspan3981"
+             y="904.6319"
+             x="99.576477"
+             sodipodi:role="line">    GHI</tspan></text>
+      </g>
+    </g>
+    <g
+       id="g4707">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4195"
+         d="m 450.8168,986.61656 84.07816,-79.57397"
+         style="fill:#ffffff;stroke:#800000;stroke-width:8.39999962;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         style="fill:#ffffff;stroke:#800000;stroke-width:8.39999962;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="M 534.89496,986.61656 450.8168,907.04259"
+         id="path4705"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+</svg>

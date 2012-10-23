@@ -47,11 +47,14 @@ public class Coordinator {
 	private final ExecutorService executorService = Executors
 			.newFixedThreadPool(4);
 
+	private IdGenerator idGenerator;
+
 	public Coordinator(InetSocketAddress address, MemnodeMapper mapper,
-			MemnodeDispatcher dispatcher) {
+			MemnodeDispatcher dispatcher, IdGenerator idGenerator) {
 		this.address = address;
 		this.mapper = mapper;
 		this.dispatcher = dispatcher;
+		this.idGenerator = idGenerator;
 	}
 
 	public void start() {
@@ -179,6 +182,8 @@ public class Coordinator {
 									writer.append("\n");
 									writer.flush();
 								}
+								
+								client.close();
 							} catch (IOException e) {
 								throw new RuntimeException(e);
 							}

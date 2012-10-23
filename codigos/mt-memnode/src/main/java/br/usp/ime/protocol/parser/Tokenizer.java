@@ -96,6 +96,7 @@ public class Tokenizer {
 			put((byte) 'N', TokenType.NOT_COMMIT);
 			put((byte) 'F', TokenType.FINISH);
 			put((byte) 'A', TokenType.ABORT);
+			put((byte) 'T', TokenType.TRY_AGAIN);
 			put((byte) '{', TokenType.OPENING_CURLY_BRACE);
 			put((byte) '}', TokenType.CLOSING_CURLY_BRACE);
 			put((byte) '\n', TokenType.NEW_LINE);

@@ -11,6 +11,7 @@ import br.usp.ime.protocol.command.Param;
 import br.usp.ime.protocol.command.Problem;
 import br.usp.ime.protocol.command.ReadCommand;
 import br.usp.ime.protocol.command.ResultCommand;
+import br.usp.ime.protocol.command.TryAgainCommand;
 import br.usp.ime.protocol.command.WriteCommand;
 
 public abstract class DefaultCommandSerializer implements CommandSerializer {
@@ -61,6 +62,8 @@ public abstract class DefaultCommandSerializer implements CommandSerializer {
 				builder.append(serialize(minitransaction.getFinishCommand()));
 				
 				builder.append(serialize(minitransaction.getAbortCommand()));
+				
+				builder.append(serialize(minitransaction.getTryAgainCommand()));
 				
 				builder.append( "}" );
 			}
@@ -145,6 +148,9 @@ public abstract class DefaultCommandSerializer implements CommandSerializer {
 			}
 			else if (command instanceof AbortCommand) {
 				builder.append("A").append("\n");
+			}
+			else if (command instanceof TryAgainCommand) {
+				builder.append("T").append("\n");
 			}
 			
 			return builder.toString();

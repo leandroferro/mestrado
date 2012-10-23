@@ -25,11 +25,13 @@ public class Minitransaction implements Command {
 
 	private final NotCommitCommand notCommitCommand;
 
+	private final TryAgainCommand tryAgainCommand;
+
 	public Minitransaction(byte[] id, Problem problem,
 			List<ReadCommand> readCommands, List<WriteCommand> writeCommands,
 			List<ExtensionCommand> extensionCommands,
 			List<ResultCommand> resultCommands, CommitCommand commitCommand, NotCommitCommand notCommitCommand,
-			FinishCommand finishCommand, AbortCommand abortCommand) {
+			FinishCommand finishCommand, AbortCommand abortCommand, TryAgainCommand tryAgainCommand) {
 		this.id = id;
 		this.problem = problem;
 		this.readCommands = readCommands;
@@ -40,12 +42,15 @@ public class Minitransaction implements Command {
 		this.notCommitCommand = notCommitCommand;
 		this.finishCommand = finishCommand;
 		this.abortCommand = abortCommand;
+		this.tryAgainCommand = tryAgainCommand;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result
+				+ ((abortCommand == null) ? 0 : abortCommand.hashCode());
 		result = prime * result
 				+ ((commitCommand == null) ? 0 : commitCommand.hashCode());
 		result = prime
@@ -55,11 +60,16 @@ public class Minitransaction implements Command {
 		result = prime * result
 				+ ((finishCommand == null) ? 0 : finishCommand.hashCode());
 		result = prime * result + Arrays.hashCode(id);
+		result = prime
+				* result
+				+ ((notCommitCommand == null) ? 0 : notCommitCommand.hashCode());
 		result = prime * result + ((problem == null) ? 0 : problem.hashCode());
 		result = prime * result
 				+ ((readCommands == null) ? 0 : readCommands.hashCode());
 		result = prime * result
 				+ ((resultCommands == null) ? 0 : resultCommands.hashCode());
+		result = prime * result
+				+ ((tryAgainCommand == null) ? 0 : tryAgainCommand.hashCode());
 		result = prime * result
 				+ ((writeCommands == null) ? 0 : writeCommands.hashCode());
 		return result;
@@ -74,6 +84,11 @@ public class Minitransaction implements Command {
 		if (getClass() != obj.getClass())
 			return false;
 		Minitransaction other = (Minitransaction) obj;
+		if (abortCommand == null) {
+			if (other.abortCommand != null)
+				return false;
+		} else if (!abortCommand.equals(other.abortCommand))
+			return false;
 		if (commitCommand == null) {
 			if (other.commitCommand != null)
 				return false;
@@ -91,6 +106,11 @@ public class Minitransaction implements Command {
 			return false;
 		if (!Arrays.equals(id, other.id))
 			return false;
+		if (notCommitCommand == null) {
+			if (other.notCommitCommand != null)
+				return false;
+		} else if (!notCommitCommand.equals(other.notCommitCommand))
+			return false;
 		if (problem == null) {
 			if (other.problem != null)
 				return false;
@@ -105,6 +125,11 @@ public class Minitransaction implements Command {
 			if (other.resultCommands != null)
 				return false;
 		} else if (!resultCommands.equals(other.resultCommands))
+			return false;
+		if (tryAgainCommand == null) {
+			if (other.tryAgainCommand != null)
+				return false;
+		} else if (!tryAgainCommand.equals(other.tryAgainCommand))
 			return false;
 		if (writeCommands == null) {
 			if (other.writeCommands != null)
@@ -125,7 +150,9 @@ public class Minitransaction implements Command {
 				+ ", writeCommands=" + writeCommands + ", extensionCommands="
 				+ extensionCommands + ", commitCommand=" + commitCommand
 				+ ", resultCommands=" + resultCommands + ", finishCommand="
-				+ finishCommand + "]";
+				+ finishCommand + ", abortCommand=" + abortCommand
+				+ ", notCommitCommand=" + notCommitCommand
+				+ ", tryAgainCommand=" + tryAgainCommand + "]";
 	}
 
 	public Problem getProblem() {
@@ -170,6 +197,10 @@ public class Minitransaction implements Command {
 
 	public boolean hasWriteCommands() {
 		return writeCommands.size() > 0;
+	}
+
+	public TryAgainCommand getTryAgainCommand() {
+		return tryAgainCommand;
 	}
 
 }

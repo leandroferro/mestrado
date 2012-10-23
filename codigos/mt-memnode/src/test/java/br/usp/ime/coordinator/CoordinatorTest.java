@@ -70,6 +70,8 @@ public class CoordinatorTest {
 	private static MemnodeDispatcher dispatcher;
 
 	private static MemnodeMapper mapper;
+	
+	private static IdGenerator idGenerator;
 
 	private static final MemnodeReference REFERENCE_1 = new MemnodeReference(
 			ADDR_REFERENCE_1);
@@ -82,8 +84,10 @@ public class CoordinatorTest {
 		mapper = Mockito.mock(MemnodeMapper.class);
 
 		dispatcher = Mockito.mock(MemnodeDispatcher.class);
+		
+		idGenerator = Mockito.mock(IdGenerator.class);
 
-		coordinator = new Coordinator(COORDINATOR_ADDRESS, mapper, dispatcher);
+		coordinator = new Coordinator(COORDINATOR_ADDRESS, mapper, dispatcher, idGenerator);
 
 		executor.execute(new Runnable() {
 

@@ -90,6 +90,17 @@ public class CommandSerializerTest {
 
 		Assert.assertEquals(expected, actual);
 	}
+	
+	@Test
+	public void shouldSerializeMinitransactionWithTryAgainCommand() {
+		Command command = CommandBuilder.minitransaction(Utils.bytes("xyz"))
+				.withTryAgainCommand().build();
+
+		String expected = "M 3 xyz {\nT\n}";
+		String actual = DefaultCommandSerializer.serializeCommand(command);
+
+		Assert.assertEquals(expected, actual);
+	}
 
 	@Test
 	public void shouldSerializeMinitransactionWithReadCommand() {

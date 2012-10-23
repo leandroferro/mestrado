@@ -159,7 +159,7 @@ public final class DefaultCommandParser implements CommandParser {
 				TokenType.PROBLEM, TokenType.READ, TokenType.WRITE,
 				TokenType.EXTENSION_COMMAND, TokenType.RESULT,
 				TokenType.COMMIT, TokenType.NOT_COMMIT, TokenType.FINISH,
-				TokenType.ABORT);
+				TokenType.ABORT, TokenType.TRY_AGAIN);
 
 		for (Token subCommand = readAndCheck(types); //
 		subCommand.getType() != TokenType.CLOSING_CURLY_BRACE; //
@@ -193,6 +193,8 @@ public final class DefaultCommandParser implements CommandParser {
 				builder.withFinishCommand();
 			} else if (subCommand.getType() == TokenType.ABORT) {
 				builder.withAbortCommand();
+			} else if (subCommand.getType() == TokenType.TRY_AGAIN) {
+				builder.withTryAgainCommand();
 			} else {
 
 				final Token param = loadParam();

@@ -92,6 +92,18 @@ public class CommandParserTest {
 
 		Assert.assertEquals(builder.build(), requestParser.parseNext());
 	}
+	
+	@Test
+	public void shouldParseTryAgainCommand()
+			throws UnexpectedTokenException {
+		DefaultCommandParser requestParser = new DefaultCommandParser(
+				stream("M 1 a {\nT\n}"));
+
+		CommandBuilder builder = CommandBuilder.minitransaction(bytes("a"))
+				.withTryAgainCommand();
+
+		Assert.assertEquals(builder.build(), requestParser.parseNext());
+	}
 
 	@Test
 	public void shouldParseTwoMinitransactionsInTheSameStream() {

@@ -64,7 +64,7 @@ public class CoordinatorApp {
 			
 			MemnodeClient client = new BasicMemnodeClient(new DefaultCommandParserFactory(), new ThreadLocalConnectionFactory(new SocketBasedConnectionProvider()), DefaultCommandSerializer.instance);
 			MemnodeDispatcher dispatcher = new BasicMemnodeDispatcher(memnodeMapper, client );
-			Coordinator coordinator = new Coordinator(address, memnodeMapper, dispatcher);
+			Coordinator coordinator = new Coordinator(address, memnodeMapper, dispatcher, null);
 
 			coordinator.start();
 			
