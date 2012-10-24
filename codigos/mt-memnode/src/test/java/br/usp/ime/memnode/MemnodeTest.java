@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +18,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,15 +65,19 @@ public class MemnodeTest {
 	
 	private static DataStore dataStore;
 	
+	private static LockManager lockManager;
+	
 
 	@BeforeClass
 	public static void startCoordinator() throws InterruptedException {
+
 		dataStore = Mockito.mock(DataStore.class);
+		lockManager = Mockito.mock(LockManager.class);
 		
 		executor.execute(new Runnable() {
 
 			public void run() {
-				memnode = new Memnode(MEMNODE_ADDRESS, dataStore);
+				memnode = new Memnode(MEMNODE_ADDRESS, dataStore, lockManager);
 				logger.trace("Starting {} in another thread", memnode);
 				memnode.start();
 			}
@@ -100,7 +108,7 @@ public class MemnodeTest {
 		logger.trace("Connecting...");
 		client.connect();
 		logger.trace("Connected!");
-		Mockito.reset(dataStore);
+		Mockito.reset(dataStore, lockManager);
 	}
 
 	@After
@@ -125,10 +133,15 @@ public class MemnodeTest {
 		}
 	}
 	
+	private static ByteArrayWrapper baw(byte[] a) {
+		return new ByteArrayWrapper(a);
+	}
+	
 	@Test(timeout=5000)
 	public void testExecuteReadCommands() throws UnknownHostException {
 		logger.trace("Populating dataStore...");
 		Mockito.when(dataStore.read(CHAVE)).thenReturn(VALOR);
+		Mockito.when(lockManager.acquire(baw(MT_ID), Arrays.asList(baw(CHAVE), baw(CHAVE_NAO_EXISTE)), Collections.<ByteArrayWrapper>emptyList())).thenReturn(true);
 
 		Command minitransaction = CommandBuilder.minitransaction(MT_ID).withReadCommand(new ReadCommand(CHAVE))
 				.withReadCommand(new ReadCommand(CHAVE_NAO_EXISTE)).build();
@@ -141,11 +154,13 @@ public class MemnodeTest {
 		Assert.assertEquals(expected, actual);
 	}
 
-	@Test()
+	@Test(timeout=5000)
 	public void shouldWriteJustAfterCommit() throws UnknownHostException {
 		logger.trace("Populating dataStore...");
 		Mockito.when(dataStore.read(CHAVE)).thenReturn(VALOR);
 		{
+			Mockito.when(lockManager.acquire(baw(MT_ID), Collections.<ByteArrayWrapper>emptyList(), Arrays.asList(baw(CHAVE), baw(CHAVE_NAO_EXISTE)))).thenReturn(true);
+			
 			Command minitransaction = CommandBuilder.minitransaction(MT_ID).withWriteCommand(new WriteCommand(CHAVE, OUTRO_VALOR))
 					.withWriteCommand(new WriteCommand(CHAVE_NAO_EXISTE, VALOR_PARA_CHAVE_NAO_EXISTE)).build();
 			
@@ -160,12 +175,14 @@ public class MemnodeTest {
 			Mockito.verify(dataStore, Mockito.never()).write(CHAVE_NAO_EXISTE, VALOR_PARA_CHAVE_NAO_EXISTE);
 		}
 		{
+			Mockito.when(lockManager.acquire(baw(MT_ID_2), Arrays.asList(baw(CHAVE), baw(CHAVE_NAO_EXISTE)), Collections.<ByteArrayWrapper>emptyList())).thenReturn(false);
+			
 			Command minitransaction = CommandBuilder.minitransaction(MT_ID_2).withReadCommand(new ReadCommand(CHAVE))
 					.withReadCommand(new ReadCommand(CHAVE_NAO_EXISTE)).build();
 			
 			client.send(minitransaction);
 			
-			Command expected = CommandBuilder.minitransaction(MT_ID_2).withResultCommand(new ResultCommand(CHAVE, VALOR)).withCommitCommand().build();
+			Command expected = CommandBuilder.minitransaction(MT_ID_2).withTryAgainCommand().build();
 			Command actual = client.receive();
 			
 			Assert.assertEquals(expected, actual);
@@ -182,8 +199,12 @@ public class MemnodeTest {
 			
 			Mockito.verify(dataStore).write(CHAVE, OUTRO_VALOR);
 			Mockito.verify(dataStore).write(CHAVE_NAO_EXISTE, VALOR_PARA_CHAVE_NAO_EXISTE);
+			
+			Mockito.verify(lockManager).release(baw(MT_ID));
 		}
 		{
+			Mockito.when(lockManager.acquire(baw(MT_ID_2), Arrays.asList(baw(CHAVE), baw(CHAVE_NAO_EXISTE)), Collections.<ByteArrayWrapper>emptyList())).thenReturn(true);
+			
 			Command minitransaction = CommandBuilder.minitransaction(MT_ID_2).withReadCommand(new ReadCommand(CHAVE))
 					.withReadCommand(new ReadCommand(CHAVE_NAO_EXISTE)).build();
 			
@@ -203,6 +224,7 @@ public class MemnodeTest {
 	public void testExecuteEqualsExtensionCommands() throws UnknownHostException {
 		logger.trace("Populating dataStore...");
 		Mockito.when(dataStore.read(CHAVE)).thenReturn(VALOR);
+		Mockito.when(lockManager.acquire(baw(MT_ID), Arrays.asList(baw(CHAVE)), Collections.<ByteArrayWrapper>emptyList())).thenReturn(true);
 
 		Command minitransaction = CommandBuilder.minitransaction(MT_ID).withExtensionCommand(new ExtensionCommand(bytes("ECMP"), Arrays.asList(new Param(CHAVE), new Param(VALOR))))
 				.build();
@@ -219,6 +241,7 @@ public class MemnodeTest {
 	public void testExecuteEqualsExtensionCommandsWhenComparisonFails() throws UnknownHostException {
 		logger.trace("Populating dataStore...");
 		Mockito.when(dataStore.read(CHAVE)).thenReturn(VALOR);
+		Mockito.when(lockManager.acquire(baw(MT_ID), Arrays.asList(baw(CHAVE)), Collections.<ByteArrayWrapper>emptyList())).thenReturn(true);
 
 		Command minitransaction = CommandBuilder.minitransaction(MT_ID).withExtensionCommand(new ExtensionCommand(bytes("ECMP"), Arrays.asList(new Param(CHAVE), new Param(OUTRO_VALOR))))
 				.build();
@@ -234,6 +257,7 @@ public class MemnodeTest {
 	@Test(timeout=5000)
 	public void testAbortWhenReadFailsForComparison() throws UnknownHostException {
 		Mockito.when(dataStore.read(CHAVE)).thenThrow(RuntimeException.class);
+		Mockito.when(lockManager.acquire(baw(MT_ID), Arrays.asList(baw(CHAVE)), Collections.<ByteArrayWrapper>emptyList())).thenReturn(true);
 
 		Command minitransaction = CommandBuilder.minitransaction(MT_ID).withExtensionCommand(new ExtensionCommand(bytes("ECMP"), Arrays.asList(new Param(CHAVE), new Param(OUTRO_VALOR))))
 				.build();

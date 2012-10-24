@@ -38,4 +38,9 @@ public class Problem implements Command {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "Problem [description=" + new String(description) + "]";
+	}
+
 }

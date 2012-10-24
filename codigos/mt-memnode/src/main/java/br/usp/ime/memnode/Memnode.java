@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -49,9 +50,12 @@ public class Memnode {
 	private final ExecutorService executorService = Executors
 			.newFixedThreadPool(4);
 
-	public Memnode(SocketAddress address, DataStore dataStore) {
+	private final LockManager lockManager;
+
+	public Memnode(SocketAddress address, DataStore dataStore, LockManager lockManager) {
 		this.address = address;
 		this.dataStore = dataStore;
+		this.lockManager = lockManager;
 	}
 
 	public void start() {
@@ -97,6 +101,7 @@ public class Memnode {
 												.minitransaction(minitransaction.getId());
 										
 										boolean commit = true;
+										boolean tryAgain = false;
 										
 										ByteArrayWrapper idWrapper = new ByteArrayWrapper(
 												minitransaction.getId());
@@ -118,45 +123,71 @@ public class Memnode {
 													break;
 												}
 											}
+											
+											lockManager.release(new ByteArrayWrapper(minitransaction.getId()));
 											stageArea.remove(idWrapper);
 											logger.debug("Stage area cleaned {}", stageArea);
-										} else {
+										} else if (minitransaction.hasActionCommands()){
+											
+											List<ByteArrayWrapper> readIds = new ArrayList<ByteArrayWrapper>();
+											List<ByteArrayWrapper> writeIds = new ArrayList<ByteArrayWrapper>();
+											
 											for (ExtensionCommand extensionCommand : minitransaction
 													.getExtensionCommands()) {
-												logger.debug("Executing {}", extensionCommand);
-												if ("ECMP".equals(new String(
-														extensionCommand.getId()))) {
-													try {
-														byte[] data = dataStore
-																.read(extensionCommand
-																		.getParams().get(0)
-																		.getValue());
-														if (!Arrays.equals(data,
-																extensionCommand
-																.getParams().get(1)
-																.getValue())) {
+												readIds.add(new ByteArrayWrapper(extensionCommand.getParams().get(0).getValue()));
+											}
+											for (ReadCommand readCommand :  minitransaction.getReadCommands()) {
+												readIds.add(new ByteArrayWrapper(readCommand.getKey()));
+											}
+											for (WriteCommand writeCommand :  minitransaction.getWriteCommands()) {
+												writeIds.add(new ByteArrayWrapper(writeCommand.getId()));
+											}
+											
+											if( !lockManager.acquire(new ByteArrayWrapper(minitransaction.getId()), readIds, writeIds) ) {
+												commit = false;
+												tryAgain = true;
+											}
+											else {
+												
+												for (ExtensionCommand extensionCommand : minitransaction
+														.getExtensionCommands()) {
+													logger.debug("Executing {}", extensionCommand);
+													if ("ECMP".equals(new String(
+															extensionCommand.getId()))) {
+														try {
+															byte[] data = dataStore
+																	.read(extensionCommand
+																			.getParams().get(0)
+																			.getValue());
+															if (!Arrays.equals(data,
+																	extensionCommand
+																	.getParams().get(1)
+																	.getValue())) {
+																commit = false;
+															}
+														} catch (Exception e) {
+															logger.error("Exception caught while executing extension command - aborting", e);
 															commit = false;
+															break;
 														}
-													} catch (Exception e) {
-														logger.error("Exception caught while executing extension command - aborting", e);
-														commit = false;
-														break;
 													}
 												}
 											}
+											
 											
 											if (commit) {
 												for (ReadCommand readCommand : minitransaction
 														.getReadCommands()) {
 													logger.debug("Executing {}", readCommand);
+													logger.debug("dataStore {}", dataStore);
 													try {
+														byte[] key = readCommand.getKey();
 														byte[] data = dataStore
-																.read(readCommand.getKey());
+																.read(key);
 														if (data != null) {
 															builder = builder
 																	.withResultCommand(new ResultCommand(
-																			readCommand
-																			.getKey(),
+																			key,
 																			data));
 														}
 													} catch (Exception e) {
@@ -177,8 +208,13 @@ public class Memnode {
 										if (commit) {
 											builder = builder.withCommitCommand();
 										} else {
-											builder = builder.withProblem(new Problem(
-													"ABORT".getBytes()));
+											if( tryAgain ) {
+												builder = builder.withTryAgainCommand();
+											}
+											else {
+												builder = builder.withProblem(new Problem(
+														"ABORT".getBytes()));
+											}
 										}
 										
 										Command returningCommand = builder.build();

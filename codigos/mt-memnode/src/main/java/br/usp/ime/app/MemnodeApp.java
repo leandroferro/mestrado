@@ -44,7 +44,7 @@ public class MemnodeApp {
 
 			Map<ByteArrayWrapper, ByteArrayWrapper> map = new HashMap<ByteArrayWrapper, ByteArrayWrapper>();
 			DataStore dataStore = new MapDataStore(map);
-			Memnode memnode = new Memnode(address, dataStore);
+			Memnode memnode = new Memnode(address, dataStore, null);
 
 			memnode.start();
 
