@@ -143,15 +143,31 @@ public class MemnodeTest {
 		Mockito.when(dataStore.read(CHAVE)).thenReturn(VALOR);
 		Mockito.when(lockManager.acquire(baw(MT_ID), Arrays.asList(baw(CHAVE), baw(CHAVE_NAO_EXISTE)), Collections.<ByteArrayWrapper>emptyList())).thenReturn(true);
 
-		Command minitransaction = CommandBuilder.minitransaction(MT_ID).withReadCommand(new ReadCommand(CHAVE))
-				.withReadCommand(new ReadCommand(CHAVE_NAO_EXISTE)).build();
+		{
+			Command minitransaction = CommandBuilder.minitransaction(MT_ID).withReadCommand(new ReadCommand(CHAVE))
+					.withReadCommand(new ReadCommand(CHAVE_NAO_EXISTE)).build();
+			
+			client.send(minitransaction);
+			
+			Command expected = CommandBuilder.minitransaction(MT_ID).withCommitCommand().withResultCommand(new ResultCommand(CHAVE, VALOR)).build();
+			Command actual = client.receive();
+			
+			Assert.assertEquals(expected, actual);
+		}
 
-		client.send(minitransaction);
-		
-		Command expected = CommandBuilder.minitransaction(MT_ID).withCommitCommand().withResultCommand(new ResultCommand(CHAVE, VALOR)).build();
-		Command actual = client.receive();
-		
-		Assert.assertEquals(expected, actual);
+		{
+			// valido que transacoes com comandos de leitura somente terao os locks liberados - era um bug
+			Command minitransaction = CommandBuilder.minitransaction(MT_ID).withFinishCommand().build();
+			
+			client.send(minitransaction);
+			
+			Command expected = CommandBuilder.minitransaction(MT_ID).withCommitCommand().build();
+			Command actual = client.receive();
+			
+			Assert.assertEquals(expected, actual);
+			
+			Mockito.verify(lockManager).release(baw(MT_ID));
+		}
 	}
 
 	@Test(timeout=5000)

@@ -16,8 +16,10 @@ import org.apache.commons.cli.PosixParser;
 
 import br.usp.ime.memnode.ByteArrayWrapper;
 import br.usp.ime.memnode.DataStore;
+import br.usp.ime.memnode.LockManager;
 import br.usp.ime.memnode.MapDataStore;
 import br.usp.ime.memnode.Memnode;
+import br.usp.ime.memnode.SimpleLockManager;
 
 public class MemnodeApp {
 
@@ -44,7 +46,8 @@ public class MemnodeApp {
 
 			Map<ByteArrayWrapper, ByteArrayWrapper> map = new HashMap<ByteArrayWrapper, ByteArrayWrapper>();
 			DataStore dataStore = new MapDataStore(map);
-			Memnode memnode = new Memnode(address, dataStore, null);
+			LockManager lockManager = new SimpleLockManager();
+			Memnode memnode = new Memnode(address, dataStore, lockManager);
 
 			memnode.start();
 

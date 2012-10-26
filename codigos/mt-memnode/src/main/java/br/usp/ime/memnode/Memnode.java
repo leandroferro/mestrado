@@ -106,27 +106,32 @@ public class Memnode {
 										ByteArrayWrapper idWrapper = new ByteArrayWrapper(
 												minitransaction.getId());
 										
-										if (minitransaction.getFinishCommand() != null
-												&& stageArea.containsKey(idWrapper)) {
+										if (minitransaction.getFinishCommand() != null) {
+											if( stageArea.containsKey(idWrapper) ) {
 											
-											logger.debug("Received finish command and has staged commands to commit for {}", idWrapper);
-											
-											for (WriteCommand writeCommand : stageArea
-													.get(idWrapper)) {
-												try {
-													logger.debug("Executing {}", writeCommand);
-													dataStore.write(writeCommand.getId(),
-															writeCommand.getData());
-												} catch (Exception e) {
-													logger.error("Ops, an error occurred while commiting - aborting", e);
-													commit = false;
-													break;
+												logger.debug("Received finish command and has staged commands to commit for {}", idWrapper);
+												
+												for (WriteCommand writeCommand : stageArea
+														.get(idWrapper)) {
+													try {
+														logger.debug("Executing {}", writeCommand);
+														dataStore.write(writeCommand.getId(),
+																writeCommand.getData());
+													} catch (Exception e) {
+														logger.error("Ops, an error occurred while commiting - aborting", e);
+														commit = false;
+														break;
+													}
 												}
+												
+												lockManager.release(new ByteArrayWrapper(minitransaction.getId()));
+												stageArea.remove(idWrapper);
+												logger.debug("Stage area cleaned {}", stageArea);
+											}
+											else {
+												lockManager.release(new ByteArrayWrapper(minitransaction.getId()));
 											}
 											
-											lockManager.release(new ByteArrayWrapper(minitransaction.getId()));
-											stageArea.remove(idWrapper);
-											logger.debug("Stage area cleaned {}", stageArea);
 										} else if (minitransaction.hasActionCommands()){
 											
 											List<ByteArrayWrapper> readIds = new ArrayList<ByteArrayWrapper>();
