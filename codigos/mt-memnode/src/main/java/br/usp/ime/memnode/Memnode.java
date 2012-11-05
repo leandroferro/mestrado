@@ -124,14 +124,17 @@ public class Memnode {
 													}
 												}
 												
-												lockManager.release(new ByteArrayWrapper(minitransaction.getId()));
+												lockManager.release(idWrapper);
 												stageArea.remove(idWrapper);
 												logger.debug("Stage area cleaned {}", stageArea);
 											}
 											else {
-												lockManager.release(new ByteArrayWrapper(minitransaction.getId()));
+												lockManager.release(idWrapper);
 											}
 											
+										} else if (minitransaction.getAbortCommand() != null) {
+											lockManager.release(new ByteArrayWrapper(minitransaction.getId()));
+											stageArea.remove(idWrapper);
 										} else if (minitransaction.hasActionCommands()){
 											
 											List<ByteArrayWrapper> readIds = new ArrayList<ByteArrayWrapper>();

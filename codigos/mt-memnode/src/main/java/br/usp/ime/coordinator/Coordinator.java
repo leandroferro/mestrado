@@ -12,7 +12,9 @@ import java.net.SocketTimeoutException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -101,65 +103,76 @@ public class Coordinator {
 
 									if (command instanceof Minitransaction) {
 										Minitransaction minitransaction = (Minitransaction) command;
+										CommandBuilder builder = CommandBuilder
+												.minitransaction(minitransaction
+														.getId());;
 
 										if (minitransaction.hasActionCommands()) {
+											boolean repeat = false;
 											MemnodeMapping mapping = mapper
 													.map(minitransaction);
+											do {
 
-											MemnodeMapping collected = dispatcher
-													.dispatchAndCollect(mapping);
+												MemnodeMapping collected = dispatcher
+														.dispatchAndCollect(mapping);
 
-											logger.debug(
-													"Command collected: {}",
-													collected);
-
-											CommandBuilder builder = CommandBuilder
-													.minitransaction(minitransaction
-															.getId());
-
-											boolean finish = true;
-											if (collected.hasProblem()) {
-												Problem problem = collected
-														.getProblem();
 												logger.debug(
-														"Problem detected: {}",
-														problem);
-												builder = builder
-														.withProblem(problem);
-												finish = false;
-											} else if (collected
-													.hasNotCommitCommand()) {
-												logger.debug("Not commit command received");
-												builder = builder
-														.withProblem(Problem.CANNOT_COMMIT);
-												finish = false;
-											} else {
-												for (ResultCommand r : collected
-														.getResultCommands()) {
-													builder = builder
-															.withResultCommand(r);
-												}
+														"Command collected: {}",
+														collected);
 
-												builder = builder
-														.withCommitCommand();
-											}
-											Command returned = builder.build();
+												boolean finish = true;
+												if (collected.hasProblem()) {
+													Problem problem = collected
+															.getProblem();
+													logger.debug(
+															"Problem detected: {}",
+															problem);
+													builder = builder
+															.withProblem(problem);
+													finish = false;
+													repeat = false;
+												} else if (collected
+														.hasNotCommitCommand()) {
+													logger.debug("Not commit command received");
+													builder = builder
+															.withProblem(Problem.CANNOT_COMMIT);
+													finish = false;
+													repeat = false;
+												} else if (collected.hasTryAgainCommand()) {
+													logger.debug("Try again command received");
+													finish = false;
+													repeat = true;
+												} else {
+													for (ResultCommand r : collected
+															.getResultCommands()) {
+														builder = builder.withResultCommand(r);
+													}
+													builder = builder.withCommitCommand();
+													finish = true;
+													repeat = false;
+												}
+												
+
+												Command finishOrAbortCommand = finish ? FinishCommand
+														.instance()
+														: AbortCommand
+																.instance();
+												logger.info(
+														"Finishing minitransaction with {}",
+														finishOrAbortCommand);
+												MemnodeMapping replacedMapping = mapping
+														.replaceCommands(finishOrAbortCommand);
+												dispatcher
+														.dispatch(replacedMapping);
+											} while (repeat);
+											
+											Command returned = builder
+													.build();
 											logger.info(
 													"Returning {} to client",
 													returned);
 											writer.append(DefaultCommandSerializer
 													.serializeCommand(returned));
-
-											Command finishOrAbortCommand = finish ? FinishCommand
-													.instance() : AbortCommand
-													.instance();
-											logger.info(
-													"Finishing minitransaction with {}",
-													finishOrAbortCommand);
-											MemnodeMapping replacedMapping = mapping
-													.replaceCommands(finishOrAbortCommand);
-											dispatcher
-													.dispatch(replacedMapping);
 										} else {
 											logger.debug("Minitransaction doesn't have actions");
 											writer.append(DefaultCommandSerializer
@@ -182,7 +195,7 @@ public class Coordinator {
 									writer.append("\n");
 									writer.flush();
 								}
-								
+
 								client.close();
 							} catch (IOException e) {
 								throw new RuntimeException(e);

@@ -33,6 +33,7 @@ import br.usp.ime.protocol.command.Param;
 import br.usp.ime.protocol.command.Problem;
 import br.usp.ime.protocol.command.ReadCommand;
 import br.usp.ime.protocol.command.ResultCommand;
+import br.usp.ime.protocol.command.TryAgainCommand;
 import br.usp.ime.protocol.command.WriteCommand;
 
 public class CoordinatorTest {
@@ -273,6 +274,57 @@ public class CoordinatorTest {
 		Mockito.verify(dispatcher).dispatch(finishMapping);
 	}
 
+	@Test(timeout = 5000)
+	public void testRetryAndCommitWriteMinitransaction() {
+		Command minitransaction = CommandBuilder
+				.minitransaction(bytes(MT_ID))
+				.withWriteCommand(
+						new WriteCommand(bytes("<<CHAVE_1>>"),
+								bytes("<<DADOS_1>>")))
+				.withWriteCommand(
+						new WriteCommand(bytes("<<CHAVE_2>>"),
+								bytes("<<DADOS_2>>"))).build();
+
+		MemnodeMapping mapping = new MemnodeMapping(bytes(MT_ID));
+		mapping.add(REFERENCE_1, new WriteCommand(bytes("<<CHAVE_1>>"),
+				bytes("<<DADOS_1>>")));
+		mapping.add(REFERENCE_2, new WriteCommand(bytes("<<CHAVE_2>>"),
+				bytes("<<DADOS_2>>")));
+
+		MemnodeMapping collectedMapping = new MemnodeMapping(bytes(MT_ID));
+		collectedMapping.add(REFERENCE_1, CommitCommand.instance());
+		collectedMapping.add(REFERENCE_2, TryAgainCommand.instance());
+		
+		MemnodeMapping abortMapping = new MemnodeMapping(bytes(MT_ID));
+		abortMapping.add(REFERENCE_1, AbortCommand.instance());
+		abortMapping.add(REFERENCE_2, AbortCommand.instance());
+		
+		MemnodeMapping collectedOkMapping = new MemnodeMapping(bytes(MT_ID));
+		collectedOkMapping.add(REFERENCE_1, CommitCommand.instance());
+		collectedOkMapping.add(REFERENCE_2, CommitCommand.instance());
+
+		MemnodeMapping finishMapping = new MemnodeMapping(bytes(MT_ID));
+		finishMapping.add(REFERENCE_1, FinishCommand.instance());
+		finishMapping.add(REFERENCE_2, FinishCommand.instance());
+		
+		Mockito.when(mapper.map((Minitransaction) minitransaction)).thenReturn(
+				mapping);
+
+		Mockito.when(dispatcher.dispatchAndCollect(mapping)).thenReturn(
+				collectedMapping).thenReturn(
+						collectedOkMapping);
+
+		client.send(minitransaction);
+
+		Command expected = CommandBuilder.minitransaction(bytes(MT_ID))
+				.withCommitCommand().build();
+		Command actual = client.receive();
+
+		Assert.assertEquals(expected, actual);
+		Mockito.verify(dispatcher).dispatch(abortMapping);
+		Mockito.verify(dispatcher).dispatch(finishMapping);
+	}
+	
 	@Test(timeout = 5000)
 	public void testAbortWriteMinitransaction() {
 

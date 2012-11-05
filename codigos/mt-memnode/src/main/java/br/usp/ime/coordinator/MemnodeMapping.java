@@ -13,11 +13,13 @@ import br.usp.ime.protocol.command.Command;
 import br.usp.ime.protocol.command.NotCommitCommand;
 import br.usp.ime.protocol.command.Problem;
 import br.usp.ime.protocol.command.ResultCommand;
+import br.usp.ime.protocol.command.TryAgainCommand;
 
 public class MemnodeMapping {
 
 	private Problem problem;
 	private NotCommitCommand notCommitCommand;
+	private TryAgainCommand tryAgainCommand;
 	private List<ResultCommand> resultCommands = new ArrayList<ResultCommand>();
 	private Map<MemnodeReference, List<Command>> mapping = new HashMap<MemnodeReference, List<Command>>();
 	private byte[] minitransactionId;
@@ -69,6 +71,9 @@ public class MemnodeMapping {
 		}
 		else if( command instanceof ResultCommand ) {
 			this.resultCommands.add((ResultCommand) command);
+		}
+		else if(command instanceof TryAgainCommand) {
+			this.tryAgainCommand = (TryAgainCommand)command;
 		}
 	}
 
@@ -137,5 +142,8 @@ public class MemnodeMapping {
 		return mapping.entrySet();
 	}
 
+	public boolean hasTryAgainCommand() {
+		return tryAgainCommand != null;
+	}
 	
 }
