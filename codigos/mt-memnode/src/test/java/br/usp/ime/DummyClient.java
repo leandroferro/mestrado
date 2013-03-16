@@ -16,6 +16,8 @@ import br.usp.ime.protocol.parser.DefaultCommandSerializer;
 public class DummyClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(DummyClient.class);
+
+	private static final byte[] _newLine = "\n".getBytes();
 			
 	private final SocketAddress socketAddress;
 	private Socket socket;
@@ -40,10 +42,8 @@ public class DummyClient {
 	public void send(Command command) {
 		try {
 			
-			String serialize = DefaultCommandSerializer.serializeCommand(command) + "\n";
-			logger.trace("Sending {}", serialize);
-			
-			socket.getOutputStream().write(serialize.getBytes());
+			socket.getOutputStream().write(DefaultCommandSerializer.serializeCommand(command).value);
+			socket.getOutputStream().write(_newLine);
 			socket.getOutputStream().flush();
 			
 			logger.trace("Sent {}", command);

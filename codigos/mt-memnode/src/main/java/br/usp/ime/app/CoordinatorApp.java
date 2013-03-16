@@ -23,6 +23,7 @@ import br.usp.ime.coordinator.DefaultCommandParserFactory;
 import br.usp.ime.coordinator.MemnodeClient;
 import br.usp.ime.coordinator.MemnodeDispatcher;
 import br.usp.ime.coordinator.MemnodeReference;
+import br.usp.ime.coordinator.SimpleIdGenerator;
 import br.usp.ime.coordinator.SimpleMemnodeMapper;
 import br.usp.ime.coordinator.SocketBasedConnectionProvider;
 import br.usp.ime.coordinator.ThreadLocalConnectionFactory;
@@ -55,7 +56,7 @@ public class CoordinatorApp {
 			
 			InetSocketAddress address = toInetSocketAddress(commandLine.getOptionValue(bindOption.getOpt()));
 			
-			SimpleMemnodeMapper memnodeMapper = new SimpleMemnodeMapper();
+			SimpleMemnodeMapper memnodeMapper = new SimpleMemnodeMapper(new SimpleIdGenerator());
 			List<String> memnodeAddresses = Arrays.asList( commandLine.getOptionValues(memnodeOption.getOpt()) );
 			for (String addr : memnodeAddresses) {
 				InetSocketAddress memnodeAddress = toInetSocketAddress(addr);
@@ -64,7 +65,7 @@ public class CoordinatorApp {
 			
 			MemnodeClient client = new BasicMemnodeClient(new DefaultCommandParserFactory(), new ThreadLocalConnectionFactory(new SocketBasedConnectionProvider()), DefaultCommandSerializer.instance);
 			MemnodeDispatcher dispatcher = new BasicMemnodeDispatcher(memnodeMapper, client );
-			Coordinator coordinator = new Coordinator(address, memnodeMapper, dispatcher, null);
+			Coordinator coordinator = new Coordinator(address, memnodeMapper, dispatcher);
 
 			coordinator.start();
 			

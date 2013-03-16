@@ -1,5 +1,9 @@
 package br.usp.ime.protocol.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import br.usp.ime.memnode.ByteArrayWrapper;
 import br.usp.ime.protocol.command.AbortCommand;
 import br.usp.ime.protocol.command.Command;
 import br.usp.ime.protocol.command.CommitCommand;
@@ -15,27 +19,42 @@ import br.usp.ime.protocol.command.TryAgainCommand;
 import br.usp.ime.protocol.command.WriteCommand;
 
 public abstract class DefaultCommandSerializer implements CommandSerializer {
-
+	
+	private static final byte[] _mintransaction = "M".getBytes();
+	private static final byte[] _problem = "P".getBytes();
+	private static final byte[] _readCommand = "L".getBytes();
+	private static final byte[] _writeCommand = "E".getBytes();
+	private static final byte[] _command = "C".getBytes();
+	private static final byte[] _resultCommand = "R".getBytes();
+	private static final byte[] _commitCommand = "S".getBytes();
+	private static final byte[] _notCommitCommand = "N".getBytes();
+	private static final byte[] _finishCommand = "F".getBytes();
+	private static final byte[] _abortCommand = "A".getBytes();
+	private static final byte[] _tryAgainCommand = "T".getBytes();
+	
+	private static final byte[] _space = " ".getBytes();
+	private static final byte[] _openCurlyBrace = "{".getBytes();
+	private static final byte[] _closeCurlyBrace = "}".getBytes();
+	private static final byte[] _newLine = "\n".getBytes();
+	
 	public static final DefaultCommandSerializer instance = new DefaultCommandSerializer() {
 		
 		@Override
-		public String serialize(Command command) {
+		public ByteArrayWrapper serialize(Command command) {
 			
 			if( command == null )
-				return "";
+				return new ByteArrayWrapper();
 			
-			StringBuilder builder = new StringBuilder();
+			ByteArrayBuilder builder = new ByteArrayBuilder();
 			
 			if( command instanceof Minitransaction ) {
 				Minitransaction minitransaction = (Minitransaction)command;
 				
-				builder.append("M").append(" ").append(minitransaction.getId().length).append(" ");
+				builder.append(_mintransaction).append(_space).append(minitransaction.getId().length).append(_space);
 				
-				for(byte b : minitransaction.getId()) {
-					builder.append((char)b);
-				}
+				builder.append(minitransaction.getId());
 				
-				builder.append(" ").append("{").append("\n");
+				builder.append(_space).append(_openCurlyBrace).append(_newLine);
 				
 				builder.append( serialize(minitransaction.getProblem()) );
 				
@@ -65,95 +84,79 @@ public abstract class DefaultCommandSerializer implements CommandSerializer {
 				
 				builder.append(serialize(minitransaction.getTryAgainCommand()));
 				
-				builder.append( "}" );
+				builder.append( _closeCurlyBrace );
 			}
 			else if (command instanceof Problem) {
 				Problem problem = (Problem)command;
-				builder.append("P").append(" ").append(problem.getDescription().length).append(" ");
+				builder.append(_problem).append(_space).append(problem.getDescription().length).append(_space);
 				
-				for(byte b : problem.getDescription()) {
-					builder.append((char)b);
-				}
+				builder.append(problem.getDescription());
 				
-				builder.append("\n");
+				builder.append(_newLine);
 			}
 			else if (command instanceof ReadCommand) {
 				ReadCommand readCommand = (ReadCommand)command;
-				builder.append("L").append(" ").append(readCommand.getKey().length).append(" ");
+				builder.append(_readCommand).append(_space).append(readCommand.getKey().length).append(_space);
 				
-				for(byte b : readCommand.getKey()) {
-					builder.append((char)b);
-				}
+				builder.append(readCommand.getKey());
 				
-				builder.append("\n");
+				builder.append(_newLine);
 			}
 			else if (command instanceof WriteCommand) {
 				WriteCommand writeCommand = (WriteCommand)command;
-				builder.append("E").append(" ").append(writeCommand.getId().length).append(" ");
+				builder.append(_writeCommand).append(_space).append(writeCommand.getId().length).append(_space);
 				
-				for(byte b : writeCommand.getId()) {
-					builder.append((char)b);
-				}
+				builder.append(writeCommand.getId());
 				
-				builder.append(" ").append(writeCommand.getData().length).append(" ");
+				builder.append(_space).append(writeCommand.getData().length).append(_space);
 				
-				for(byte b : writeCommand.getData()) {
-					builder.append((char)b);
-				}
+				builder.append(writeCommand.getData());
 				
-				builder.append("\n");
+				builder.append(_newLine);
 			}
 			else if (command instanceof ExtensionCommand) {
 				ExtensionCommand extensionCommand = (ExtensionCommand)command;
-				builder.append("C").append(" ");
+				builder.append(_command).append(_space);
 				
-				for(byte b : extensionCommand.getId()) {
-					builder.append((char)b);
-				}
+				builder.append(extensionCommand.getId());
 				
 				for(Param param : extensionCommand.getParams()) {
-					builder.append(" ").append(param.getValue().length).append(" ");
+					builder.append(_space).append(param.getValue().length).append(_space);
 					
-					for(byte b : param.getValue()) {
-						builder.append((char)b);
-					}
+					builder.append(param.getValue());
 				}
 				
-				builder.append("\n");
+				builder.append(_newLine);
 			}
 			else if (command instanceof ResultCommand) {
 				ResultCommand resultCommand = (ResultCommand)command;
-				builder.append("R").append(" ").append(resultCommand.getId().length).append(" ");
+				builder.append(_resultCommand).append(_space).append(resultCommand.getId().length).append(_space);
 				
-				for(byte b : resultCommand.getId()) {
-					builder.append((char)b);
-				}
+				builder.append(resultCommand.getId());
 				
-				builder.append(" ").append(resultCommand.getData().length).append(" ");
+				builder.append(_space).append(resultCommand.getData().length).append(_space);
 				
-				for(byte b : resultCommand.getData()) {
-					builder.append((char)b);
-				}
+				builder.append(resultCommand.getData());
 				
-				builder.append("\n");
+				builder.append(_newLine);
 			}
 			else if (command instanceof CommitCommand) {
-				builder.append("S").append("\n");
+				builder.append(_commitCommand).append(_newLine);
 			}
 			else if (command instanceof NotCommitCommand) {
-				builder.append("N").append("\n");
+				builder.append(_notCommitCommand).append(_newLine);
 			}
 			else if (command instanceof FinishCommand) {
-				builder.append("F").append("\n");
+				builder.append(_finishCommand).append(_newLine);
 			}
 			else if (command instanceof AbortCommand) {
-				builder.append("A").append("\n");
+				builder.append(_abortCommand).append(_newLine);
 			}
 			else if (command instanceof TryAgainCommand) {
-				builder.append("T").append("\n");
+				builder.append(_tryAgainCommand).append(_newLine);
 			}
 			
-			return builder.toString();
+			return new ByteArrayWrapper(builder.build());
 		}
 	};
 	
@@ -161,11 +164,11 @@ public abstract class DefaultCommandSerializer implements CommandSerializer {
 		
 	}
 	
-	public static String serializeCommand(Command command) {
+	public static ByteArrayWrapper serializeCommand(Command command) {
 		return instance.serialize(command);
 	}
 	
 	@Override
-	public abstract String serialize(Command command);
+	public abstract ByteArrayWrapper serialize(Command command);
 
 }

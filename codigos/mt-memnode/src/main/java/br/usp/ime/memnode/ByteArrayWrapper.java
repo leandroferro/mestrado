@@ -10,6 +10,10 @@ public class ByteArrayWrapper {
 		this.value = value;
 	}
 
+	public ByteArrayWrapper() {
+		this(new byte[0]);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

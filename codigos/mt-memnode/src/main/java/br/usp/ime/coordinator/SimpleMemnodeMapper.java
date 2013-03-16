@@ -11,6 +11,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 
+import br.usp.ime.memnode.ByteArrayWrapper;
 import br.usp.ime.protocol.command.ExtensionCommand;
 import br.usp.ime.protocol.command.Minitransaction;
 import br.usp.ime.protocol.command.ReadCommand;
@@ -41,7 +42,13 @@ public class SimpleMemnodeMapper implements MemnodeMapper {
 			return port1 - port2;
 		}
 	});
-	private final HashFunction hashFunction = Hashing.goodFastHash(32);;
+	private final HashFunction hashFunction = Hashing.goodFastHash(32);
+	
+	private IdGenerator idGenerator;
+	
+	public SimpleMemnodeMapper(IdGenerator idGenerator) {
+		this.idGenerator = idGenerator;
+	}
 	
 	public void add(MemnodeReference reference) {
 		references.add(reference);
@@ -59,7 +66,10 @@ public class SimpleMemnodeMapper implements MemnodeMapper {
 
 	@Override
 	public MemnodeMapping map(Minitransaction minitransaction) {
-		MemnodeMapping mapping = new MemnodeMapping(minitransaction.getId());
+		
+		ByteArrayWrapper id = idGenerator.generate(new ByteArrayWrapper(minitransaction.getId()));
+		
+		MemnodeMapping mapping = new MemnodeMapping(id.value);
 		
 		for( ReadCommand readCommand : minitransaction.getReadCommands() ) {
 			mapping.add(map(readCommand.getKey()), readCommand);

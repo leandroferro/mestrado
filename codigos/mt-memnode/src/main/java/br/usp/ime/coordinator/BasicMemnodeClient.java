@@ -34,7 +34,7 @@ public class BasicMemnodeClient implements MemnodeClient {
 		OutputStream outputStream = connection.getOutputStream();
 		
 		try {
-			outputStream.write( commandSerializer.serialize(command).getBytes() );
+			outputStream.write( commandSerializer.serialize(command).value );
 			outputStream.write("\n".getBytes());
 			outputStream.flush();
 		} catch (IOException e) {

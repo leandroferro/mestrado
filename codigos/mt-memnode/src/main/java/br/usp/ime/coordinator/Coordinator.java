@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import br.usp.ime.memnode.ByteArrayWrapper;
 import br.usp.ime.protocol.command.AbortCommand;
 import br.usp.ime.protocol.command.Command;
 import br.usp.ime.protocol.command.CommandBuilder;
@@ -32,6 +33,8 @@ import br.usp.ime.protocol.parser.DefaultCommandParser;
 import br.usp.ime.protocol.parser.DefaultCommandSerializer;
 
 public class Coordinator {
+
+	private static final byte[] _newLine = "\n".getBytes();
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(Coordinator.class);
@@ -49,14 +52,11 @@ public class Coordinator {
 	private final ExecutorService executorService = Executors
 			.newFixedThreadPool(4);
 
-	private IdGenerator idGenerator;
-
 	public Coordinator(InetSocketAddress address, MemnodeMapper mapper,
-			MemnodeDispatcher dispatcher, IdGenerator idGenerator) {
+			MemnodeDispatcher dispatcher) {
 		this.address = address;
 		this.mapper = mapper;
 		this.dispatcher = dispatcher;
-		this.idGenerator = idGenerator;
 	}
 
 	public void start() {
@@ -91,9 +91,6 @@ public class Coordinator {
 								DefaultCommandParser cmdParser = new DefaultCommandParser(
 										inputStream);
 
-								OutputStreamWriter writer = new OutputStreamWriter(
-										outputStream);
-
 								logger.debug("Waiting for command");
 
 								for (Command command = cmdParser.parseNext(); shouldContinue
@@ -103,16 +100,17 @@ public class Coordinator {
 
 									if (command instanceof Minitransaction) {
 										Minitransaction minitransaction = (Minitransaction) command;
+										
 										CommandBuilder builder = CommandBuilder
 												.minitransaction(minitransaction
-														.getId());;
+														.getId());
 
 										if (minitransaction.hasActionCommands()) {
 											boolean repeat = false;
 											MemnodeMapping mapping = mapper
 													.map(minitransaction);
+											logger.debug("Mapped {}", mapping);
 											do {
-
 												MemnodeMapping collected = dispatcher
 														.dispatchAndCollect(mapping);
 
@@ -171,29 +169,29 @@ public class Coordinator {
 											logger.info(
 													"Returning {} to client",
 													returned);
-											writer.append(DefaultCommandSerializer
-													.serializeCommand(returned));
+											outputStream.write(DefaultCommandSerializer
+													.serializeCommand(returned).value);
 										} else {
 											logger.debug("Minitransaction doesn't have actions");
-											writer.append(DefaultCommandSerializer
+											outputStream.write(DefaultCommandSerializer
 													.serializeCommand(CommandBuilder
 															.minitransaction(
 																	minitransaction
 																			.getId())
 															.withCommitCommand()
-															.build()));
+															.build()).value);
 										}
 									} else {
-										writer.append(DefaultCommandSerializer
+										outputStream.write(DefaultCommandSerializer
 												.serializeCommand(CommandBuilder
 														.problem(
 																"Unknown command"
 																		.getBytes())
-														.build()));
+														.build()).value);
 									}
 
-									writer.append("\n");
-									writer.flush();
+									outputStream.write(_newLine);
+									outputStream.flush();
 								}
 
 								client.close();

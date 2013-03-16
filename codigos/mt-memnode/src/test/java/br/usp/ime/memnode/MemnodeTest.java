@@ -53,6 +53,8 @@ public class MemnodeTest {
 	private static final byte[] MT_ID = bytes("<<MT_ID>>");
 	private static final byte[] MT_ID_2 = bytes("<<MT_ID_2>>");
 	private static final byte[] MT_ID_3 = bytes("<<MT_ID_3>>");
+	private static final byte[] ABORTED_MT_ID = bytes("<<ABORTED_MT_ID>>");
+	private static final byte[] ABORTED_MT_ID_2 = bytes("<<ABORTED_MT_ID_2>>");
 	private static final byte[] CHAVE = bytes("<<CHAVE>>");
 	private static final byte[] VALOR = bytes("<<VALOR>>");
 	private static final byte[] OUTRO_VALOR = bytes("<<OUTRO_VALOR>>");
@@ -100,6 +102,8 @@ public class MemnodeTest {
 
 	private static final DummyClient client = new DummyClient(MEMNODE_ADDRESS);
 
+
+
 	@Before
 	public void connect() {
 		logger.trace("Connecting...");
@@ -127,6 +131,43 @@ public class MemnodeTest {
 					.withCommitCommand().build();
 			Command actual = client.receive();
 
+			Assert.assertEquals(expected, actual);
+		}
+	}
+
+	@Test(timeout = 5000)
+	public void shouldReportAbortedTransaction() throws UnknownHostException {
+		{
+			Command minitransaction = CommandBuilder.minitransaction(ABORTED_MT_ID).build();
+			
+			client.send(minitransaction);
+			
+			Command expected = CommandBuilder.minitransaction(ABORTED_MT_ID)
+					.withCommitCommand().build();
+			Command actual = client.receive();
+			
+			Assert.assertEquals(expected, actual);
+		}
+		{
+			Command minitransaction = CommandBuilder.minitransaction(ABORTED_MT_ID).withAbortCommand().build();
+			
+			client.send(minitransaction);
+			
+			Command expected = CommandBuilder.minitransaction(ABORTED_MT_ID)
+					.withAbortCommand().build();
+			Command actual = client.receive();
+			
+			Assert.assertEquals(expected, actual);
+		}
+		{
+			Command minitransaction = CommandBuilder.minitransaction(ABORTED_MT_ID).build();
+			
+			client.send(minitransaction);
+			
+			Command expected = CommandBuilder.minitransaction(ABORTED_MT_ID)
+					.withAbortCommand().build();
+			Command actual = client.receive();
+			
 			Assert.assertEquals(expected, actual);
 		}
 	}
@@ -278,18 +319,18 @@ public class MemnodeTest {
 
 	@Test(timeout = 5000)
 	public void shouldReleaseLocksAfterAbort() throws UnknownHostException {
-		Command minitransaction = CommandBuilder.minitransaction(MT_ID)
+		Command minitransaction = CommandBuilder.minitransaction(ABORTED_MT_ID_2)
 				.withAbortCommand().build();
 
 		client.send(minitransaction);
 
-		Command expected = CommandBuilder.minitransaction(MT_ID)
-				.withCommitCommand().build();
+		Command expected = CommandBuilder.minitransaction(ABORTED_MT_ID_2)
+				.withAbortCommand().build();
 		Command actual = client.receive();
 
 		Assert.assertEquals(expected, actual);
 
-		Mockito.verify(lockManager).release(baw(MT_ID));
+		Mockito.verify(lockManager).release(baw(ABORTED_MT_ID_2));
 	}
 
 	@Test(timeout = 5000)

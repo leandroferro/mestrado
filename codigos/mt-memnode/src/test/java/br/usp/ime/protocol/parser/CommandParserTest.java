@@ -2,11 +2,16 @@ package br.usp.ime.protocol.parser;
 
 import static br.usp.ime.Utils.*;
 
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import br.usp.ime.coordinator.SimpleIdGenerator;
+import br.usp.ime.memnode.ByteArrayWrapper;
 import br.usp.ime.protocol.command.CommandBuilder;
 import br.usp.ime.protocol.command.ExtensionCommand;
 import br.usp.ime.protocol.command.Param;
@@ -245,4 +250,38 @@ public class CommandParserTest {
 						build(), requestParser.parseNext());
 	}
 
+	@Test
+	public void shouldParseRealMinitransactionId() {
+		
+		SimpleIdGenerator generator = new SimpleIdGenerator();
+		
+		ByteArrayWrapper wrapper = generator.generate(baw("ABACABB11182934mkms"));
+		
+		List<Byte> bytes = new ArrayList<Byte>();
+		for( byte b : ("M " + wrapper.value.length+ " ").getBytes() ){
+			bytes.add(b);
+		}
+		for( byte b : wrapper.value ) {
+			bytes.add(b);
+		}
+		for( byte b : (" {\n}").getBytes() ){
+			bytes.add(b);
+		}
+		byte[] a = new byte[bytes.size()];
+		for(int i = 0; i < bytes.size(); i++) {
+			a[i] = bytes.get(i);
+		}
+		
+		DefaultCommandParser requestParser = new DefaultCommandParser(
+				new ByteArrayInputStream(a));
+		
+		Assert.assertEquals(
+				CommandBuilder
+						.minitransaction(wrapper.value).
+						build(), requestParser.parseNext());
+	}
+
+	private ByteArrayWrapper baw(String string) {
+		return new ByteArrayWrapper(string.getBytes());
+	}
 }

@@ -7,6 +7,7 @@
   </appender>
 
   <logger name="br.usp.ime.coordinator.Coordinator" level="debug" />
+  <logger name="br.usp.ime.protocol.parser.DefaultCommandParser" level="debug" />
 <!--   <logger name="br.usp.ime.coordinator.CoordinatorTest" level="trace" /> -->
 <!--   <logger name="br.usp.ime.memnode.Memnode" level="debug" /> -->
 <!--   <logger name="br.usp.ime.memnode.MapDataStore" level="debug" /> -->

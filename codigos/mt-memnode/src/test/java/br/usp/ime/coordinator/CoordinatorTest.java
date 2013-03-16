@@ -17,10 +17,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import br.usp.ime.DummyClient;
+import br.usp.ime.memnode.ByteArrayWrapper;
 import br.usp.ime.protocol.command.AbortCommand;
 import br.usp.ime.protocol.command.Command;
 import br.usp.ime.protocol.command.CommandBuilder;
@@ -71,8 +74,6 @@ public class CoordinatorTest {
 	private static MemnodeDispatcher dispatcher;
 
 	private static MemnodeMapper mapper;
-	
-	private static IdGenerator idGenerator;
 
 	private static final MemnodeReference REFERENCE_1 = new MemnodeReference(
 			ADDR_REFERENCE_1);
@@ -85,10 +86,8 @@ public class CoordinatorTest {
 		mapper = Mockito.mock(MemnodeMapper.class);
 
 		dispatcher = Mockito.mock(MemnodeDispatcher.class);
-		
-		idGenerator = Mockito.mock(IdGenerator.class);
 
-		coordinator = new Coordinator(COORDINATOR_ADDRESS, mapper, dispatcher, idGenerator);
+		coordinator = new Coordinator(COORDINATOR_ADDRESS, mapper, dispatcher);
 
 		executor.execute(new Runnable() {
 
@@ -125,6 +124,7 @@ public class CoordinatorTest {
 		logger.trace("Connected!");
 
 		Mockito.reset(dispatcher);
+		Mockito.reset(mapper);
 	}
 
 	@After
@@ -162,10 +162,10 @@ public class CoordinatorTest {
 		mapping.add(REFERENCE_2, new ReadCommand(bytes("<<CHAVE_2>>")));
 
 		MemnodeMapping collectedMapping = new MemnodeMapping(bytes(MT_ID));
-		collectedMapping.add(REFERENCE_1, new ResultCommand(bytes("<<CHAVE_1>>"),
-				bytes("<<DATA_1>>")));
-		collectedMapping.add(REFERENCE_2, new ResultCommand(bytes("<<CHAVE_2>>"),
-				bytes("<<DATA_2>>")));
+		collectedMapping.add(REFERENCE_1, new ResultCommand(
+				bytes("<<CHAVE_1>>"), bytes("<<DATA_1>>")));
+		collectedMapping.add(REFERENCE_2, new ResultCommand(
+				bytes("<<CHAVE_2>>"), bytes("<<DATA_2>>")));
 
 		MemnodeMapping finishMapping = new MemnodeMapping(bytes(MT_ID));
 		finishMapping.add(REFERENCE_1, FinishCommand.instance());
@@ -201,20 +201,20 @@ public class CoordinatorTest {
 		Command minitransaction = CommandBuilder.minitransaction(bytes(MT_ID))
 				.withReadCommand(new ReadCommand(bytes("<<CHAVE_1>>")))
 				.withReadCommand(new ReadCommand(bytes("<<CHAVE_2>>"))).build();
-		
+
 		MemnodeMapping mapping = new MemnodeMapping(bytes(MT_ID));
 		mapping.add(REFERENCE_1, new ReadCommand(bytes("<<CHAVE_1>>")));
 		mapping.add(REFERENCE_2, new ReadCommand(bytes("<<CHAVE_2>>")));
 
 		MemnodeMapping collectedMapping = new MemnodeMapping(bytes(MT_ID));
-		collectedMapping.add(REFERENCE_1, new ResultCommand(bytes("<<CHAVE_1>>"),
-				bytes("<<DATA_1>>")));
+		collectedMapping.add(REFERENCE_1, new ResultCommand(
+				bytes("<<CHAVE_1>>"), bytes("<<DATA_1>>")));
 		collectedMapping.add(REFERENCE_2, new Problem(bytes("<<ERRO>>")));
 
 		MemnodeMapping finishMapping = new MemnodeMapping(bytes(MT_ID));
 		finishMapping.add(REFERENCE_1, AbortCommand.instance());
 		finishMapping.add(REFERENCE_2, AbortCommand.instance());
-		
+
 		Mockito.when(mapper.map((Minitransaction) minitransaction)).thenReturn(
 				mapping);
 
@@ -228,8 +228,7 @@ public class CoordinatorTest {
 		Command actual = client.receive();
 
 		Assert.assertEquals(expected, actual);
-		Mockito.verify(dispatcher).dispatch(
-				finishMapping);
+		Mockito.verify(dispatcher).dispatch(finishMapping);
 
 	}
 
@@ -257,7 +256,7 @@ public class CoordinatorTest {
 		MemnodeMapping finishMapping = new MemnodeMapping(bytes(MT_ID));
 		finishMapping.add(REFERENCE_1, FinishCommand.instance());
 		finishMapping.add(REFERENCE_2, FinishCommand.instance());
-		
+
 		Mockito.when(mapper.map((Minitransaction) minitransaction)).thenReturn(
 				mapping);
 
@@ -294,11 +293,11 @@ public class CoordinatorTest {
 		MemnodeMapping collectedMapping = new MemnodeMapping(bytes(MT_ID));
 		collectedMapping.add(REFERENCE_1, CommitCommand.instance());
 		collectedMapping.add(REFERENCE_2, TryAgainCommand.instance());
-		
+
 		MemnodeMapping abortMapping = new MemnodeMapping(bytes(MT_ID));
 		abortMapping.add(REFERENCE_1, AbortCommand.instance());
 		abortMapping.add(REFERENCE_2, AbortCommand.instance());
-		
+
 		MemnodeMapping collectedOkMapping = new MemnodeMapping(bytes(MT_ID));
 		collectedOkMapping.add(REFERENCE_1, CommitCommand.instance());
 		collectedOkMapping.add(REFERENCE_2, CommitCommand.instance());
@@ -306,13 +305,12 @@ public class CoordinatorTest {
 		MemnodeMapping finishMapping = new MemnodeMapping(bytes(MT_ID));
 		finishMapping.add(REFERENCE_1, FinishCommand.instance());
 		finishMapping.add(REFERENCE_2, FinishCommand.instance());
-		
+
 		Mockito.when(mapper.map((Minitransaction) minitransaction)).thenReturn(
 				mapping);
 
-		Mockito.when(dispatcher.dispatchAndCollect(mapping)).thenReturn(
-				collectedMapping).thenReturn(
-						collectedOkMapping);
+		Mockito.when(dispatcher.dispatchAndCollect(mapping))
+				.thenReturn(collectedMapping).thenReturn(collectedOkMapping);
 
 		client.send(minitransaction);
 
@@ -324,7 +322,7 @@ public class CoordinatorTest {
 		Mockito.verify(dispatcher).dispatch(abortMapping);
 		Mockito.verify(dispatcher).dispatch(finishMapping);
 	}
-	
+
 	@Test(timeout = 5000)
 	public void testAbortWriteMinitransaction() {
 
@@ -350,13 +348,13 @@ public class CoordinatorTest {
 		MemnodeMapping finishMapping = new MemnodeMapping(bytes(MT_ID));
 		finishMapping.add(REFERENCE_1, AbortCommand.instance());
 		finishMapping.add(REFERENCE_2, AbortCommand.instance());
-		
+
 		Mockito.when(mapper.map((Minitransaction) minitransaction)).thenReturn(
 				mapping);
 
 		Mockito.when(dispatcher.dispatchAndCollect(mapping)).thenReturn(
 				collectedMapping);
-		
+
 		client.send(minitransaction);
 
 		Command expected = CommandBuilder.minitransaction(bytes(MT_ID))
@@ -382,25 +380,25 @@ public class CoordinatorTest {
 						new WriteCommand(bytes("<<CHAVE_2>>"),
 								bytes("<<DADOS_2>>"))).build();
 
-
 		MemnodeMapping mapping = new MemnodeMapping(bytes(MT_ID));
-		mapping.add(REFERENCE_1, new ExtensionCommand(bytes("ABCD"), Arrays.asList(
-				new Param(bytes("<<PARAM_1>>")), new Param(
-						bytes("<<PARAM_2>>")))));
+		mapping.add(
+				REFERENCE_1,
+				new ExtensionCommand(bytes("ABCD"), Arrays.asList(new Param(
+						bytes("<<PARAM_1>>")), new Param(bytes("<<PARAM_2>>")))));
 		mapping.add(REFERENCE_2, new ReadCommand(bytes("<<CHAVE_1>>")));
 		mapping.add(REFERENCE_1, new WriteCommand(bytes("<<CHAVE_2>>"),
 				bytes("<<DADOS_2>>")));
 
 		MemnodeMapping collectedMapping = new MemnodeMapping(bytes(MT_ID));
 		collectedMapping.add(REFERENCE_1, CommitCommand.instance());
-		collectedMapping.add(REFERENCE_2, new ResultCommand(bytes("<<CHAVE_1>>"),
-				bytes("<<DADO_1>>")));
+		collectedMapping.add(REFERENCE_2, new ResultCommand(
+				bytes("<<CHAVE_1>>"), bytes("<<DADO_1>>")));
 		collectedMapping.add(REFERENCE_2, CommitCommand.instance());
 
 		MemnodeMapping finishMapping = new MemnodeMapping(bytes(MT_ID));
 		finishMapping.add(REFERENCE_1, FinishCommand.instance());
 		finishMapping.add(REFERENCE_2, FinishCommand.instance());
-		
+
 		Mockito.when(mapper.map((Minitransaction) minitransaction)).thenReturn(
 				mapping);
 
@@ -436,25 +434,25 @@ public class CoordinatorTest {
 						new WriteCommand(bytes("<<CHAVE_2>>"),
 								bytes("<<DADOS_2>>"))).build();
 
-	
 		MemnodeMapping mapping = new MemnodeMapping(bytes(MT_ID));
-		mapping.add(REFERENCE_1, new ExtensionCommand(bytes("ABCD"), Arrays.asList(
-				new Param(bytes("<<PARAM_1>>")), new Param(
-						bytes("<<PARAM_2>>")))));
+		mapping.add(
+				REFERENCE_1,
+				new ExtensionCommand(bytes("ABCD"), Arrays.asList(new Param(
+						bytes("<<PARAM_1>>")), new Param(bytes("<<PARAM_2>>")))));
 		mapping.add(REFERENCE_2, new ReadCommand(bytes("<<CHAVE_1>>")));
 		mapping.add(REFERENCE_1, new WriteCommand(bytes("<<CHAVE_2>>"),
 				bytes("<<DADOS_2>>")));
 
 		MemnodeMapping collectedMapping = new MemnodeMapping(bytes(MT_ID));
 		collectedMapping.add(REFERENCE_1, new Problem(bytes("<<PROBLEMA>>")));
-		collectedMapping.add(REFERENCE_2, new ResultCommand(bytes("<<CHAVE_1>>"),
-				bytes("<<DADO_1>>")));
+		collectedMapping.add(REFERENCE_2, new ResultCommand(
+				bytes("<<CHAVE_1>>"), bytes("<<DADO_1>>")));
 		collectedMapping.add(REFERENCE_2, CommitCommand.instance());
 
 		MemnodeMapping finishMapping = new MemnodeMapping(bytes(MT_ID));
 		finishMapping.add(REFERENCE_1, AbortCommand.instance());
 		finishMapping.add(REFERENCE_2, AbortCommand.instance());
-		
+
 		Mockito.when(mapper.map((Minitransaction) minitransaction)).thenReturn(
 				mapping);
 
@@ -485,25 +483,26 @@ public class CoordinatorTest {
 				.withWriteCommand(
 						new WriteCommand(bytes("<<CHAVE_2>>"),
 								bytes("<<DADOS_2>>"))).build();
-		
+
 		MemnodeMapping mapping = new MemnodeMapping(bytes(MT_ID));
-		mapping.add(REFERENCE_1, new ExtensionCommand(bytes("ABCD"), Arrays.asList(
-				new Param(bytes("<<PARAM_1>>")), new Param(
-						bytes("<<PARAM_2>>")))));
+		mapping.add(
+				REFERENCE_1,
+				new ExtensionCommand(bytes("ABCD"), Arrays.asList(new Param(
+						bytes("<<PARAM_1>>")), new Param(bytes("<<PARAM_2>>")))));
 		mapping.add(REFERENCE_2, new ReadCommand(bytes("<<CHAVE_1>>")));
 		mapping.add(REFERENCE_1, new WriteCommand(bytes("<<CHAVE_2>>"),
 				bytes("<<DADOS_2>>")));
 
 		MemnodeMapping collectedMapping = new MemnodeMapping(bytes(MT_ID));
 		collectedMapping.add(REFERENCE_1, NotCommitCommand.instance());
-		collectedMapping.add(REFERENCE_2, new ResultCommand(bytes("<<CHAVE_1>>"),
-				bytes("<<DADO_1>>")));
+		collectedMapping.add(REFERENCE_2, new ResultCommand(
+				bytes("<<CHAVE_1>>"), bytes("<<DADO_1>>")));
 		collectedMapping.add(REFERENCE_2, CommitCommand.instance());
 
 		MemnodeMapping finishMapping = new MemnodeMapping(bytes(MT_ID));
 		finishMapping.add(REFERENCE_1, AbortCommand.instance());
 		finishMapping.add(REFERENCE_2, AbortCommand.instance());
-		
+
 		Mockito.when(mapper.map((Minitransaction) minitransaction)).thenReturn(
 				mapping);
 

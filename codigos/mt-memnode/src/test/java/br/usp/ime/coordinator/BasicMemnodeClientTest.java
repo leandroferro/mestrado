@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import br.usp.ime.Utils;
 import br.usp.ime.protocol.command.Command;
 import br.usp.ime.protocol.command.CommandBuilder;
 import br.usp.ime.protocol.parser.CommandParser;
@@ -61,7 +62,7 @@ public class BasicMemnodeClientTest {
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[0]);
 
 		Mockito.when(commandSerializer.serialize(toSend)).thenReturn(
-				"<<SERIALIZED>>");
+				Utils.baw("<<SERIALIZED>>"));
 		Mockito.when(connectionFactory.create(reference))
 				.thenReturn(connection);
 		Mockito.when(connection.getOutputStream()).thenReturn(outputStream);

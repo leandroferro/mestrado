@@ -68,8 +68,8 @@ public final class DefaultCommandParser implements CommandParser {
 
 	private Token nextRawToken(int size) {
 		try {
-			logger.debug("Trying to read raw token with {}", size);
 			final Token token = tokenizer.nextRaw(size);
+			logger.debug("Read raw token with {}: {}", size, token);
 
 			if (token.getType() != TokenType.RAW) {
 				throw new ParserException("Expected sequence with " + size
@@ -91,8 +91,9 @@ public final class DefaultCommandParser implements CommandParser {
 	private Token nextToken() {
 		try {
 			if (__currentToken == null) {
-				logger.debug("Trying to read next token");
-				return __currentToken = tokenizer.next();
+				__currentToken = tokenizer.next();
+				logger.debug("Read next token {}", __currentToken);
+				return __currentToken;
 			} else {
 				logger.debug("Returning cached token {}", __currentToken);
 				return __currentToken;
