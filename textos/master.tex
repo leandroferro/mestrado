@@ -702,26 +702,67 @@ melhor desempenho das modernas arquiteturas de múltiplos processadores e
 múltiplos núcleos, ao mesmo tempo em que oferece funcionalidades de \emph{cache}
 distribuído.
 
-O componente principal do \emph{Infinispan} é a \emph{interface Cache}, uma extensão 
-da \emph{interface java.util.Map} da biblioteca padrão de coleções do \emph{Java}. 
-O acesso aos dados segue então a mesma abordagem que o acesso a uma coleção da biblioteca
-padrão do \emph{Java} oferece, em que uma valor é associado a uma chave arbitrária definida
-pela aplicação.
+As máquinas rodando \emph{Infinispan} podem formar um ou mais agrupamentos (\emph{cluster}),
+caso sejam configuradas de tal forma. Esses agrupamentos permitem que os dados sejam espalhados 
+por diferentes máquinas, permitindo assim uma melhor distribuição de carga entre as máquinas e
+aumento na disponibilidade dos dados.
 
-Se configurado para executar de forma isolada (\emph{standalone} ??), o \emph{Infinispan}
+O componente principal do \emph{Infinispan} é a interface \emph{org.infinispan.Cache}, uma extensão 
+da interface \emph{java.util.Map} da biblioteca padrão de coleções do \emph{Java}. 
+O acesso aos dados segue então a mesma abordagem, armazenando entradas, em que um valor é associado a uma 
+chave arbitrária definida pela aplicação. \emph{Cache} permite abstrair os diversos 
+modos de execução em que o \emph{Infinispan} pode rodar, oferecendo uma interface 
+simples e de ampla utilização para acessar os dados.
 
+Os quatro modos de execução oferecidos pelo \emph{Infinispan} são:
 
-Essa interface \emph{Cache} é uma fachada para o repositório
-de dados criado pelas máquinas em que roda o \emph{Infinispan}, que gerencia a distribuição 
-dos dados entre essas máquinas, em uma arquitetura de rede ponto-a-ponto.  
+\begin{description}
+	\item[Local] Todas as entradas são armazenadas na máquina local, mesmo que um agrupamento tenha sido formado.
+	\item[Replicado] Todas as entradas são copiadas para todas as outras máquinas do agrupamento.
+	\item[Distribuído] Cada entrada é replicada para um subconjunto das máquinas do agrupamento.
+\end{description}
 
-Offering high availability via making replicas of state across a network as well as optionally persisting state to 
-configurable cache stores, Infinispan offers enterprise features such as efficient eviction algorithms to control memory 
-usage as well as JTA compatibility.
+No modo \textbf{Local} todos as entradas ficam armazenadas na mesma máquina em que o cache está configurado, não permitindo 
+que aplicações compartilhem os dados. O modo \textbf{Replicado} garante alta disponibilidade dos dados, uma vez que cada 
+entrada está copiada em todas as máquinas do agrupamento. Assim, um dado só ficará indisponível no caso em que todas as 
+máquinas do agrupamento em que ele esteja armazenado fiquem indisponíveis. No modo \textbf{Distribuído} o \emph{Infinispan} 
+armazena uma determinada entrada em um subconjunto do agrupamento. Dessa forma, se esse subconjunto de máquinas ficar indisponível, 
+essa determinada entrada ficará indisponível também. 
 
-In addition to the peer-to-peer architecture of Infinispan, a client/server mode is also supported.  This provides the 
-ability to run farms of Infinispan instances as servers and connecting to them using a plethora of clients - both written 
-in Java as well as other popular open source and proprietary platforms.
+O modo \textbf{Distribuído} permite um certo grau de disponibilidade ao mesmo tempo em que oferece um espaço de armazenamento
+expandido compartilhado entre o agrupamento. Esse grau de disponibilidade é controlado pelo tamanho do subconjunto em que uma
+entrada estará replicada, podendo variar de 1 (não havendo nenhuma replicação, cada entrada é armazenada em somente uma máquina) até
+o total de máquinas no agrupamento (o que fará esse modo idêntico ao \textbf{Replicado}). O grau de expansão do espaço de armazenamento
+é inversamente proporcional à disponibilidade, ou seja, quanto maior a disponibilidade, menor a expansão, pois menos espaço ficará
+disponível devido ao maior número de cópias de uma entrada.
+
+O \emph{Infinispan} oferece também duas modalidades de acesso:
+
+\begin{description}
+	\item[Embarcado]
+	\item[Cliente-Servidor] 
+\end{description}
+
+Na modalidade de acesso \textbf{embarcado}, o espaço de armazenamento do \emph{Infinispan} compartilha a mesma máquina virtual \emph{Java}
+(e portanto, a mesma memória) que a aplicação. No modo \textbf{client-servidor}, uma máquina virtual fica dedicada ao espaço de armazenamento
+do \emph{Infinispan}, e a aplicação pode acessar esse espaço por meio de alguns protocolos disponíveis: HTTP, Memcached ou HotRod \cite{infinispan}.
+
+%Uma combinação entre um tipo de modalidade de acesso e um modo de acesso oferece uma grande flexibilidae ao usuário do 
+%\emph{Infinispan}, podendo adequá-lo a diferentes cenários e casos de uso.
+
+%Desse ponto em diante, vamos nos concentrar no modo de execução distribuído, uma vez que este é o mais flexível e pode emular os outros
+%modos. 
+
+As máquinas que compõem o agrupamento (os nós) formam uma rede \textbf{P2P} (\emph{Peer-to-Peer} ou ponto-a-ponto \cite{p2p}). Em uma rede P2P,
+cada participante (cada nó rodando o \emph{Infinispan}) compartilha uma parcela de seus próprios recursos (processador, memória, 
+etc...) para oferecer um serviço em conjunto com todos os outros participantes (nesse caso, oferecer uma abstração de cache distribuído).
+O ponto central dessa rede P2P é que não há distinção entre os nós. Cada nó pode atuar tanto como um provedor quanto 
+como um solicitante de recursos. Qualquer nó pode receber uma solicitação para armazenar ou recuperar um dado associado a qualquer
+chave, e essa solicitação será atendida por meio da cooperação entre os nós que compõem a rede.
+
+O que permite essa transparência e independência de localização é o uso de uma abstração conhecida como \textbf{DHT} (\emph{distributed hash table}, 
+ou tabela de espalhamento distribuída \cite{dht}). Uma DHT permite associar uma determinada chave a um nó do agrupamento, possibilitando
+encontrar onde o dado associado com essa chave está
 
 \section{Minitransações no Infinispan}
 \label{sec:mt_infinispan}
