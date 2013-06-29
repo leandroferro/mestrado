@@ -217,7 +217,7 @@ síncrona entre as máquinas, e falhas e conhecimento parcial do sistema.
 
 Um sistema distribuído é uma coleção de dispositivos computacionais individuais que podem se comunicar uns com os outros 
 \cite{tanenbaum, distributed_computing}. Essa definição engloba uma gama de
-sistemas computacionais atuais, desde placas de circutos integrados contendo diversos processadores até a \emph{Internet}. Os sistemas 
+sistemas computacionais atuais, desde placas de circuitos integrados contendo diversos processadores até a \emph{Internet}. Os sistemas 
 distribuídos a que este trabalho se refere são compostos por diversos computadores interligados por uma rede de comunicação. Cada computador 
 nesses sistemas possui acesso somente ao seu próprio sistema de armazenamento e a única forma de compartilharem informação é por meio da troca 
 de dados pela rede de comunicação.
@@ -282,7 +282,7 @@ em transações distribuídas.
 
 \section{Transações}
 \label{sec:transacoes}
-Aplicações executam operações, de variados tipos e para diversas finalidades, como somar dois números, ler uma tecla digitada do teclado ou enviar um \emph{email} através da rede. Vamos considerar por exemplo o Algoritmo \ref{alg:transferencia_valores_sem_transacao}, que implementa a transferência de valores entre duas contas, origem e destino. Digamos que as funções $Ler$ e $Escrever$ implementam as operações de leitura e escrita em um gerenciador de recursos que armazene os dados das contas. Essas operações são executadas imediatamente e abortam a execução do programa caso algum erro ocorra.
+Aplicações executam operações, de variados tipos e para diversas finalidades, como somar dois números, ler uma tecla digitada do teclado ou enviar um \emph{e-mail} através da rede. Vamos considerar por exemplo o Algoritmo \ref{alg:transferencia_valores_sem_transacao}, que implementa a transferência de valores entre duas contas, origem e destino. Digamos que as funções $Ler$ e $Escrever$ implementam as operações de leitura e escrita em um gerenciador de recursos que armazene os dados das contas. Essas operações são executadas imediatamente e abortam a execução do programa caso algum erro ocorra.
 
 O algoritmo irá obter uma referência às contas, verificar se o saldo da conta de origem é suficiente, subtrair o valor da conta de origem, somar esse mesmo valor na conta de destino e escrever os novos valores nos recursos correspondentes. Se um erro ocorrer ao executar a escrita do novo valor na conta de destino os dados ficarão inconsistentes, pois o valor terá sido retirado da conta de origem ($Escrever(O, V_O - V)$ já aconteceu), mas não terá sido adicionado à conta de destino ($Escrever(D, V_D + V)$ falhou).
 
@@ -408,20 +408,20 @@ porém, antes de terminar o programa, as funções irão abortar a transação �
 \section{Transações distribuídas e o protocolo de efetivação em duas fases}
 \label{sec:transacoes_distribuidas}
 \label{sec:2pc}
-Uma transação distribuída é uma transação que engloba operações que executam em diversos gerenciadores de recursos na forma de subtransações, 
+Uma transação distribuída é uma transação que engloba operações que executam em diversos gerenciadores de recursos na forma de sub-transações, 
 subordinadas à transação, e que é finalizada por uma requisição para efetivar ou
 abortar a transação \cite{gray-lamport}. Por exemplo, vamos considerar
 novamente o problema da transferência entre contas, como descrito na Seção \ref{sec:transacoes}, porém agora as contas estão em dois 
 gerenciadores de recursos transacionais distintos ($G_O$ e $G_D$), como na Figura \ref{fig:transacao_distribuida}.
 
-A efetivação das subtransações geradas em $G_O$ e $G_D$ precisa ser efetuada
+A efetivação das sub-transações geradas em $G_O$ e $G_D$ precisa ser efetuada
 atomicamente e precisa levar em conta que mais problemas podem ocorrer em
 comparação com o caso não distribuído, como por exemplo: as conexões de rede
 podem falhar, fazendo com que a aplicação consiga se comunicar somente com um dos gerenciadores; mensagens na rede podem ser duplicadas ou 
 perdidas, exigindo um tratamento especial para esses casos.
 
 Para lidar com esses problemas e garantir que a efetivação seja atômica, é necessário o uso de um protocolo que irá coordenar a efetivação da 
-transação distribuída e garantir que essa só será considerada efetivada se todas as subtransações forem efetivadas. O mais conhecido desses 
+transação distribuída e garantir que essa só será considerada efetivada se todas as sub-transações forem efetivadas. O mais conhecido desses 
 protocolos é o protocolo de efetivação em duas fases (\emph{two-phase commit protocol} ou \emph{2PC}).
 
 \begin{figure}
@@ -432,14 +432,14 @@ protocolos é o protocolo de efetivação em duas fases (\emph{two-phase commit 
 \end{figure}
 
 A idéia desse protocolo é simples e utilizada a bastante tempo \cite{2pc}:
-verificar se todos os gerenciadores de recurso envolvidos em uma transação estão aptos a efetivar suas respectivas subtransações. Se estiverem, a 
+verificar se todos os gerenciadores de recurso envolvidos em uma transação estão aptos a efetivar suas respectivas sub-transações. Se estiverem, a 
 transação será efetivada. Se algum gerenciador não puder efetivar, por qualquer motivo, a transação será abortada. O \emph{2PC} necessita de um 
 gerenciador que atue como o \textbf{coordenador} da transação, responsável por gerenciar a execução do protocolo e tomar a decisão sobre efetivar 
-ou abortar a transação comunicando-se com os outros \textbf{participantes}, que executam as subtransações associadas à transação. O coordenador 
+ou abortar a transação comunicando-se com os outros \textbf{participantes}, que executam as sub-transações associadas à transação. O coordenador 
 pode ser um participante da transação também.
 
 O protocolo é dividido em duas fases. Na primeira fase o coordenador solicita que os participantes enviem seus votos, indicando se estão aptos a 
-efetivar a subtransação executada. Os votos são coletados e o coordenador decide se a transação pode ser efetivada (caso todos os participantes 
+efetivar a sub-transação executada. Os votos são coletados e o coordenador decide se a transação pode ser efetivada (caso todos os participantes 
 tenham votado de acordo) ou se deve ser abortada (caso algum participante tenha votado para não efetivar a transação). Decidido o resultado da 
 votação, o coordenador efetua a segunda fase, em que os participantes são notificados do resultado da votação. 
 
@@ -514,7 +514,7 @@ algoritmo pode ser vista nas figuras \ref{fig:2PC_1fase} e \ref{fig:2PC_2fase}.
 
 A premissa que norteia o protocolo é que qualquer gerenciador envolvido na
 transação pode decidir abortá-la de forma unilateral, ou falhar em executar uma
-subtransação, exigindo assim unanimidade na decisão pela efetivação da
+sub-transação, exigindo assim unanimidade na decisão pela efetivação da
 transação.
 As mensagens enviadas durante a execução do protocolo indicam uma decisão do remetente, e para garantir que essa decisão sobreviva a falhas no 
 gerenciador que enviou a mensagem, os dados do \emph{log} são gravados em um meio de armazenamento estável, como um disco rígido, antes da 
@@ -537,7 +537,7 @@ a decisão do coordenador registrada em seu \emph{log} e gravada em disco.
 \end{figure}
 
 É importante notar que esse protocolo não define como as operações da transação
-devem ser executadas nas máquinas participantes, mas sim como a efetivação da transação deve proceder. As subtransações ocorrem em cada 
+devem ser executadas nas máquinas participantes, mas sim como a efetivação da transação deve proceder. As sub-transações ocorrem em cada 
 participante antes que o protocolo de efetivação inicie. Portanto, a utilização desse protocolo aumenta o número de mensagens e consequentemente 
 o tempo e o esforço necessários para que uma transação seja executada. Algumas otimizações podem ocorrer, como no caso de transações que efetuam 
 somente operações de leitura ou de transações que envolvam dados em somente uma máquina do sistema mas, de forma geral, a execução do \emph{2PC} 
@@ -564,7 +564,7 @@ Podemos ver que, do ponto de vista semântico, as operações que influenciam na
 
 O aspecto semântico da transação em relação aos dados pode ser tratado nos participantes também, e não somente no coordenador, caso o participante saiba como o coordenador irá utilizar o dado para fazer sua decisão sobre efetivar ou cancelar a transação. Se isso for possível, podemos então embutir também operações de leitura que influenciam a decisão do coordenador no protocolo de efetivação e fazer o participante adequar seu voto à maneira como o coordenador faria ao analisar o dado retornado.
 
-As minitransações surgem no contexto em que todas as operações de uma subtransação podem ser embutidas dentro do protocolo de efetivação, utilizando somente as trocas de mensagens que ocorreriam no protocolo de efetivação, após a execução dos comandos. Para que isso possa ocorrer, o protocolo \emph{2PC} precisa ser alterado.
+As minitransações surgem no contexto em que todas as operações de uma sub-transação podem ser embutidas dentro do protocolo de efetivação, utilizando somente as trocas de mensagens que ocorreriam no protocolo de efetivação, após a execução dos comandos. Para que isso possa ocorrer, o protocolo \emph{2PC} precisa ser alterado.
 
 \subsection{Definição}
 \label{subsec:estrutura-minitransacoes}
@@ -653,7 +653,7 @@ podemos citar \emph{Bigtable} \cite{bigtable}, \emph{Dynamo} \cite{dynamo},
 \emph{ZooKeeper} \cite{zookeeper}, e \emph{PNUTS} \cite{pnuts}.
 
 \emph{Bigtable} é o sistema de armazenamento distribuído do \emph{Google} que
-oferece uma abstração de um mapa ordenado, multi-dimensional, esparso e
+oferece uma abstração de um mapa ordenado, multidimensional, esparso e
 distribuído. \emph{Dynamo}, da \emph{Amazon}, é um sistema de armazenamento
 chave-valor que visa oferecer alta disponibilidade às aplicações. Esses dois sistemas permitem que dados sejam
 particionados e replicados para obter melhor desempenho e disponibilidade, mas
@@ -682,8 +682,7 @@ neste trabalho em operações de leitura e escrita na memória principal do comp
 
 \chapter{A infraestrutura}
 \label{chap:implementacao}
-Começamos este capítulo com uma apresentação do \emph{Infinispan} e uma
-descrição da sua arquitetura, na seção \ref{sec:infinispan}. 
+Na seção \ref{sec:infinispan} há uma breve descrição do \emph{Infinispan}, seguida pela apresentação de sua arquitetura em \ref{sec:arquitetura_infinispan} e por um detalhamento de sua implementação (\ref{sec:implementacao_infinispan}). 
 
 A seção \ref{sec:mt_infinispan} descreve como as minitransações se
 encaixam na estrutura de transações do \emph{Infinispan} e as alterações que
@@ -702,6 +701,8 @@ melhor desempenho das modernas arquiteturas de múltiplos processadores e
 múltiplos núcleos, ao mesmo tempo em que oferece funcionalidades de \emph{cache}
 distribuído.
 
+\subsection{Arquitetura}
+\label{sec:arquitetura_infinispan}
 As máquinas rodando \emph{Infinispan} podem formar um ou mais agrupamentos (\emph{cluster}),
 caso sejam configuradas de tal forma. Esses agrupamentos permitem que os dados sejam espalhados 
 por diferentes máquinas, permitindo assim uma melhor distribuição de carga entre as máquinas e
@@ -722,7 +723,7 @@ Os quatro modos de execução oferecidos pelo \emph{Infinispan} são:
 	\item[Distribuído] Cada entrada é replicada para um subconjunto das máquinas do agrupamento.
 \end{description}
 
-No modo \textbf{Local} todos as entradas ficam armazenadas na mesma máquina em que o cache está configurado, não permitindo 
+No modo \textbf{Local} todas as entradas ficam armazenadas na mesma máquina em que o cache está configurado, não permitindo 
 que aplicações compartilhem os dados. O modo \textbf{Replicado} garante alta disponibilidade dos dados, uma vez que cada 
 entrada está copiada em todas as máquinas do agrupamento. Assim, um dado só ficará indisponível no caso em que todas as 
 máquinas do agrupamento em que ele esteja armazenado fiquem indisponíveis. No modo \textbf{Distribuído} o \emph{Infinispan} 
@@ -744,25 +745,19 @@ O \emph{Infinispan} oferece também duas modalidades de acesso:
 \end{description}
 
 Na modalidade de acesso \textbf{embarcado}, o espaço de armazenamento do \emph{Infinispan} compartilha a mesma máquina virtual \emph{Java}
-(e portanto, a mesma memória) que a aplicação. No modo \textbf{client-servidor}, uma máquina virtual fica dedicada ao espaço de armazenamento
-do \emph{Infinispan}, e a aplicação pode acessar esse espaço por meio de alguns protocolos disponíveis: HTTP, Memcached ou HotRod \cite{infinispan}.
+(e portanto, a mesma memória) que a aplicação. No modo \textbf{cliente-servidor}, uma máquina virtual fica dedicada ao espaço de armazenamento do \emph{Infinispan}, e a aplicação pode acessar esse espaço por meio de alguns protocolos disponíveis: HTTP, Memcached ou HotRod \cite{infinispan}.
 
-%Uma combinação entre um tipo de modalidade de acesso e um modo de acesso oferece uma grande flexibilidae ao usuário do 
-%\emph{Infinispan}, podendo adequá-lo a diferentes cenários e casos de uso.
-
-%Desse ponto em diante, vamos nos concentrar no modo de execução distribuído, uma vez que este é o mais flexível e pode emular os outros
-%modos. 
-
-As máquinas que compõem o agrupamento (os nós) formam uma rede \textbf{P2P} (\emph{Peer-to-Peer} ou ponto-a-ponto \cite{p2p}). Em uma rede P2P,
-cada participante (cada nó rodando o \emph{Infinispan}) compartilha uma parcela de seus próprios recursos (processador, memória, 
+As máquinas que compõem o agrupamento (os nós) formam uma rede \textbf{P2P} (\emph{Peer-to-Peer} ou ponto-a-ponto \cite{p2p}). Em uma rede P2P, cada participante (cada nó rodando o \emph{Infinispan}) compartilha uma parcela de seus próprios recursos (processador, memória, 
 etc...) para oferecer um serviço em conjunto com todos os outros participantes (nesse caso, oferecer uma abstração de cache distribuído).
-O ponto central dessa rede P2P é que não há distinção entre os nós. Cada nó pode atuar tanto como um provedor quanto 
-como um solicitante de recursos. Qualquer nó pode receber uma solicitação para armazenar ou recuperar um dado associado a qualquer
-chave, e essa solicitação será atendida por meio da cooperação entre os nós que compõem a rede.
+O ponto central dessa rede P2P é que não há distinção entre os nós. Cada nó pode atuar tanto como um provedor quanto como um solicitante de recursos. Qualquer nó pode receber uma solicitação para armazenar ou recuperar um dado associado a qualquer chave, e essa solicitação será atendida de forma transparente por meio da cooperação entre os nós que compõem a rede.
 
-O que permite essa transparência e independência de localização é o uso de uma abstração conhecida como \textbf{DHT} (\emph{distributed hash table}, 
-ou tabela de espalhamento distribuída \cite{dht}). Uma DHT permite associar uma determinada chave a um nó do agrupamento, possibilitando
-encontrar onde o dado associado com essa chave está
+O que permite essa transparência no acesso e independência de localização é uma abstração conhecida como \textbf{DHT} (\emph{distributed hash table}, ou tabela de espalhamento(?) distribuída \cite{dht}). Em uma DHT, existe um conjunto finito de localizadores, e a cada nó que compõe a rede é atribuída a tutela sobre um determinado subconjunto desses localizadores. A DHT permite então encontrar ou armazenar um par de chave e valor por meio do mapeamento da chave para um determinado localizador, que por sua vez está sob a tutela de um nó da rede.
+
+A associação entre localizadores e um nó é feito por uma função de espalhamento consistente (\emph{consistent hashing} \cite{consistent-hashing}), que é um tipo especial de função de espalhamento (\emph{hash function} \cite{taocp_3}). Como toda função de espalhamento, ela mapeia um conjunto de valores para um índice em um espaço de endereçamento de uma forma que a cada índice desse espaço sejam mapeados subconjuntos com aproximadamente o mesmo tamanho. A propriedade essencial do função de espalhamento consistente é que, ao contrário dos outros tipos, um pequena alteração no espaço de endereçamento não causa um remapeamento total dos valores.
+
+\subsection{Implementação do Infinispan}
+\label{sec:implementacao_infinispan}
+xxx
 
 \section{Minitransações no Infinispan}
 \label{sec:mt_infinispan}
