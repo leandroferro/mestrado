@@ -147,18 +147,7 @@ Dissertação (Mestrado) - Instituto de Matemática e Estatística,
 Universidade de São Paulo, São Paulo, 2013.
 \\
 
-Este trabalho apresenta uma infraestrutura para sistemas
-distribuídos que oferece uma abstração de estado compartilhado entre as máquinas
-na forma de um repositório de dados utilizando minitransações para garantir a atomicidade na execução de 
-grupos de operações sobre esse repositório. As minitransações são uma modificação do protocolo de efetivação 
-em duas fases em que todas as operações que compõem a transação são enviadas de
-uma só vez, diminuindo o custo de comunicação entre as máquinas do sistema. Com o uso da primitiva de 
-minitransação os desenvolvedores podem projetar sistemas distribuídos baseando o
-compartilhamento de estado entre as máquinas em estruturas de dados, e não na troca explícita de mensagens. 
-As máquinas terão à disposição um repositório de dados que pode crescer de forma a acomodar grandes 
-quantidades de dados e que permite que aplicações tenham sempre acesso a dados
-consistentes. Assim, esperamos que o desenvolvimento da aplicação distribuída seja mais simples e ajude o 
-desenvolvedor a focar nas necessidades reais da aplicação.
+Este trabalho apresenta uma infraestrutura para sistemas distribuídos que oferece uma abstração de estado compartilhado entre as máquinas na forma de um repositório de dados utilizando minitransações para garantir a atomicidade na execução de grupos de operações sobre esse repositório. As minitransações são uma modificação do protocolo de efetivação em duas fases em que todas as operações que compõem a transação são enviadas de uma só vez, diminuindo o custo de comunicação entre as máquinas do sistema. Com o uso da primitiva de minitransação os desenvolvedores podem projetar sistemas distribuídos baseando o compartilhamento de estado entre as máquinas em estruturas de dados, e não na troca explícita de mensagens. As máquinas terão à disposição um repositório de dados que pode crescer de forma a acomodar grandes quantidades de dados e que permite que aplicações tenham sempre acesso a dados consistentes. Assim, esperamos que o desenvolvimento da aplicação distribuída seja mais simples e ajude o desenvolvedor a focar nas necessidades reais da aplicação.
 \\
 
 \noindent \textbf{Palavras-chave:} minitransação, transação, banco de dado, sistemas distribuídos.
@@ -209,75 +198,31 @@ the applications.
 
 \chapter{Introdução}
 \label{chap:introducao}
-Há diversos motivos para construirmos uma aplicação de forma distribuída, como por exemplo o compartilhamento de recursos, tolerância a falhas e 
-escalabilidade. Embora de grande importância, desenvolver um sistema distribuído com essas características pode ser difícil. Múltiplos fatores 
-fazem com que o desenvolvimento de aplicações distribuídas exija um esforço adicional em relação ao necessário para construir sistemas 
-convencionais. Dentre esses fatores podemos mencionar diferentes plataformas de hardware, diferentes sistemas operacionais, comunicação não 
-síncrona entre as máquinas, e falhas e conhecimento parcial do sistema.
+Há diversos motivos para construirmos uma aplicação de forma distribuída, como por exemplo o compartilhamento de recursos, tolerância a falhas e escalabilidade. Embora de grande importância, desenvolver um sistema distribuído com essas características pode ser difícil. Múltiplos fatores fazem com que o desenvolvimento de aplicações distribuídas exija um esforço adicional em relação ao necessário para construir sistemas  convencionais. Dentre esses fatores podemos mencionar diferentes plataformas de hardware, diferentes sistemas operacionais, comunicação não síncrona entre as máquinas, e falhas e conhecimento parcial do sistema.
 
-Um sistema distribuído é uma coleção de dispositivos computacionais individuais que podem se comunicar uns com os outros 
-\cite{tanenbaum, distributed_computing}. Essa definição engloba uma gama de
-sistemas computacionais atuais, desde placas de circuitos integrados contendo diversos processadores até a \emph{Internet}. Os sistemas 
-distribuídos a que este trabalho se refere são compostos por diversos computadores interligados por uma rede de comunicação. Cada computador 
-nesses sistemas possui acesso somente ao seu próprio sistema de armazenamento e a única forma de compartilharem informação é por meio da troca 
-de dados pela rede de comunicação.
+Um sistema distribuído é uma coleção de dispositivos computacionais individuais que podem se comunicar uns com os outros \cite{tanenbaum, distributed_computing}. Essa definição engloba uma gama de sistemas computacionais atuais, desde placas de circuitos integrados contendo diversos processadores até a \emph{Internet}. Os sistemas distribuídos a que este trabalho se refere são compostos por diversos computadores interligados por uma rede de comunicação. Cada computador nesses sistemas possui acesso somente ao seu próprio sistema de armazenamento e a única forma de compartilharem informação é por meio da troca de dados pela rede de comunicação.
 
-Implementar o compartilhamento de estado da aplicação utilizando a troca de
-dados na rede não é trivial, em especial quando os dados possuem restrições semânticas que precisam ser mantidas e validadas. Por exemplo, se 
-considerarmos um sistema bancário em que as contas dos usuários estão
-distribuídas entre diversas máquinas e que temos uma solicitação de transferência entre contas que estão em duas máquinas diferentes, é esperado 
-que essa transferência subtraia uma certa quantia da conta de origem e adicione essa mesma quantia na conta de destino, sem alterar o valor 
-total das contas envolvidas. Se a máquina que armazena os dados da conta de
-destino falhar, a quantia subtraída da conta de origem deve ser reposta.
+Implementar o compartilhamento de estado da aplicação utilizando a troca de dados na rede não é trivial, em especial quando os dados possuem restrições semânticas que precisam ser mantidas e validadas. Por exemplo, se 
+considerarmos um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e que temos uma solicitação de transferência entre contas que estão em duas máquinas diferentes, é esperado que essa transferência subtraia uma certa quantia da conta de origem e adicione essa mesma quantia na conta de destino, sem alterar o valor total das contas envolvidas. Se a máquina que armazena os dados da conta de destino falhar, a quantia subtraída da conta de origem deve ser reposta.
 
-O problema descrito acima exige que as operações efetuadas em cada máquina sejam consideradas como uma única operação lógica, ou uma transação. 
-Para satisfazer essa exigência pode ser utilizado o protocolo de efetivação em duas fases (\emph{two-phase commit} ou \emph{2PC}). O \emph{2PC} 
-coordena a efetivação de operações executadas em diversas máquinas, garantido que essa efetivação só ocorra se houver um consenso entre as 
-máquinas participantes da transação. Com a utilização do \emph{2PC} são necessárias duas rodadas adicionais de comunicação entre as máquinas, 
-aumentando o tempo e a complexidade de uma transação.
+O problema descrito acima exige que as operações efetuadas em cada máquina sejam consideradas como uma única operação lógica, ou uma transação. Para satisfazer essa exigência pode ser utilizado o protocolo de efetivação em duas fases (\emph{two-phase commit} ou \emph{2PC}). O \emph{2PC} coordena a efetivação de operações executadas em diversas máquinas, garantido que essa efetivação só ocorra se houver um consenso entre as máquinas participantes da transação. Com a utilização do \emph{2PC} são necessárias duas rodadas adicionais de comunicação entre as máquinas, aumentando o tempo e a complexidade de uma transação.
 
-Neste trabalho propomos a utilização de minitransações como uma abordagem
-viável para o desenvolvimento de aplicações distribuídas.
-Uma minitransação é uma primitiva que aglutina as operações de uma transação na primeira fase do \emph{2PC}, permitindo que as operações sejam 
-executadas e efetivadas com apenas duas rodadas de comunicação entre as máquinas. Essa abordagem diminui o escopo em que as minitransações podem 
-ser utilizadas, mas oferece ao desenvolvedor uma alternativa menos custosa para a execução de transações em um ambiente distribuído.
+Neste trabalho propomos a utilização de minitransações como uma abordagem viável para o desenvolvimento de aplicações distribuídas. Uma minitransação é uma primitiva que aglutina as operações de uma transação na primeira fase do \emph{2PC}, permitindo que as operações sejam executadas e efetivadas com apenas duas rodadas de comunicação entre as máquinas. Essa abordagem diminui o escopo em que as minitransações podem ser utilizadas, mas oferece ao desenvolvedor uma alternativa menos custosa para a execução de transações em um ambiente distribuído.
 
 \section{Objetivo}
 \label{sec:objetivo}
-O objetivo deste trabalho é apresentar o conceito de minitransação e
-disponibilizar uma infraestrutura para o desenvolvimento de sistemas
+O objetivo deste trabalho é apresentar o conceito de minitransação e disponibilizar uma infraestrutura para o desenvolvimento de sistemas
 distribuídos que oferece suporte a essas minitransações.
 
-Essa infraestrutura oferece uma abstração de estado compartilhado entre as
-máquinas na forma de um repositório de dados utilizando minitransações para garantir a atomicidade na execução de grupos de operações sobre esse repositório. 
-Ao invés de trocarem mensagens explicitamente, as máquinas verão um repositório que pode crescer de forma a acomodar grandes 
-quantidades de dados e que permite que todas as máquinas tenham sempre acesso a dados consistentes. Assim, esperamos que o 
-desenvolvimento das aplicações distribuídas seja mais simples e ajude os
-desenvolvedores a direcionar o esforço de trabalho para as necessidades reais
-das aplicações. O desenvolvimento da infraestrutura foi baseado no
-\emph{Infinispan} \cite{infinispan}, uma plataforma de dados distribuídos de código aberto
+Essa infraestrutura oferece uma abstração de estado compartilhado entre as máquinas na forma de um repositório de dados utilizando minitransações para garantir a atomicidade na execução de grupos de operações sobre esse repositório. Ao invés de trocarem mensagens explicitamente, as máquinas verão um repositório que pode crescer de forma a acomodar grandes quantidades de dados e que permite que todas as máquinas tenham sempre acesso a dados consistentes. Assim, esperamos que o desenvolvimento das aplicações distribuídas seja mais simples e ajude os desenvolvedores a direcionar o esforço de trabalho para as necessidades reais das aplicações. O desenvolvimento da infraestrutura foi baseado no \emph{Infinispan} \cite{infinispan}, uma plataforma de dados distribuídos de código aberto
 
 \section{Organização do texto}
 \label{sec:organizacao_do_texto}
-O capítulo \ref{chap:conceitos} apresenta uma motivação para o uso de
-transações, sua utilização em um ambiente distribuído e a necessidade de um
-protocolo de efetivação nesse contexto, detalhando o \emph{2PC} e o conceito
-original de minitransação. O capítulo \ref{chap:implementacao} descreve como
-o \emph{Infinispan} foi modificado para permitir a execução de minitransações.
-O capítulo \ref{chap:conclusao} apresenta os resultados obtidos e as conclusoes
-sobre o uso de minitransações para a implementação de transações distribuídas.
+O capítulo \ref{chap:conceitos} apresenta uma motivação para o uso de transações, sua utilização em um ambiente distribuído e a necessidade de um protocolo de efetivação nesse contexto, detalhando o \emph{2PC} e o conceito original de minitransação. O capítulo \ref{chap:implementacao} descreve como o \emph{Infinispan} foi modificado para permitir a execução de minitransações. O capítulo \ref{chap:conclusao} apresenta os resultados obtidos e as conclusoes sobre o uso de minitransações para a implementação de transações distribuídas.
 
 \chapter{Conceitos}
 \label{chap:conceitos}
-Este capítulo apresenta a motivação para o uso de transações em aplicações
-(Seção \ref{sec:transacoes}), ilustrando os exemplos com alguns algoritmos
-simples.
-Naturalmente estendemos o conceito de transação para envolver mais de uma
-máquina, o que nos leva às transações distribuídas e ao problema de efetivar uma
-transação desse tipo (Seção \ref{sec:transacoes_distribuidas}), onde descrevemos
-também o protocolo de efetivação em duas fases, de ampla utilização. Por fim é
-apresentado o conceito de minitransação (Seção \ref{sec:minitransacoes}), uma extensão do protocolo de efetivação em duas fases que oferece melhor
-desempenho e escalabilidade ao mesmo tempo que garante atomicidade de operações
+Este capítulo apresenta a motivação para o uso de transações em aplicações (Seção \ref{sec:transacoes}), ilustrando os exemplos com alguns algoritmos simples. Naturalmente estendemos o conceito de transação para envolver mais de uma máquina, o que nos leva às transações distribuídas e ao problema de efetivar uma transação desse tipo (Seção \ref{sec:transacoes_distribuidas}), onde descrevemos também o protocolo de efetivação em duas fases, de ampla utilização. Por fim é apresentado o conceito de minitransação (Seção \ref{sec:minitransacoes}), uma extensão do protocolo de efetivação em duas fases que oferece melhor desempenho e escalabilidade ao mesmo tempo que garante atomicidade de operações
 em transações distribuídas.
 
 \section{Transações}
@@ -306,13 +251,7 @@ O algoritmo irá obter uma referência às contas, verificar se o saldo da conta
 }
 \end{algorithm}
 
-Para manter a consistência dos dados em caso de falha, vamos criar duas novas
-funções $Ler_M$ e $Escrever_M$ que implementam as mesmas operações das
-originais $Ler$ e $Escrever$, mas que não abortam o programa caso ocorra uma
-falha. Vamos criar também uma nova função $HouveErro$, que permite verificar se
-a última operação $Ler_M$ ou $Escrever_M$ falhou. Com essas novas funções,
-podemos criar um novo algoritmo, efetuando operações para desfazer alterações no
-estado do sistema em caso de falha.
+Para manter a consistência dos dados em caso de falha, vamos criar duas novas funções $Ler_M$ e $Escrever_M$ que implementam as mesmas operações das originais $Ler$ e $Escrever$, mas que não abortam o programa caso ocorra uma falha. Vamos criar também uma nova função $HouveErro$, que permite verificar se a última operação $Ler_M$ ou $Escrever_M$ falhou. Com essas novas funções, podemos criar um novo algoritmo, efetuando operações para desfazer alterações no estado do sistema em caso de falha.
 
 \begin{algorithm}
 \caption{Transferência de valores - tratamento de erros}
@@ -348,30 +287,17 @@ estado do sistema em caso de falha.
 }
 \end{algorithm}
 
-Podemos observar dois pontos importantes no Algoritmo
-\ref{alg:transferencia_valores_checar_erro}:
+Podemos observar dois pontos importantes no Algoritmo \ref{alg:transferencia_valores_checar_erro}:
 
 \itemize{
-	\item[1] Mesmo que todos os erros sejam tratados, ainda é possível que os dados
-	fiquem em um estado inconsistente (linha 16) 
+	\item[1] Mesmo que todos os erros sejam tratados, ainda é possível que os dados	fiquem em um estado inconsistente (linha 16) 
 
-	\item[2] as operações executadas pela aplicação não são isoladas, mas fazem
-	parte de uma operação lógica mais abrangente, a transferência de valores, que só pode ocorrer por completo caso todas as operações que a 
-	constituem sejam finalizadas corretamente. Essa operação lógica constituída por um conjunto de operações sobre os recursos do sistema é 
-	chamada de \textbf{transação}. O uso mais clássico e difundido de transações é feito na área de banco de dados, em que uma transação é a 
-	unidade de execução de operações, composta por uma sequência de comandos de leitura e escrita de dados \cite{garcia-molina, vaca}. 
+	\item[2] as operações executadas pela aplicação não são isoladas, mas fazem parte de uma operação lógica mais abrangente, a transferência de valores, que só pode ocorrer por completo caso todas as operações que a constituem sejam finalizadas corretamente. Essa operação lógica constituída por um conjunto de operações sobre os recursos do sistema é chamada de \textbf{transação}. O uso mais clássico e difundido de transações é feito na área de banco de dados, em que uma transação é a unidade de execução de operações, composta por uma sequência de comandos de leitura e escrita de dados \cite{garcia-molina, vaca}. 
 }
 
-O uso de transações para o desenvolvimento de aplicativos facilita a maneira como o aplicativo pode ser implementado. Por exemplo, digamos que a 
-transferência de valores do Algoritmo \ref{alg:transferencia_valores_sem_transacao} possa ser agora implementada utilizando um gerenciador de 
-recursos que suporte o agrupamento de operações em uma transação, como no Algoritmo \ref{alg:transferencia_valores_transacao}. 
+O uso de transações para o desenvolvimento de aplicativos facilita a maneira como o aplicativo pode ser implementado. Por exemplo, digamos que a transferência de valores do Algoritmo \ref{alg:transferencia_valores_sem_transacao} possa ser agora implementada utilizando um gerenciador de recursos que suporte o agrupamento de operações em uma transação, como no Algoritmo \ref{alg:transferencia_valores_transacao}. 
 
-Nesse algoritmo introduzimos três novas funções: $IniciarTransacao$, para criar uma nova transação, retornando um identificador para a transação 
-criada; $Efetivar(T)$, que sinaliza que as alterações efetuadas pela transação $T$ podem ser realmente executadas; e $Abortar(T)$, que indica que 
-a transação foi cancelada e que as alterações efetuadas não surtirão
-efeito. Criamos duas operações, $Ler_T$ e $Escrever_T$, baseadas respectivamente
-em $Ler$ e $Escrever$, para permitir associar a referida operação com
-uma transação dada.
+Nesse algoritmo introduzimos três novas funções: $IniciarTransacao$, para criar uma nova transação, retornando um identificador para a transação criada; $Efetivar(T)$, que sinaliza que as alterações efetuadas pela transação $T$ podem ser realmente executadas; e $Abortar(T)$, que indica que a transação foi cancelada e que as alterações efetuadas não surtirão efeito. Criamos duas operações, $Ler_T$ e $Escrever_T$, baseadas respectivamente em $Ler$ e $Escrever$, para permitir associar a referida operação com uma transação dada.
 
 \begin{algorithm}
 \caption{Transferência de valores - uso de transações}
@@ -396,33 +322,19 @@ uma transação dada.
 }
 \end{algorithm}
 
-O uso da transação permitiu que o formato do Algoritmo
-\ref{alg:transferencia_valores_transacao} ficasse muito parecido com o do Algoritmo \ref{alg:transferencia_valores_sem_transacao}. As únicas 
-diferenças são relacionadas à criação da transação, para demarcar o início das operações que devem ser executadas de forma atômica, e os momentos 
-da efetivação ou cancelamento. No caso de efetivação, nenhum erro ocorreu e o gerenciador de recursos irá efetivar as alterações efetuadas pelas operações da transação. Caso a conta de origem não possua saldo suficiente, a transação será cancelada.
+O uso da transação permitiu que o formato do Algoritmo \ref{alg:transferencia_valores_transacao} ficasse muito parecido com o do Algoritmo \ref{alg:transferencia_valores_sem_transacao}. As únicas diferenças são relacionadas à criação da transação, para demarcar o início das operações que devem ser executadas de forma atômica, e os momentos da efetivação ou cancelamento. No caso de efetivação, nenhum erro ocorreu e o gerenciador de recursos irá efetivar as alterações efetuadas pelas operações da transação. Caso a conta de origem não possua saldo suficiente, a transação será cancelada.
 
-Nesse algoritmo o comportamento das funções $Ler_T$ e $Escrever_T$ é parecido
-com o comportamento apresentado no Algoritmo \ref{alg:transferencia_valores_sem_transacao}: se ocorrer um erro, o programa é terminado. Agora, 
-porém, antes de terminar o programa, as funções irão abortar a transação à qual estão relacionadas, mantendo os dados inalterados.
+Nesse algoritmo o comportamento das funções $Ler_T$ e $Escrever_T$ é parecido com o comportamento apresentado no Algoritmo \ref{alg:transferencia_valores_sem_transacao}: se ocorrer um erro, o programa é terminado. Agora, porém, antes de terminar o programa, as funções irão abortar a transação à qual estão relacionadas, mantendo os dados inalterados.
 
 \section{Transações distribuídas e o protocolo de efetivação em duas fases}
 \label{sec:transacoes_distribuidas}
 \label{sec:2pc}
-Uma transação distribuída é uma transação que engloba operações que executam em diversos gerenciadores de recursos na forma de sub-transações, 
-subordinadas à transação, e que é finalizada por uma requisição para efetivar ou
-abortar a transação \cite{gray-lamport}. Por exemplo, vamos considerar
-novamente o problema da transferência entre contas, como descrito na Seção \ref{sec:transacoes}, porém agora as contas estão em dois 
-gerenciadores de recursos transacionais distintos ($G_O$ e $G_D$), como na Figura \ref{fig:transacao_distribuida}.
 
-A efetivação das sub-transações geradas em $G_O$ e $G_D$ precisa ser efetuada
-atomicamente e precisa levar em conta que mais problemas podem ocorrer em
-comparação com o caso não distribuído, como por exemplo: as conexões de rede
-podem falhar, fazendo com que a aplicação consiga se comunicar somente com um dos gerenciadores; mensagens na rede podem ser duplicadas ou 
-perdidas, exigindo um tratamento especial para esses casos.
+Uma transação distribuída é uma transação que engloba operações que executam em diversos gerenciadores de recursos na forma de sub-transações, subordinadas à transação, e que é finalizada por uma requisição para efetivar ou abortar a transação \cite{gray-lamport}. Por exemplo, vamos considerar novamente o problema da transferência entre contas, como descrito na Seção \ref{sec:transacoes}, porém agora as contas estão em dois gerenciadores de recursos transacionais distintos ($G_O$ e $G_D$), como na Figura \ref{fig:transacao_distribuida}.
 
-Para lidar com esses problemas e garantir que a efetivação seja atômica, é necessário o uso de um protocolo que irá coordenar a efetivação da 
-transação distribuída e garantir que essa só será considerada efetivada se todas as sub-transações forem efetivadas. O mais conhecido desses 
-protocolos é o protocolo de efetivação em duas fases (\emph{two-phase commit protocol} ou \emph{2PC}).
+A efetivação das sub-transações geradas em $G_O$ e $G_D$ precisa ser efetuada atomicamente e precisa levar em conta que mais problemas podem ocorrer em comparação com o caso não distribuído, como por exemplo: as conexões de rede podem falhar, fazendo com que a aplicação consiga se comunicar somente com um dos gerenciadores; mensagens na rede podem ser duplicadas ou perdidas, exigindo um tratamento especial para esses casos.
+
+Para lidar com esses problemas e garantir que a efetivação seja atômica, é necessário o uso de um protocolo que irá coordenar a efetivação da transação distribuída e garantir que essa só será considerada efetivada se todas as sub-transações forem efetivadas. O mais conhecido desses protocolos é o protocolo de efetivação em duas fases (\emph{two-phase commit protocol} ou \emph{2PC}).
 
 \begin{figure}
   \centering
@@ -431,34 +343,15 @@ protocolos é o protocolo de efetivação em duas fases (\emph{two-phase commit 
   \label{fig:transacao_distribuida} 
 \end{figure}
 
-A idéia desse protocolo é simples e utilizada a bastante tempo \cite{2pc}:
-verificar se todos os gerenciadores de recurso envolvidos em uma transação estão aptos a efetivar suas respectivas sub-transações. Se estiverem, a 
-transação será efetivada. Se algum gerenciador não puder efetivar, por qualquer motivo, a transação será abortada. O \emph{2PC} necessita de um 
-gerenciador que atue como o \textbf{coordenador} da transação, responsável por gerenciar a execução do protocolo e tomar a decisão sobre efetivar 
-ou abortar a transação comunicando-se com os outros \textbf{participantes}, que executam as sub-transações associadas à transação. O coordenador 
-pode ser um participante da transação também.
+A idéia desse protocolo é simples e utilizada a bastante tempo \cite{2pc}: verificar se todos os gerenciadores de recurso envolvidos em uma transação estão aptos a efetivar suas respectivas sub-transações. Se estiverem, a transação será efetivada. Se algum gerenciador não puder efetivar, por qualquer motivo, a transação será abortada. O \emph{2PC} necessita de um gerenciador que atue como o \textbf{coordenador} da transação, responsável por gerenciar a execução do protocolo e tomar a decisão sobre efetivar ou abortar a transação comunicando-se com os outros \textbf{participantes}, que executam as sub-transações associadas à transação. O coordenador pode ser um participante da transação também.
 
-O protocolo é dividido em duas fases. Na primeira fase o coordenador solicita que os participantes enviem seus votos, indicando se estão aptos a 
-efetivar a sub-transação executada. Os votos são coletados e o coordenador decide se a transação pode ser efetivada (caso todos os participantes 
-tenham votado de acordo) ou se deve ser abortada (caso algum participante tenha votado para não efetivar a transação). Decidido o resultado da 
-votação, o coordenador efetua a segunda fase, em que os participantes são notificados do resultado da votação. 
+O protocolo é dividido em duas fases. Na primeira fase o coordenador solicita que os participantes enviem seus votos, indicando se estão aptos a efetivar a sub-transação executada. Os votos são coletados e o coordenador decide se a transação pode ser efetivada (caso todos os participantes tenham votado de acordo) ou se deve ser abortada (caso algum participante tenha votado para não efetivar a transação). Decidido o resultado da votação, o coordenador efetua a segunda fase, em que os participantes são notificados do resultado da votação. 
 
-De forma mais detalhada, o \emph{2PC} pode ser descrito pelos algoritmos \ref{alg:2pc_coordenador}, \ref{alg:2pc_participante1} e 
-\ref{alg:2pc_participante2}. O Algoritmo \ref{alg:2pc_coordenador} descreve as ações do coordenador ao ser notificado que o protocolo deve 
-iniciar. Os algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} descrevem as ações executadas pelos participantes ao receberem 
-uma solicitação de votação (primeira fase) e o resultado da votação (segunda fase), respectivamente. 
+De forma mais detalhada, o \emph{2PC} pode ser descrito pelos algoritmos \ref{alg:2pc_coordenador}, \ref{alg:2pc_participante1} e  \ref{alg:2pc_participante2}. O Algoritmo \ref{alg:2pc_coordenador} descreve as ações do coordenador ao ser notificado que o protocolo deve  iniciar. Os algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} descrevem as ações executadas pelos participantes ao receberem uma solicitação de votação (primeira fase) e o resultado da votação (segunda fase), respectivamente. 
 
-Uma estrutura de dados essencial na execução do \emph{2PC} é o registro de operações, ou \emph{log}. Ele é responsável por registrar as decisões 
-do coordenador e dos participantes, e é gravado localmente em cada gerenciador de recursos envolvido na transação para evitar que essas 
-informações sejam perdidas caso ocorra alguma falha. No Algoritmo \ref{alg:2pc_coordenador} $log_c$ representa o \emph{log} do coordenador e nos 
-algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} $log_i$ é o \emph{log} do participante $p_i$ executando o algoritmo em 
-questão.
+Uma estrutura de dados essencial na execução do \emph{2PC} é o registro de operações, ou \emph{log}. Ele é responsável por registrar as decisões do coordenador e dos participantes, e é gravado localmente em cada gerenciador de recursos envolvido na transação para evitar que essas informações sejam perdidas caso ocorra alguma falha. No Algoritmo \ref{alg:2pc_coordenador} $log_c$ representa o \emph{log} do coordenador e nos algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} $log_i$ é o \emph{log} do participante $p_i$ executando o algoritmo em questão.
 
-A função $Adicionar$ representa a operação de adicionar um elemento ao final do
-\emph{log}. A função $Enviar(d, m)$ representa o envio de uma mensagem $m$ para
-um destinatário $d$ pela rede de comunicação, e a função $Receber(r)$ representa
-o recebimento de uma mensagem de um remetente $r$. Uma simulação da execução do
-algoritmo pode ser vista nas figuras \ref{fig:2PC_1fase} e \ref{fig:2PC_2fase}.
+A função $Adicionar$ representa a operação de adicionar um elemento ao final do \emph{log}. A função $Enviar(d, m)$ representa o envio de uma mensagem $m$ para um destinatário $d$ pela rede de comunicação, e a função $Receber(r)$ representa o recebimento de uma mensagem de um remetente $r$. Uma simulação da execução do algoritmo pode ser vista nas figuras \ref{fig:2PC_1fase} e \ref{fig:2PC_2fase}.
 
 \begin{algorithm}
 \caption{Coordenador 2PC}
@@ -512,15 +405,7 @@ algoritmo pode ser vista nas figuras \ref{fig:2PC_1fase} e \ref{fig:2PC_2fase}.
 }
 \end{algorithm}
 
-A premissa que norteia o protocolo é que qualquer gerenciador envolvido na
-transação pode decidir abortá-la de forma unilateral, ou falhar em executar uma
-sub-transação, exigindo assim unanimidade na decisão pela efetivação da
-transação.
-As mensagens enviadas durante a execução do protocolo indicam uma decisão do remetente, e para garantir que essa decisão sobreviva a falhas no 
-gerenciador que enviou a mensagem, os dados do \emph{log} são gravados em um meio de armazenamento estável, como um disco rígido, antes da 
-mensagem ser enviada. A transação $T$ é considerada oficialmente efetivada (ou abortada) no momento que o registro de $(EFETIVAR, T)$ 
-(ou $(ABORTAR, T)$) do \emph{log} do coordenador for escrito para a área de armazenamento estável da máquina. Falhas posteriores não podem mudar 
-a decisão do coordenador registrada em seu \emph{log} e gravada em disco.
+A premissa que norteia o protocolo é que qualquer gerenciador envolvido na transação pode decidir abortá-la de forma unilateral, ou falhar em executar uma sub-transação, exigindo assim unanimidade na decisão pela efetivação da transação. As mensagens enviadas durante a execução do protocolo indicam uma decisão do remetente, e para garantir que essa decisão sobreviva a falhas no gerenciador que enviou a mensagem, os dados do \emph{log} são gravados em um meio de armazenamento estável, como um disco rígido, antes da  mensagem ser enviada. A transação $T$ é considerada oficialmente efetivada (ou abortada) no momento que o registro de $(EFETIVAR, T)$ (ou $(ABORTAR, T)$) do \emph{log} do coordenador for escrito para a área de armazenamento estável da máquina. Falhas posteriores não podem mudar a decisão do coordenador registrada em seu \emph{log} e gravada em disco.
 
 \begin{figure}
   \centering
@@ -536,12 +421,7 @@ a decisão do coordenador registrada em seu \emph{log} e gravada em disco.
   \label{fig:2PC_2fase} 
 \end{figure}
 
-É importante notar que esse protocolo não define como as operações da transação
-devem ser executadas nas máquinas participantes, mas sim como a efetivação da transação deve proceder. As sub-transações ocorrem em cada 
-participante antes que o protocolo de efetivação inicie. Portanto, a utilização desse protocolo aumenta o número de mensagens e consequentemente 
-o tempo e o esforço necessários para que uma transação seja executada. Algumas otimizações podem ocorrer, como no caso de transações que efetuam 
-somente operações de leitura ou de transações que envolvam dados em somente uma máquina do sistema mas, de forma geral, a execução do \emph{2PC} 
-é custosa \cite{gray-lamport}.
+É importante notar que esse protocolo não define como as operações da transação devem ser executadas nas máquinas participantes, mas sim como a efetivação da transação deve proceder. As sub-transações ocorrem em cada participante antes que o protocolo de efetivação inicie. Portanto, a utilização desse protocolo aumenta o número de mensagens e consequentemente o tempo e o esforço necessários para que uma transação seja executada. Algumas otimizações podem ocorrer, como no caso de transações que efetuam somente operações de leitura ou de transações que envolvam dados em somente uma máquina do sistema mas, de forma geral, a execução do \emph{2PC} é custosa \cite{gray-lamport}.
 
 \section{Minitransações}
 \label{sec:minitransacoes}
@@ -549,10 +429,7 @@ Minitransação é uma primitiva que permite que as operações de uma transaç�
 
 Porém, o uso das minitransações impõe certas restrições em relação ao que pode ser feito, diminuindo sua aplicabilidade. Por exemplo, o condicionamento das operações de leitura e escrita é baseado somente em comparações de igualdade, e a única forma da aplicação cliente abortar a minitransação é se essa comparação falhar, como será detalhado. Com as minitransações originais não é possível efetuar a transferência entre contas distribuídas como no Algoritmo \ref{alg:transferencia_valores_transacao}, pois a comparação de maior ou igual ($>=$) não pode ser feita. A nossa infraestrutura irá permitir que essa e outras comparações sejam feitas.
 
-Na subseção \ref{subsec:derivando-minitransacoes} é apresentado como o
-\emph{2PC} pode ser usado como ponto de partida para otimizações e para a
-obtenção do protocolo de minitransações. Na subseção
-\ref{subsec:estrutura-minitransacoes} definimos formalmente o conceito de minitransação.
+Na subseção \ref{subsec:derivando-minitransacoes} é apresentado como o \emph{2PC} pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações. Na subseção \ref{subsec:estrutura-minitransacoes} definimos formalmente o conceito de minitransação.
 
 \subsection{Otimização do \emph{2PC}}
 \label{subsec:derivando-minitransacoes}
@@ -579,11 +456,7 @@ Uma minitransação é composta por três conjuntos: itens de comparação, iten
 
 Formalmente, uma minitransação pode ser vista como uma tupla na forma $(I, C, L, E)$. $I$ é o identificador da minitransação, gerado pelo criador da minitransação. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((Id, Dado)\), em que \(Id\) é o identificador do dado e \(Dado\) é o valor para se comparar com o valor identificado por $Id$ ou para substituí-lo.
 
-Sendo uma extensão do \emph{2PC}, o protocolo de minitransações possui também um
-coordenador responsável por iniciar e gerenciar a execução do protocolo entre os
-participantes da transação. O protocolo de minitransações é composto também por
-duas fases, mas agora a primeira fase passa a ser uma fase de execução, em que
-as minitransações são executadas em cada participante e seus votos são enviados para o coordenador. O coordenador coleta os votos de todos os participantes e, como no protocolo original, irá decidir por efetivar a transação somente se os votos forem unânimes. Na segunda fase os participantes são notificados da decisão do coordenador e devem atuar de acordo, efetivando as operações da minitransação ou desfazendo suas ações.
+Sendo uma extensão do \emph{2PC}, o protocolo de minitransações possui também um coordenador responsável por iniciar e gerenciar a execução do protocolo entre os participantes da transação. O protocolo de minitransações é composto também por duas fases, mas agora a primeira fase passa a ser uma fase de execução, em que as minitransações são executadas em cada participante e seus votos são enviados para o coordenador. O coordenador coleta os votos de todos os participantes e, como no protocolo original, irá decidir por efetivar a transação somente se os votos forem unânimes. Na segunda fase os participantes são notificados da decisão do coordenador e devem atuar de acordo, efetivando as operações da minitransação ou desfazendo suas ações.
 
 Um operador especial, $Id[X]$, representa o conjunto formado pelo elemento $Id$ de todas as tuplas no formato $(Id, Dado)$ do conjunto $X$. Esse operador permite obter o conjunto $D$ de todos os identificadores utilizados pela minitransação: $D \gets L \cup Id[C] \cup Id[E]$. Cada elemento de $D$ fica sob responsabilidade de um participante $p$ específico da minitransação, e $\forall d \in D$ o participante responsável pelo identificador $d$ é definido por $Participante(d)$, uma função que indica que $p$ é a possível localização de $d$ entre os participantes, uma vez que o identificador $d$ pode ainda não ter sido inserido em $p$.
 
@@ -622,98 +495,44 @@ Quando os participantes são notificados do cancelamento da minitransação, as 
 
 \section{Trabalhos relacionados}
 \label{sec:trabalhos_relacionados}
-O conceito de minitransações é introduzido como base para a construção de
-\emph{Sinfonia} \cite{sinfonia}, um sistema cujo foco é prover a base para o
-desenvolvimento de sistemas distribuídos de baixo nível, como sistemas de arquivos distribuídos, 
-gerenciadores de travas ou serviços de comunicação de grupos de computadores, enquanto que o objetivo 
-deste trabalho é utilizar as minitransações como base para a construção de uma infraestrutura que facilite 
-o desenvolvimento de aplicações distribuídas de alto nível, como sistemas de comércio eletrônico ou redes sociais.
+O conceito de minitransações é introduzido como base para a construção de \emph{Sinfonia} \cite{sinfonia}, um sistema cujo foco é prover a base para o desenvolvimento de sistemas distribuídos de baixo nível, como sistemas de arquivos distribuídos, gerenciadores de travas ou serviços de comunicação de grupos de computadores, enquanto que o objetivo deste trabalho é utilizar as minitransações como base para a construção de uma infraestrutura que facilite o desenvolvimento de aplicações distribuídas de alto nível, como sistemas de comércio eletrônico ou redes sociais.
 
-\cite{padilha} apresenta um sistema de armazenamento baseado em minitransações tolerante a falhas bizantinas. Em sistemas 
-que toleram somente componentes com falhas simples (\emph{fail-stop components}), é assumido que um componente pode estar 
-em dois estados: ativo e inativo. Se estiver em um estado ativo, o componente se comportará de acordo com a especificação 
-do sistema. Se estiver inativo, o componente simplesmente para de interagir com o sistema. Essa é uma maneira simples e um 
-tanto simplificada de lidar com falhas no sistema, mas é a forma utilizada por diversos sistemas, entre eles \emph{Sinfonia} 
-e a nossa infraestrutura. A maneira mais geral de lidar com falhas é através
-da modelagem de falhas bizantinas \cite{byzantine}. Em sistemas que lidam com
-esse tipo de falha, um componente ativo pode se comportar de forma incorreta, enviando mensagens com conteúdo aleatório 
-(correto ou incorreto), ou não enviando mensagem nenhuma. O tratamento de falhas bizantinas não será discutido neste trabalho.
+\cite{padilha} apresenta um sistema de armazenamento baseado em minitransações tolerante a falhas bizantinas. Em sistemas que toleram somente componentes com falhas simples (\emph{fail-stop components}), é assumido que um componente pode estar em dois estados: ativo e inativo. Se estiver em um estado ativo, o componente se comportará de acordo com a especificação do sistema. Se estiver inativo, o componente simplesmente para de interagir com o sistema. Essa é uma maneira simples e um tanto simplificada de lidar com falhas no sistema, mas é a forma utilizada por diversos sistemas, entre eles \emph{Sinfonia} e a nossa infraestrutura. A maneira mais geral de lidar com falhas é através da modelagem de falhas bizantinas \cite{byzantine}. Em sistemas que lidam com esse tipo de falha, um componente ativo pode se comportar de forma incorreta, enviando mensagens com conteúdo aleatório (correto ou incorreto), ou não enviando mensagem nenhuma. O tratamento de falhas bizantinas não será discutido neste trabalho.
 
-O uso mais difundido de transações é no contexto dos gerenciadores de bancos
-de dados relacionais, como \emph{Oracle} \cite{oracle}, \emph{MySQL}
-\cite{mysql}, \emph{SQL Server} \cite{sqlserver}, entre diversos outros.
-O tipo de transação oferecida por esses sistemas é normalmente chamada de ACID (Atomicidade, Consistência, Isolamento e Durabilidade) 
-\cite{vaca}. Essas transações podem ser usadas em cenários nos quais não conseguimos utilizar as minitransações, sendo portanto 
-muito mais gerais. Porém, devido às propriedades que devem garantir, o uso dessas transações não permite escalar o banco de dados 
-para um grande número de máquinas, algo que as minitransações permitem.
+O uso mais difundido de transações é no contexto dos gerenciadores de bancos de dados relacionais, como \emph{Oracle} \cite{oracle}, \emph{MySQL} \cite{mysql}, \emph{SQL Server} \cite{sqlserver}, entre diversos outros. O tipo de transação oferecida por esses sistemas é normalmente chamada de ACID (Atomicidade, Consistência, Isolamento e Durabilidade) \cite{vaca}. Essas transações podem ser usadas em cenários nos quais não conseguimos utilizar as minitransações, sendo portanto muito mais gerais. Porém, devido às propriedades que devem garantir, o uso dessas transações não permite escalar o banco de dados para um grande número de máquinas, algo que as minitransações permitem.
 
-Existem diversos sistemas que visam o armazenamento escalável de informações e a disponibilização de serviços para facilitar o 
-desenvolvimento de sistemas distribuídos, visando em geral a utilização em aplicações de internet de larga escala. Entre eles, 
-podemos citar \emph{Bigtable} \cite{bigtable}, \emph{Dynamo} \cite{dynamo},
-\emph{ZooKeeper} \cite{zookeeper}, e \emph{PNUTS} \cite{pnuts}.
+Existem diversos sistemas que visam o armazenamento escalável de informações e a disponibilização de serviços para facilitar o  desenvolvimento de sistemas distribuídos, visando em geral a utilização em aplicações de internet de larga escala. Entre eles, podemos citar \emph{Bigtable} \cite{bigtable}, \emph{Dynamo} \cite{dynamo}, \emph{ZooKeeper} \cite{zookeeper}, e \emph{PNUTS} \cite{pnuts}.
 
-\emph{Bigtable} é o sistema de armazenamento distribuído do \emph{Google} que
-oferece uma abstração de um mapa ordenado, multidimensional, esparso e
-distribuído. \emph{Dynamo}, da \emph{Amazon}, é um sistema de armazenamento
-chave-valor que visa oferecer alta disponibilidade às aplicações. Esses dois sistemas permitem que dados sejam
-particionados e replicados para obter melhor desempenho e disponibilidade, mas
+\emph{Bigtable} é o sistema de armazenamento distribuído do \emph{Google} que oferece uma abstração de um mapa ordenado, multidimensional, esparso e distribuído. \emph{Dynamo}, da \emph{Amazon}, é um sistema de armazenamento chave-valor que visa oferecer alta disponibilidade às aplicações. Esses dois sistemas permitem que dados sejam particionados e replicados para obter melhor desempenho e disponibilidade, mas
 permitem que diferentes máquinas possam ter versões diferentes de uma mesma informação.
 
-\emph{ZooKeeper} é um sistema que provê serviços de coordenação e sincronização
-para a construção de sistemas distribuídos que utiliza o algoritmo \emph{Paxos}
-\cite{paxos} para garantir consistência entre as operações. Como o objetivo do
-\emph{ZooKeeper} é permitir a coordenação entre componentes de um sistema
-distribuído, sua capacidade de armazenamento é limitada (em um \emph{megabyte}), e portanto não é utilizável como um 
-repositório de dados geral.
+\emph{ZooKeeper} é um sistema que provê serviços de coordenação e sincronização para a construção de sistemas distribuídos que utiliza o algoritmo \emph{Paxos} \cite{paxos} para garantir consistência entre as operações. Como o objetivo do \emph{ZooKeeper} é permitir a coordenação entre componentes de um sistema distribuído, sua capacidade de armazenamento é limitada (em um \emph{megabyte}), e portanto não é utilizável como um repositório de dados geral.
 
-\emph{PNUTS} é o serviço de armazenamento de dados do \emph{Yahoo!} que garante
-que todas as réplicas de um determinado dado armazenado executam as mesmas alterações, na mesma ordem. PNUTS permite a 
-existência de várias versões de um dado, e oferece uma primitiva \emph{test-and-set-write}, que efetua uma escrita de dados 
-somente se uma determinada versão do dado for encontrada, semelhante ao mecanismo de comparação das minitransações.
+\emph{PNUTS} é o serviço de armazenamento de dados do \emph{Yahoo!} que garante que todas as réplicas de um determinado dado armazenado executam as mesmas alterações, na mesma ordem. PNUTS permite a existência de várias versões de um dado, e oferece uma primitiva \emph{test-and-set-write}, que efetua uma escrita de dados somente se uma determinada versão do dado for encontrada, semelhante ao mecanismo de comparação das minitransações.
 
-Por último, \emph{Hazelcast} \cite{hazelcast} e \emph{Akka} \cite{akka} são
-ferramentas para o desenvolvimento de sistemas distribuídos que visam eliminar a necessidade de comunicação explícita entre os 
-participantes do sistema, oferecendo abstrações como estruturas de dados
-distribuídas ou memória transacional. \emph{Hazelcast} oferece a programas
-rodando na \emph{JVM Java} implementações distribuídas das coleções da biblioteca padrão (\emph{Collection, Set, List e Map}). 
-\emph{Akka} permite a utilização de memória transacional por \emph{software}
-(\emph{software transactional memory} ou \emph{STM} \cite{stm}), uma abordagem que emprega o conceito de transação discutido 
+Por último, \emph{Hazelcast} \cite{hazelcast} e \emph{Akka} \cite{akka} são ferramentas para o desenvolvimento de sistemas distribuídos que visam eliminar a necessidade de comunicação explícita entre os participantes do sistema, oferecendo abstrações como estruturas de dados
+distribuídas ou memória transacional. \emph{Hazelcast} oferece a programas rodando na \emph{JVM Java} implementações distribuídas das coleções da biblioteca padrão (\emph{Collection, Set, List e Map}). \emph{Akka} permite a utilização de memória transacional por \emph{software} (\emph{software transactional memory} ou \emph{STM} \cite{stm}), uma abordagem que emprega o conceito de transação discutido 
 neste trabalho em operações de leitura e escrita na memória principal do computador.
 
 \chapter{A infraestrutura}
 \label{chap:implementacao}
-Na seção \ref{sec:infinispan} há uma breve descrição do \emph{Infinispan}, seguida pela apresentação de sua arquitetura em \ref{sec:arquitetura_infinispan} e por um detalhamento de sua implementação (\ref{sec:implementacao_infinispan}). 
+Na seção \ref{sec:infinispan} apresenta o \emph{Infinispan}, detalhando os pontos importantes de sua arquitetura e parte central de sua implementação. 
 
-A seção \ref{sec:mt_infinispan} descreve como as minitransações se
-encaixam na estrutura de transações do \emph{Infinispan} e as alterações que
-foram necessárias nessa estrutura para disponibilizar as minitransações.
+A seção \ref{sec:mt_infinispan} descreve como as minitransações se encaixam na estrutura de transações do \emph{Infinispan} e as alterações que foram necessárias nessa estrutura para disponibilizar as minitransações.
 
-Por último, ilustramos na seção \ref{sec:utilizacao} como as minitransações
-podem ser utilizadas no \emph{Infinispan}.
+Por último, ilustramos na seção \ref{sec:utilizacao} como as minitransações podem ser utilizadas no \emph{Infinispan}.
 
 \section{Infinispan}
 \label{sec:infinispan}
-O \emph{Infinispan} foi escolhido como base para o desenvolvimento de nossa
-infraestrutura por ser uma plataforma e repositório de dados distribuído. Além
-disso, ele é um sistema de código aberto, escrito em \emph{Java} \cite{java},
-projetado para expor uma estrutura de dados altamente concorrente e para obter o
-melhor desempenho das modernas arquiteturas de múltiplos processadores e
-múltiplos núcleos, ao mesmo tempo em que oferece funcionalidades de \emph{cache}
-distribuído.
+O \emph{Infinispan} foi escolhido como base para o desenvolvimento de nossa infraestrutura por ser uma plataforma e repositório de dados distribuído. Além disso, ele é um sistema de código aberto, escrito em \emph{Java} \cite{java}, projetado para expor uma estrutura de dados altamente concorrente e para obter o melhor desempenho das modernas arquiteturas de múltiplos processadores e múltiplos núcleos, ao mesmo tempo em que oferece funcionalidades de \emph{cache} distribuído.
+
+Na seção \ref{sec:arquitetura_infinispan} descrevemos a arquitetura do \emph{Infinispan}, e os principais conceitos sobre os quais essa arquitetura se baseia. A seção \ref{sec:implementacao_infinispan} detalha o núcleo de código que habilita os pontos centrais dessa arquitetura.
 
 \subsection{Arquitetura}
 \label{sec:arquitetura_infinispan}
-As máquinas rodando \emph{Infinispan} podem formar um ou mais agrupamentos (\emph{cluster}),
-caso sejam configuradas de tal forma. Esses agrupamentos permitem que os dados sejam espalhados 
-por diferentes máquinas, permitindo assim uma melhor distribuição de carga entre as máquinas e
-aumento na disponibilidade dos dados.
+As máquinas rodando \emph{Infinispan} podem formar um ou mais agrupamentos (\emph{cluster}), caso sejam configuradas de tal forma. Esses agrupamentos permitem que os dados sejam espalhados por diferentes máquinas, permitindo assim uma melhor distribuição de carga entre as máquinas e aumento na disponibilidade dos dados.
 
-O componente principal do \emph{Infinispan} é a interface \emph{org.infinispan.Cache}, uma extensão 
-da interface \emph{java.util.Map} da biblioteca padrão de coleções do \emph{Java}. 
-O acesso aos dados segue então a mesma abordagem, armazenando entradas, em que um valor é associado a uma 
-chave arbitrária definida pela aplicação. \emph{Cache} permite abstrair os diversos 
-modos de execução em que o \emph{Infinispan} pode rodar, oferecendo uma interface 
-simples e de ampla utilização para acessar os dados.
+O componente principal do \emph{Infinispan} é a interface \emph{org.infinispan.Cache}, uma extensão da interface \emph{java.util.Map} da biblioteca padrão de coleções do \emph{Java}. O acesso aos dados segue então a mesma abordagem, armazenando entradas, em que um valor é associado a uma chave arbitrária definida pela aplicação. \emph{Cache} permite abstrair os diversos modos de execução em que o \emph{Infinispan} pode rodar, oferecendo uma interface simples e de ampla utilização para acessar os dados.
 
 Os quatro modos de execução oferecidos pelo \emph{Infinispan} são:
 
@@ -723,19 +542,9 @@ Os quatro modos de execução oferecidos pelo \emph{Infinispan} são:
 	\item[Distribuído] Cada entrada é replicada para um subconjunto das máquinas do agrupamento.
 \end{description}
 
-No modo \textbf{Local} todas as entradas ficam armazenadas na mesma máquina em que o cache está configurado, não permitindo 
-que aplicações compartilhem os dados. O modo \textbf{Replicado} garante alta disponibilidade dos dados, uma vez que cada 
-entrada está copiada em todas as máquinas do agrupamento. Assim, um dado só ficará indisponível no caso em que todas as 
-máquinas do agrupamento em que ele esteja armazenado fiquem indisponíveis. No modo \textbf{Distribuído} o \emph{Infinispan} 
-armazena uma determinada entrada em um subconjunto do agrupamento. Dessa forma, se esse subconjunto de máquinas ficar indisponível, 
-essa determinada entrada ficará indisponível também. 
+No modo \textbf{Local} todas as entradas ficam armazenadas na mesma máquina em que o cache está configurado, não permitindo que aplicações compartilhem os dados. O modo \textbf{Replicado} garante alta disponibilidade dos dados, uma vez que cada entrada está copiada em todas as máquinas do agrupamento. Assim, um dado só ficará indisponível no caso em que todas as máquinas do agrupamento em que ele esteja armazenado fiquem indisponíveis. No modo \textbf{Distribuído} o \emph{Infinispan} armazena uma determinada entrada em um subconjunto do agrupamento. Dessa forma, se esse subconjunto de máquinas ficar indisponível, essa determinada entrada ficará indisponível também. 
 
-O modo \textbf{Distribuído} permite um certo grau de disponibilidade ao mesmo tempo em que oferece um espaço de armazenamento
-expandido compartilhado entre o agrupamento. Esse grau de disponibilidade é controlado pelo tamanho do subconjunto em que uma
-entrada estará replicada, podendo variar de 1 (não havendo nenhuma replicação, cada entrada é armazenada em somente uma máquina) até
-o total de máquinas no agrupamento (o que fará esse modo idêntico ao \textbf{Replicado}). O grau de expansão do espaço de armazenamento
-é inversamente proporcional à disponibilidade, ou seja, quanto maior a disponibilidade, menor a expansão, pois menos espaço ficará
-disponível devido ao maior número de cópias de uma entrada.
+O modo \textbf{Distribuído} permite um certo grau de disponibilidade ao mesmo tempo em que oferece um espaço de armazenamento expandido compartilhado entre o agrupamento. Esse grau de disponibilidade é controlado pelo tamanho do subconjunto em que uma entrada será replicada, podendo variar de 1 (não havendo nenhuma replicação, cada entrada é armazenada em somente uma máquina) até o total de máquinas no agrupamento (o que fará esse modo idêntico ao \textbf{Replicado}). O grau de expansão do espaço de armazenamento é inversamente proporcional à disponibilidade, ou seja, quanto maior a disponibilidade, menor a expansão, pois menos espaço ficará disponível devido ao maior número de cópias de uma entrada.
 
 O \emph{Infinispan} oferece também duas modalidades de acesso:
 
@@ -744,8 +553,7 @@ O \emph{Infinispan} oferece também duas modalidades de acesso:
 	\item[Cliente-Servidor] 
 \end{description}
 
-Na modalidade de acesso \textbf{embarcado}, o espaço de armazenamento do \emph{Infinispan} compartilha a mesma máquina virtual \emph{Java}
-(e portanto, a mesma memória) que a aplicação. No modo \textbf{cliente-servidor}, uma máquina virtual fica dedicada ao espaço de armazenamento do \emph{Infinispan}, e a aplicação pode acessar esse espaço por meio de alguns protocolos disponíveis: HTTP, Memcached ou HotRod \cite{infinispan}.
+Na modalidade de acesso \textbf{embarcado}, o espaço de armazenamento do \emph{Infinispan} compartilha a mesma máquina virtual \emph{Java} (e portanto, a mesma memória) que a aplicação. No modo \textbf{cliente-servidor}, uma máquina virtual fica dedicada ao espaço de armazenamento do \emph{Infinispan}, e a aplicação pode acessar esse espaço por meio de alguns protocolos disponíveis: HTTP, Memcached ou HotRod \cite{infinispan}.
 
 As máquinas que compõem o agrupamento (os nós) formam uma rede \textbf{P2P} (\emph{Peer-to-Peer} ou ponto-a-ponto \cite{p2p}). Em uma rede P2P, cada participante (cada nó rodando o \emph{Infinispan}) compartilha uma parcela de seus próprios recursos (processador, memória, 
 etc...) para oferecer um serviço em conjunto com todos os outros participantes (nesse caso, oferecer uma abstração de cache distribuído).
@@ -753,11 +561,26 @@ O ponto central dessa rede P2P é que não há distinção entre os nós. Cada n
 
 O que permite essa transparência no acesso e independência de localização é uma abstração conhecida como \textbf{DHT} (\emph{distributed hash table}, ou tabela de espalhamento(?) distribuída \cite{dht}). Em uma DHT, existe um conjunto finito de localizadores, e a cada nó que compõe a rede é atribuída a tutela sobre um determinado subconjunto desses localizadores. A DHT permite então encontrar ou armazenar um par de chave e valor por meio do mapeamento da chave para um determinado localizador, que por sua vez está sob a tutela de um nó da rede.
 
-A associação entre localizadores e um nó é feito por uma função de espalhamento consistente (\emph{consistent hashing} \cite{consistent-hashing}), que é um tipo especial de função de espalhamento (\emph{hash function} \cite{taocp_3}). Como toda função de espalhamento, ela mapeia um conjunto de valores para um índice em um espaço de endereçamento de uma forma que a cada índice desse espaço sejam mapeados subconjuntos com aproximadamente o mesmo tamanho. A propriedade essencial do função de espalhamento consistente é que, ao contrário dos outros tipos, um pequena alteração no espaço de endereçamento não causa um remapeamento total dos valores.
+A associação entre localizadores e um nó é feito por uma função de espalhamento consistente (\emph{consistent hashing} \cite{consistent_hashing}), que é um tipo especial de função de espalhamento (\emph{hash function} \cite{taocp_3}). Como toda função de espalhamento, ela mapeia um conjunto de valores para um índice em um espaço de endereçamento (um localizador) de uma forma que a cada localizador desse espaço sejam mapeados subconjuntos com aproximadamente o mesmo tamanho. A propriedade essencial da função de espalhamento consistente que a torna de grande utilidade em um ambiente distribuído é que, ao contrário dos outros tipos de funções de espalhamento, um pequena alteração no espaço de endereçamento resulta em um número pequeno e limitado de remapeamento, mantendo a maioria dos valores mapeados para os mesmos localizadores.
 
 \subsection{Implementação do Infinispan}
 \label{sec:implementacao_infinispan}
-xxx
+Infinispan é implementado integralmente na plataforma java, versão padrão (\emph{SE} ou \emph{Standard Edition}). Dessa forma é possível executar o Infinispan em qualquer sistema operacional e plataforma de máquina que ofereça suporte à essa versão do java. Seu código é aberto e público, o que permitiu sua utilização como base para o desenvolvimento de nossa infraestrutura.
+
+A natureza distribuída do Infinispan exige que os nós se comuniquem por meio da rede, e o Infinispan utiliza o JGroups \cite{jgroups} para isso. JGroups oferece uma camada de abstração sobre a rede permitindo um mecanismo de troca de mensagens confiável entre um ou mais nós de uma só vez, que o Infinispan utiliza para a formação dos agrupamentos e comunicação entre os nós.
+
+A interface Cache é uma extensão da interface \emph{java.util.concurrent.ConcurrentMap}, que por sua vez extende \emph{java.util.Map}. \emph{Map} permite armazenar e recuperar entradas compostas por uma chave e um valor, além de possuir alguns outros comandos úteis, como para verificar se uma determinada chave foi armazenada, ou consultar o número de entradas armazenadas. A interface \emph{ConcurrentMap} introduz alguns comandos úteis para a utilização de um mapa em um ambiente de código concorrente, como um comando para armazenar uma entrada somente se a chave associada não tiver sido mapeada (\emph{putIfAbsent}) ou para trocar o valor de uma entrada baseado em um valor já existente (\emph{replace}). A interface Cache acrescenta as funcionalidades para a representação de um cache distribuído e outras funcionalidades específicas para a manutenção e utilização dos agrupamentos formados no Infinispan.
+
+A implementação de Cache, \emph{CacheImpl}, converte as chamadas das funções da interface em comandos representando as ações a serem executadas, contendo referências e informações necessárias para essa execução. Esses comandos são executados por diferentes tipos de processadores de comandos, cada um responsável por diferentes aspectos que um comando apresenta (como distribuição na rede ou persitência de dados em disco). Os processadores são dispostos em uma sequência configurada, e a execução do comando é composta então pela atuação de cada um desses processadores, um após o outro, seguindo a sequência estabelecida. Esse esquema de execução é baseado em alguns padrões (\emph{design patterns}) bem estabelecidos e de ampla utilização, como \emph{Command}, \emph{Visitor}, \emph{Chain of Responsibility} e \emph{Interceptor} (\cite{design_patterns}, \cite{posa}).
+
+Por exemplo, a operação \emph{Cache.get(Object k)}, que permite recuperar a entrada associada à chave \emph{k}, é transformada no comando \emph{GetKeyValueCommand}. De acordo com a configuração e detalhes específicos de cada cache, a sequência de processadores pode ser ligeiramente diferente, mas os tipos mais representativos de processadores são:
+
+\begin{description} 
+	\item[BaseDistributionInterceptor] - Provê funcionalidades básicas para que o cache opere de forma distribuída. Processadores mais específicos como \textbf{TxDistributionInterceptor} e \textbf{NonTxDistributionInterceptor} estendem a classe base e são usados de acordo com a configuração para obter melhor desempenho.
+	\item[AbstractLockingInterceptor] - Gerencia a aquisição e liberação de travas em chaves ou grupos de chaves. Conforme a configuração, são utilizadas classes mais especializadas como \textbf{OptimisticLockingInterceptor} ou \textbf{PessimisticLockingInterceptor}.
+	\item[TxInterceptor] - Responsável por tratar de aspectos transacionais, como registrar o cache como um participante em uma transação distribuída.
+	\item[CallInterceptor] - Sempre posicionado como o último processador na sequência, é responsável por invocar a operação específica de cada comando.
+\end{description}
 
 \section{Minitransações no Infinispan}
 \label{sec:mt_infinispan}
