@@ -31,6 +31,8 @@
 \renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{#1}}{}}
 \renewcommand{\sectionmark}[1]{\markright{\MakeUppercase{#1}}{}}
 \renewcommand{\headrulewidth}{0pt}
+\renewcommand*{\lstlistingname}{Listagem}
+%\renewcommand*{\lstlistoflistingname}{Lista de Listagens}
 \graphicspath{{imagens/}}             
 \frenchspacing                          
 \urlstyle{same}                         
@@ -188,7 +190,7 @@ the applications.
 \listoffigures
 % \listoftables
 \listofalgorithms
-
+\lstlistoflistings
 \mainmatter
 
 % cabeçalho para as páginas de todos os capítulos
@@ -218,7 +220,7 @@ Essa infraestrutura oferece uma abstração de estado compartilhado entre as má
 
 \section{Organização do texto}
 \label{sec:organizacao_do_texto}
-O capítulo \ref{chap:conceitos} apresenta uma motivação para o uso de transações, sua utilização em um ambiente distribuído e a necessidade de um protocolo de efetivação nesse contexto, detalhando o \emph{2PC} e o conceito original de minitransação. O capítulo \ref{chap:implementacao} descreve como o \emph{Infinispan} foi modificado para permitir a execução de minitransações. O capítulo \ref{chap:conclusao} apresenta os resultados obtidos e as conclusoes sobre o uso de minitransações para a implementação de transações distribuídas.
+O capítulo \ref{chap:conceitos} apresenta uma motivação para o uso de transações, sua utilização em um ambiente distribuído e a necessidade de um protocolo de efetivação nesse contexto, detalhando o \emph{2PC} e o conceito original de minitransação. O capítulo \ref{chap:implementacao} descreve como o Infinispan foi modificado para permitir a execução de minitransações. O capítulo \ref{chap:conclusao} apresenta os resultados obtidos e as conclusoes sobre o uso de minitransações para a implementação de transações distribuídas.
 
 \chapter{Conceitos}
 \label{chap:conceitos}
@@ -516,25 +518,23 @@ neste trabalho em operações de leitura e escrita na memória principal do comp
 
 \chapter{A infraestrutura}
 \label{chap:implementacao}
-Na seção \ref{sec:infinispan} apresenta o \emph{Infinispan}, detalhando os pontos importantes de sua arquitetura e parte central de sua implementação. 
+Na seção \ref{sec:infinispan} apresenta o Infinispan, detalhando os pontos importantes de sua arquitetura e parte central de sua implementação. 
 
-A seção \ref{sec:mt_infinispan} descreve como as minitransações se encaixam na estrutura de transações do \emph{Infinispan} e as alterações que foram necessárias nessa estrutura para disponibilizar as minitransações.
-
-Por último, ilustramos na seção \ref{sec:utilizacao} como as minitransações podem ser utilizadas no \emph{Infinispan}.
+A seção \ref{sec:mt_infinispan} descreve como as minitransações se encaixam na estrutura de transações do Infinispan e as alterações que foram necessárias nessa estrutura para disponibilizar as minitransações.
 
 \section{Infinispan}
 \label{sec:infinispan}
-O \emph{Infinispan} foi escolhido como base para o desenvolvimento de nossa infraestrutura por ser uma plataforma e repositório de dados distribuído. Além disso, ele é um sistema de código aberto, escrito em \emph{Java} \cite{java}, projetado para expor uma estrutura de dados altamente concorrente e para obter o melhor desempenho das modernas arquiteturas de múltiplos processadores e múltiplos núcleos, ao mesmo tempo em que oferece funcionalidades de \emph{cache} distribuído.
+O Infinispan foi escolhido como base para o desenvolvimento de nossa infraestrutura por ser uma plataforma e repositório de dados distribuído. Além disso, ele é um sistema de código aberto, escrito em \emph{Java} \cite{java}, projetado para expor uma estrutura de dados altamente concorrente e para obter o melhor desempenho das modernas arquiteturas de múltiplos processadores e múltiplos núcleos, ao mesmo tempo em que oferece funcionalidades de \emph{cache} distribuído.
 
-Na seção \ref{sec:arquitetura_infinispan} descrevemos a arquitetura do \emph{Infinispan}, e os principais conceitos sobre os quais essa arquitetura se baseia. A seção \ref{sec:implementacao_infinispan} detalha o núcleo de código que habilita os pontos centrais dessa arquitetura.
+Na seção \ref{sec:arquitetura_infinispan} descrevemos a arquitetura do Infinispan, e os principais conceitos sobre os quais essa arquitetura se baseia. A seção \ref{sec:implementacao_infinispan} detalha o núcleo de código que habilita os pontos centrais dessa arquitetura.
 
 \subsection{Arquitetura}
 \label{sec:arquitetura_infinispan}
-As máquinas rodando \emph{Infinispan} podem formar um ou mais agrupamentos (\emph{cluster}), caso sejam configuradas de tal forma. Esses agrupamentos permitem que os dados sejam espalhados por diferentes máquinas, permitindo assim uma melhor distribuição de carga entre as máquinas e aumento na disponibilidade dos dados.
+As máquinas rodando Infinispan podem formar um ou mais agrupamentos (\emph{cluster}), caso sejam configuradas de tal forma. Esses agrupamentos permitem que os dados sejam espalhados por diferentes máquinas, permitindo assim uma melhor distribuição de carga entre as máquinas e aumento na disponibilidade dos dados.
 
-O componente principal do \emph{Infinispan} é a interface \emph{org.infinispan.Cache}, uma extensão da interface \emph{java.util.Map} da biblioteca padrão de coleções do \emph{Java}. O acesso aos dados segue então a mesma abordagem, armazenando entradas, em que um valor é associado a uma chave arbitrária definida pela aplicação. \emph{Cache} permite abstrair os diversos modos de execução em que o \emph{Infinispan} pode rodar, oferecendo uma interface simples e de ampla utilização para acessar os dados.
+O componente principal do Infinispan é a interface \emph{org.infinispan.Cache}, uma extensão da interface \emph{java.util.Map} da biblioteca padrão de coleções do \emph{Java}. O acesso aos dados segue então a mesma abordagem, armazenando entradas, em que um valor é associado a uma chave arbitrária definida pela aplicação. \emph{Cache} permite abstrair os diversos modos de execução em que o Infinispan pode rodar, oferecendo uma interface simples e de ampla utilização para acessar os dados.
 
-Os quatro modos de execução oferecidos pelo \emph{Infinispan} são:
+Os quatro modos de execução oferecidos pelo Infinispan são:
 
 \begin{description}
 	\item[Local] Todas as entradas são armazenadas na máquina local, mesmo que um agrupamento tenha sido formado.
@@ -542,24 +542,24 @@ Os quatro modos de execução oferecidos pelo \emph{Infinispan} são:
 	\item[Distribuído] Cada entrada é replicada para um subconjunto das máquinas do agrupamento.
 \end{description}
 
-No modo \textbf{Local} todas as entradas ficam armazenadas na mesma máquina em que o cache está configurado, não permitindo que aplicações compartilhem os dados. O modo \textbf{Replicado} garante alta disponibilidade dos dados, uma vez que cada entrada está copiada em todas as máquinas do agrupamento. Assim, um dado só ficará indisponível no caso em que todas as máquinas do agrupamento em que ele esteja armazenado fiquem indisponíveis. No modo \textbf{Distribuído} o \emph{Infinispan} armazena uma determinada entrada em um subconjunto do agrupamento. Dessa forma, se esse subconjunto de máquinas ficar indisponível, essa determinada entrada ficará indisponível também. 
+No modo \textbf{Local} todas as entradas ficam armazenadas na mesma máquina em que o cache está configurado, não permitindo que aplicações compartilhem os dados. O modo \textbf{Replicado} garante alta disponibilidade dos dados, uma vez que cada entrada está copiada em todas as máquinas do agrupamento. Assim, um dado só ficará indisponível no caso em que todas as máquinas do agrupamento em que ele esteja armazenado fiquem indisponíveis. No modo \textbf{Distribuído} o Infinispan armazena uma determinada entrada em um subconjunto do agrupamento. Dessa forma, se esse subconjunto de máquinas ficar indisponível, essa determinada entrada ficará indisponível também. 
 
 O modo \textbf{Distribuído} permite um certo grau de disponibilidade ao mesmo tempo em que oferece um espaço de armazenamento expandido compartilhado entre o agrupamento. Esse grau de disponibilidade é controlado pelo tamanho do subconjunto em que uma entrada será replicada, podendo variar de 1 (não havendo nenhuma replicação, cada entrada é armazenada em somente uma máquina) até o total de máquinas no agrupamento (o que fará esse modo idêntico ao \textbf{Replicado}). O grau de expansão do espaço de armazenamento é inversamente proporcional à disponibilidade, ou seja, quanto maior a disponibilidade, menor a expansão, pois menos espaço ficará disponível devido ao maior número de cópias de uma entrada.
 
-O \emph{Infinispan} oferece também duas modalidades de acesso:
+O Infinispan oferece também duas modalidades de acesso:
 
 \begin{description}
 	\item[Embarcado]
 	\item[Cliente-Servidor] 
 \end{description}
 
-Na modalidade de acesso \textbf{embarcado}, o espaço de armazenamento do \emph{Infinispan} compartilha a mesma máquina virtual \emph{Java} (e portanto, a mesma memória) que a aplicação. No modo \textbf{cliente-servidor}, uma máquina virtual fica dedicada ao espaço de armazenamento do \emph{Infinispan}, e a aplicação pode acessar esse espaço por meio de alguns protocolos disponíveis: HTTP, Memcached ou HotRod \cite{infinispan}.
+Na modalidade de acesso \textbf{embarcado}, o espaço de armazenamento do Infinispan compartilha a mesma máquina virtual \emph{Java} (e portanto, a mesma memória) que a aplicação. No modo \textbf{cliente-servidor}, uma máquina virtual fica dedicada ao espaço de armazenamento do Infinispan, e a aplicação pode acessar esse espaço por meio de alguns protocolos disponíveis: HTTP, Memcached ou HotRod \cite{infinispan}.
 
-As máquinas que compõem o agrupamento (os nós) formam uma rede \textbf{P2P} (\emph{Peer-to-Peer} ou ponto-a-ponto \cite{p2p}). Em uma rede P2P, cada participante (cada nó rodando o \emph{Infinispan}) compartilha uma parcela de seus próprios recursos (processador, memória, 
+As máquinas que compõem o agrupamento (os nós) formam uma rede \textbf{P2P} (\emph{Peer-to-Peer} ou ponto-a-ponto \cite{p2p}). Em uma rede P2P, cada participante (cada nó rodando o Infinispan) compartilha uma parcela de seus próprios recursos (processador, memória, 
 etc...) para oferecer um serviço em conjunto com todos os outros participantes (nesse caso, oferecer uma abstração de cache distribuído).
 O ponto central dessa rede P2P é que não há distinção entre os nós. Cada nó pode atuar tanto como um provedor quanto como um solicitante de recursos. Qualquer nó pode receber uma solicitação para armazenar ou recuperar um dado associado a qualquer chave, e essa solicitação será atendida de forma transparente por meio da cooperação entre os nós que compõem a rede.
 
-O que permite essa transparência no acesso e independência de localização é uma abstração conhecida como \textbf{DHT} (\emph{distributed hash table}, ou tabela de espalhamento(?) distribuída \cite{dht}). Em uma DHT, existe um conjunto finito de localizadores, e a cada nó que compõe a rede é atribuída a tutela sobre um determinado subconjunto desses localizadores. A DHT permite então encontrar ou armazenar um par de chave e valor por meio do mapeamento da chave para um determinado localizador, que por sua vez está sob a tutela de um nó da rede.
+O que permite essa transparência no acesso e independência de localização é uma abstração conhecida como \textbf{DHT} (\emph{distributed hash table}, ou tabela de espalhamento distribuída \cite{dht}). Em uma DHT, existe um conjunto finito de localizadores, e a cada nó que compõe a rede é atribuída a tutela sobre um determinado subconjunto desses localizadores. A DHT permite então encontrar ou armazenar um par de chave e valor por meio do mapeamento da chave para um determinado localizador, que por sua vez está sob a tutela de um nó da rede.
 
 A associação entre localizadores e um nó é feito por uma função de espalhamento consistente (\emph{consistent hashing} \cite{consistent_hashing}), que é um tipo especial de função de espalhamento (\emph{hash function} \cite{taocp_3}). Como toda função de espalhamento, ela mapeia um conjunto de valores para um índice em um espaço de endereçamento (um localizador) de uma forma que a cada localizador desse espaço sejam mapeados subconjuntos com aproximadamente o mesmo tamanho. A propriedade essencial da função de espalhamento consistente que a torna de grande utilidade em um ambiente distribuído é que, ao contrário dos outros tipos de funções de espalhamento, um pequena alteração no espaço de endereçamento resulta em um número pequeno e limitado de remapeamento, mantendo a maioria dos valores mapeados para os mesmos localizadores.
 
@@ -571,29 +571,231 @@ A natureza distribuída do Infinispan exige que os nós se comuniquem por meio d
 
 A interface Cache é uma extensão da interface \emph{java.util.concurrent.ConcurrentMap}, que por sua vez extende \emph{java.util.Map}. \emph{Map} permite armazenar e recuperar entradas compostas por uma chave e um valor, além de possuir alguns outros comandos úteis, como para verificar se uma determinada chave foi armazenada, ou consultar o número de entradas armazenadas. A interface \emph{ConcurrentMap} introduz alguns comandos úteis para a utilização de um mapa em um ambiente de código concorrente, como um comando para armazenar uma entrada somente se a chave associada não tiver sido mapeada (\emph{putIfAbsent}) ou para trocar o valor de uma entrada baseado em um valor já existente (\emph{replace}). A interface Cache acrescenta as funcionalidades para a representação de um cache distribuído e outras funcionalidades específicas para a manutenção e utilização dos agrupamentos formados no Infinispan.
 
-A implementação de Cache, \emph{CacheImpl}, converte as chamadas das funções da interface em comandos representando as ações a serem executadas, contendo referências e informações necessárias para essa execução. Esses comandos são executados por diferentes tipos de processadores de comandos, cada um responsável por diferentes aspectos que um comando apresenta (como distribuição na rede ou persitência de dados em disco). Os processadores são dispostos em uma sequência configurada, e a execução do comando é composta então pela atuação de cada um desses processadores, um após o outro, seguindo a sequência estabelecida. Esse esquema de execução é baseado em alguns padrões (\emph{design patterns}) bem estabelecidos e de ampla utilização, como \emph{Command}, \emph{Visitor}, \emph{Chain of Responsibility} e \emph{Interceptor} (\cite{design_patterns}, \cite{posa}).
+Infinispan começou a ser desenvolvido em paralelo à especificação da JSR-107 \cite{jsr107}, uma padronização ao acesso de mecanismos de cache em java. Essa especificação define uma interface \emph{javax.cache.Cache} que é muito parecida com a interface Cache do infinispan, mas que não disponibiliza acesso a todos os recursos presentes no infinispan. Assim, para poder adequar e permitir que o infinispan possa ser usado por aplicações acessando caches por meio da JSR-107, foi criado o AdvancedCache, uma interface que estende Cache e permite acessar detalhes específicos do infinispan como adicionar e remover interceptadores, gerenciadores de travas e etc. A interface Cache é compatível com a interface de mesmo nome da JSR-107, enquanto que AdvancedCache acrescenta o que é específico do infinispan.
+
+\emph{CacheImpl} é a classe que implementa AdvancedCache (e portanto, Cache). Ela converte as chamadas das funções da interface em comandos representando as ações a serem executadas, contendo referências e informações necessárias para essa execução. Esses comandos são executados por diferentes tipos de processadores de comandos, cada um responsável por diferentes aspectos que um comando apresenta (como distribuição na rede ou persistência de dados em disco). Os processadores são dispostos em uma sequência configurada, e a execução do comando é composta então pela atuação de cada um desses processadores, um após o outro, seguindo a sequência estabelecida. Esse esquema de execução é baseado em alguns padrões (\emph{design patterns}) bem estabelecidos e de ampla utilização, como \emph{Command}, \emph{Visitor}, \emph{Chain of Responsibility} e \emph{Interceptor} (\cite{design_patterns}, \cite{posa}).
 
 Por exemplo, a operação \emph{Cache.get(Object k)}, que permite recuperar a entrada associada à chave \emph{k}, é transformada no comando \emph{GetKeyValueCommand}. De acordo com a configuração e detalhes específicos de cada cache, a sequência de processadores pode ser ligeiramente diferente, mas os tipos mais representativos de processadores são:
 
 \begin{description} 
-	\item[BaseDistributionInterceptor] - Provê funcionalidades básicas para que o cache opere de forma distribuída. Processadores mais específicos como \textbf{TxDistributionInterceptor} e \textbf{NonTxDistributionInterceptor} estendem a classe base e são usados de acordo com a configuração para obter melhor desempenho.
-	\item[AbstractLockingInterceptor] - Gerencia a aquisição e liberação de travas em chaves ou grupos de chaves. Conforme a configuração, são utilizadas classes mais especializadas como \textbf{OptimisticLockingInterceptor} ou \textbf{PessimisticLockingInterceptor}.
+	\item[DistributionInterceptor] - Provê funcionalidades básicas para que o cache opere de forma distribuída. Processadores mais específicos como \textbf{TxDistributionInterceptor} e \textbf{NonTxDistributionInterceptor} estendem a classe base e são usados de acordo com a configuração para obter melhor desempenho.
+	\item[LockingInterceptor] - Gerencia a aquisição e liberação de travas em chaves ou grupos de chaves. Conforme a configuração, são utilizadas classes mais especializadas como \textbf{OptimisticLockingInterceptor} ou \textbf{PessimisticLockingInterceptor}.
 	\item[TxInterceptor] - Responsável por tratar de aspectos transacionais, como registrar o cache como um participante em uma transação distribuída.
 	\item[CallInterceptor] - Sempre posicionado como o último processador na sequência, é responsável por invocar a operação específica de cada comando.
 \end{description}
 
+Um componente muito importante na execução de um comando é InvocationContext, a interface principal da hierarquia ilustrada na figura \ref{fig:invocation_context}, e a escolha de uma ou outra implementação é determinada em tempo de execução de acordo com a configuração. InvocationContext contém informações como o endereço de origem da execução e as chaves sobre as quais a execução obteve travas. AbstractInvocationContext provê a base necessária para a implementação dos contextos, implementando os métodos definidos em InvocationContext de maneira direta. NonTxInvocationContext é utilizado quando o cache não está configurado para utilizar transações, e SingleKeyNonTxInvocationContext é uma otimização para quando a operação envolve somente uma chave. TxInvocationContext permite acessar a transação associada à execução pode ser de dois tipos: LocalTxInvocationContext ou RemoteTxInvocationContext. A implementação Local é utilizada para operações transacionais que foram iniciadas no mesmo nó que estiver executando a operação, e Remote é utilizada quando a operação tiver sido iniciada em um outro nó. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{invocation_context} 
+  \caption{Hierarquia de InvocationContext}
+  \label{fig:invocation_context} 
+\end{figure}
+
 \section{Minitransações no Infinispan}
 \label{sec:mt_infinispan}
-ssss
+O subsistema de transações do Infinispan permite agrupar operações em unidades lógicas de execução, oferecendo uma opção transacional para quem utiliza o cache. A seção \ref{sec:tx_infinispan} detalha o subsistema que gerencia e executa transações dentro do Infinispan. A seção seguinte, \ref{sec:suporte_mt_infinispan}, apresenta as modificações necessárias nesse subsistema para que o Infinispan permita a execução de minitransações.
 
-\section{Utilização}
-\label{sec:utilizacao}
-dddd
+\subsection{O subsistema de transações do Infinispan}
+\label{sec:tx_infinispan}
+O Infinispan pode ser configurado para agrupar ou não as operações em transações. Quando configurado para não agrupar, cada operação efetuada no cache é considerada isolada, sem relação com as outras operações. Nessa configuração, cada operação pertence a uma transação distinta, que é iniciada antes da operação ser executada e finalizada após o término da execução da operação.
+
+Quando configurado para agrupar as operações, o Infinispan permite que o usuário defina as operações que formam uma transação, explicitamente iniciando e finalizando uma transação de modo a englobar as operações que precisam ser executadas como uma única operação lógica.
+
+A abstração central do subsistema de transações é CacheTransaction, uma \emph{interface Java} \cite{java} que define os detalhes de uma transação no Infinispan. CacheTransaction é o topo de uma complexa estrutura projetada para atender a diferentes demandas transacionais e permitir a integração com \emph{JTA} (\emph{Java Transaction API} \cite{jta}) e \emph{X/Open XA} (\emph{Extended Architecture} \cite{xa}). Um resumo dessa estrutura é apresentado na figura \ref{fig:subsistema_transacoes}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{subsistema_transacoes} 
+  \caption{Resumo do subsistema de transações}
+  \label{fig:subsistema_transacoes} 
+\end{figure}
+
+LocalTransaction é utilizada na execução de transações iniciadas localmente e RemoteTransaction representa uma transação em execução em um nó A que foi iniciada em um outro nó B do agrupamento e que altera informações sob a responsabilidade de A. A classe LocalTransaction referencia uma Transaction do JTA. SyncLocalTransaction é utilizada por SynchronizationAdapter, que implementa a interface Synchronization definida pela JTA. LocalXATransaction é utilizada pelo TransactionXAAdapter, que implementa XAResource para integração com gerenciadores compatíveis com XOpen/XA. Tanto SynchronizationAdapter quando TransactionXAAdapter mapeiam chamadas do JTA e XOpen/XA, respectivamente, para operações de TransactionCoordinator, que centraliza a lógica para o controle de estado e execução das transações. O relacionamento entre essas classes pode ser visto na figura \ref{fig:transaction_coordinator}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{transaction_coordinator} 
+  \caption{TransactionCoordinator e seus adaptadores}
+  \label{fig:transaction_coordinator} 
+\end{figure}
+
+GlobalTransaction representa um identificador de transação único em todo o agrupamento, para distinguir uma transação, independente do nó em que foi originada. Ela também é uma representação de alto-nível, sendo especializada por outras classes dependendendo da configuração do Infinispan. A figura \ref{fig:global_transaction} nos mostra de maneira simplificada essas classes. A DldGlobalTransaction implementa algoritmos para detecção de impasses (\emph{deadlocks}) na obtenção de travas para a execução das transações. Xid é uma interface que identifica uma transação no XOpen/XA.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{global_transaction} 
+  \caption{GlobalTransaction}
+  \label{fig:global_transaction} 
+\end{figure}
+
+Os comandos que encapsulam operações diretamente relacionadas a uma transação são PrepareCommand, CommitCommand e RollbackCommand. PrepareCommand registra a transação relacionada na estrutura de dados do Infinispan que controla as transações (TransactionTable). CommitCommand e RollbackCommand marcam nessa mesma tabela que a transação relacionada foi finalizada. Outros compartamentos relacionados à esses comandos são implementados nos interceptadores TxInterceptor e TxDistributionInterceptor. TxInterceptor gerencia os comandos transacionais recebidos de outros nós, e TxDistributionInterceptor distribui comandos dentro da transação (como escrita, leitura, etc) para os nós responsáveis pelas chaves especificadas.
+
+Na Listagem \ref{lst:exemplo_transaction} há um trecho de código que ilustra uma transação que utilizaremos para demonstrar como o Infinispan processa transações. Esse código está incompleto e simplificado por questões de clareza.
+
+\begin{lstlisting}[caption={Transação convencional}, label=lst:exemplo_transaction]
+cache.getAdvancedCache().getTransactionManager().begin();
+cache.put("CHAVE 1", "VALOR 1");
+cache.getAdvancedCache().getTransactionManager().commit();
+\end{lstlisting}
+
+A primeira linha instrui o gerenciador de transações (\emph{Transaction Manager}) do JTA a criar uma nova transação (\emph{javax.transaction.Transaction} \cite{jta}) e associá-la com a \emph{thread} de execução atual (\cite{ipc}). 
+
+A segunda linha instrui o cache a inserir um novo elemento. Internamente, a classe CacheImpl irá criar os dois objetos necessários para a execução da operação. Um deles é PutKeyValueCommand, responsável por armazenar na chave especificada o valor fornecido. O outro objeto é LocalTxInvocationContext, que vai representar uma execução transacional iniciada no mesmo nó que executa o comando. 
+
+Após criar o comando e o contexto de execução, o infinispan inicia o processamento do comando, oferecendo a cada interceptador configurado a oportunidade de aplicar sua lógica específica à execução do comando em questão. Os interceptadores mais relevantes na execução do comando de escrita são TxInterceptor, LockingInterceptor e EntryWrappingInterceptor.
+
+TxInterceptor vai criar uma implementação de CacheTransaction e mapeá-la para a Transaction criada pela TransactionManager (associada à thread de execução). Dessa forma, a transação pode ser propagada para outro nós (uma vez que a Transaction do JTA não é propagada) e permite que vários nós executem operações em uma mesma transação. O tipo mais comum de CacheTransaction utilizado é o SyncLocalTransaction, que irá permitir que o TransactionManager notifique o infinispan que uma transação foi finalizada.
+
+LockingInterceptor é responsável por efetuar a trava das chaves relacionadas ao comando. Existem duas implementações desse interceptador: OptimisticLockingInterceptor e PessimisticLockingInterceptor. Optimistic utiliza uma abordagem otimista no processo de travamento, postergando a obtenção da trava para o momento da efetivação da transação. Pessimistic tenta obter as travas no momento da execução do comando.
+
+EntryWrappingInterceptor é responsável por obter as entradas do cache referentes às chaves especificadas no comando e disponibilizá-las no contexto de execução. Essas entradas são encapsuladas por uma classe, MVCCEntry, que permite o multiversionamento dos valores e garante as propriedades ACID da transação.
+
+Por último, CallInterceptor irá executar o método \emph{perform} de PutKeyValueCommand, que por sua vez irá alterar o valor da entrada armazenada no contexto de execução disponibilizado por EntryWrappingInterceptor.
+
+A terceira linha faz com que TransactionManager inicie o processo de efetivação da transação. O infinispan faz uso do mecanismo de notificação de eventos do JTA para ser avisado que a transação foi finalizada. Quando isso acontece, é criado um novo contexto de execução e um novo comando do tipo PrepareCommand. Esse comando representa a primera fase do 2PC, e é responsável por notificar os nós participantes da transação que a transação foi finalizada. 
+
+Esse comando será processado pela mesma cadeia de interceptadores configurada, e os interceptadores mais relevantes para esse execução são TxInterceptor e TxDistributionInterceptor. TxInterceptor fica responsável por registrar como \textbf{preparada} a transação em questão, e TxDistributionInterceptor é o responsável por replicar o comando para os outros nós envolvidos na transação.
+
+O próximo passo dependerá do resultado da execução de PrepareCommand. Se nenhum erro ocorrer, TransactionManager irá então solicitar a efetivação da transação. Caso contrário, a transação será cancelada. No caso de efetivação é criado um CommitCommand e no caso de cancelamento, um RollbackCommand. Os dois comandos resultam em marcar a transação como finalizada, mas CommitCommand faz com que EntryWrappingInterceptor efetive as alterações efetuadas nas entradas, disponibilizando-as para outras transações.
+
+\subsection{Suporte a minitransações}
+\label{sec:suporte_mt_infinispan}
+
+O objetivo deste trabalho é implementar uma infraestrutura para o desenvolvimento de sistemas distribuídos baseada em minitransações. Para isso, foram necessárias alterações no código do Infinispan para que esse pudesse suportar a execução de minitransações.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{transaction_operations} 
+  \caption{Estrutura de classes das minitransações}
+  \label{fig:transaction_operations} 
+\end{figure}
+
+A primeira alteração foi a criação de uma estrutura para representar uma minitransação, ilustrada na figura \ref{fig:transaction_operations}. Minitransaction é a classe que agrupa as operações que podem ser efetuadas no contexto de uma minitransação. A interface MinitransactionOperation é a base que deve ser implementada por qualquer operação que faça parte de uma minitransação.
+
+A operação mais simples é ReadOperation, que especifica a chave cujo valor associado deve ser retornado. ComparisonOperation vai efetuar uma comparação, designada por ComparisonType, entre um valor especificado pelo usuário e o valor associado à chave no cache. WriteOperation irá armazenar no cache o valor especificado e associá-lo à chave especificada. TransformationOperation é a operação mais flexível, pois permite que o usuário aplique uma função de transformação no valor associado à chave especificada. Essa função de transformação é uma implementação de TransformationCallback.
+
+A listagem \ref{lst:exemplo_minitransaction} contém código utilizando minitransações com funcionalidade equivalente ao código da listagem \ref{lst:exemplo_transaction}, e apresenta os principais elementos presentes ao codificarmos utilizando minitransações.
+
+\begin{lstlisting}[caption={Minitransação}, label=lst:exemplo_minitransaction]
+Minitransaction minitransaction = new Minitransaction();
+minitransaction.addWrite(new WriteOperation("CHAVE 1", "VALOR 1"));
+MinitransactionExecution execution = cache.getAdvancedCache().execute(minitransaction);
+\end{lstlisting}
+
+O método \textbf{execute} de AdvancedCache inicia criando uma transação em TransactionManager. Esse passo é necessário pois a execução de minitransações é baseada no subsistema de transações do infinispan, e esse vai exigir a presença de uma transação no contexto de execução.
+
+Como segundo passo, \textbf{execute} cria uma PrepareMinitransactionCommand, referenciando o objeto Minitransaction recebido como parâmetro. Esse comando percorre então a cadeia de interceptadores, sendo tratado em quase todos eles da mesma maneira que um PrepareCommand, com exceção de TxInterceptor.
+
+O papel de TxInterceptor ao interceptar PrepareMinitransactionCommand é popular a tabela de transações com uma nova CacheTransaction associada à Transaction atual, e associar ao comando a GlobalTransaction que vai permitir que a transação seja identificada dentro do agrupamento, quando o comando for replicado para os outros nós envolvidos.
+
+A lógica de execução da minitransação, descrita na seção \ref{subsec:estrutura-minitransacoes}, é implementada no método \textbf{perform} de PrepareMinitransactionCommand. O nó para o qual a minitransação foi submetida - aquele em que o método \textbf{execute} foi executado - será chamado aqui de coordenador, e os demais nós envolvidos - aqueles responsáveis por chaves envolvidas na minitransação - são chamados de participantes. Devido ao caráter não-centralizado do infinispan, qualquer minitransação pode ser submetida a qualquer nó do agrupamento, inclusive um nó que não seja responsável por nenhuma chave envolvida na minitransação. Uma chave está envolvida na minitransação se ela for referenciada por qualquer operação dessa minitransação.
+
+O objeto Minitransaction que originou a execução é repassado para todos os nós envolvidos, mas cada nó executa somente as operações relacionadas às chaves sob sua responsabilidade. A replicação de dados que não serão usados não acarreta grandes problemas de performance, mas é um ajuste que pode ser feito facilmente no futuro.
+
+A arquitetura do infinispan permite que tanto o código do coordenador quanto dos participantes seja centralizado no método \textbf{perform} do comando. Quando esse comando é executado como resultado da submissão da minitransação para o coordenador, o fluxo é simplesmente um encadeamento de chamadas de métodos dentro da mesma JVM, que culminam na execução de \textbf{perform} e na obtenção do resultado dessa execução, um MinitransactionExecution. Quando replicado para os participantes, esse comando é transmitido pela rede, reconstruído em cada participante e inserido no fluxo de execução de comandos, como uma chamada de método comum. O objeto retornado pelo método como resultado de sua execução percorre o caminho inverso, sendo enviado de cada participante de volta para o coordenador.
+
+O primeiro passo na execução é obter acesso exclusivo às chaves envolvidas na transação utilizando o mecanismo de travas do infinispan. Um LockControlCommand é criado e executado na cadeia de interceptadores. Se não for possível travar uma ou mais chaves, ocorrerá um erro e a minitransação será cancelada.
+
+Com as entradas referentes às chaves da minitransação travadas, são executadas todas as comparações referentes ao nó atual. Se alguma delas falhar, a minitransação como um todo deve ser cancelada. Para indicar isso, é utilizado o método \textbf{markAsAborted} de MinitransactionExecution. Se todas as comparações forem bem-sucedidas, ou se não houver nenhuma comparação para o nó atual, o fluxo de execução segue.
+
+As operações de leitura são efetuadas em seguida. Para isso, são criados e executados comandos do tipo GetKeyValueCommand, um para cada chave especificada. O valor retornado pela execução de cada um desses comandos é registrado em MinitransactionExecution, com o método \textbf{addReadKeyValue}.
+
+Após as leituras é a vez das operações de escrita, efetuadas com o comando PutKeyValueCommand. Esses comandos são enviados para a cadeia de interceptadores e segue o mesmo fluxo de execução descrito na seção \ref{sec:tx_infinispan}.
+
+O último tipo de operação a ser efetuado é a transformação, que é representada por TransformCommand e por sua implementação de TransformationCallback. Esse comando é semanticalmente muito semelhante à PutKeyValueCommand no sentido em que ele atribui um valor a uma entrada. A diferença é que esse valor é uma função aplicada sobre o valor já existente na entrada. Essa função é representada pela interface TransformCallback e é implementada de acordo com a necessidade do usuário.
+
+Para o nó participante, \textbf{perform} termina nesse ponto, retornando um MinitransactionExecution que será transmitido pela rede para o coordenador. O nó coordenador precisa agrupar todos os resultados obtidos dos participantes e combiná-los por meio do método \textbf{mergeWith} de MinitransactionExecution. Esse método vai agrupar em um só conjunto os resultados das leituras efetuadas e irá marcar esse resultado combinado como sendo cancelado caso algum dos resultados obtidos tenha sido cancelado.
+
+Esse resultado combinado é retornado pelo coordenador e é utilizado pelo método \textbf{execute} para determinar se a minitransação deve ser efetivada ou não. Se \textbf{isAborted} for verdadeiro, a minitransação deve ser abortada e suas alterações devem ser desfeitas. Caso contrário, as alterações devem ser efetivadas e disponibilizadas para futuras transações. Esse processo de efetivação e cancelamento segue o fluxo normal de efetivação e cancelamento do infinispan, sem passar porém pela fazer de preparação do 2PC.
+
+\chapter{Conclusão}
+\label{cap:conclusao}
+
+Embora tenha sido planejado para ser modificado, houve alguns pequenos problemas para alterar o infinispan para executar minitransações. Esses problemas e as lições aprendidas com eles estão descritos na seção \ref{sec:problemas_licoes}. Os resultados obtidos com esse trabalho foram disponibilizados para amplo acesso, e uma breve análise está disponível na seção \ref{sec:resultados}. Na seção \ref{sec:trabalhos_futuros} identificamos alguns pontos que podem ser melhorados no trabalho desenvolvido e possíveis extensões.
+
+\section{Problemas, soluções e resultados}
+\label{sec:problemas_licoes}
+
+O principal problema encontrado, e de certa forma ainda não resolvido, está relacionado à avaliação da infraestrutura. Esse problema direcionou o desenvolvimento do trabalho para sua direção atual. Os outros problemas estão relacionados ao desenvolvimento.
+
+Inicialmente, foi desenvolvida uma infraestrutura nova, sem utilizar nenhum código como base, em que o processamento de minitransações estava diretamente embutido no sistema. Essa infraestrutura armazena os dados em memória e oferece uma interface de acesso muito parecida à do infinispan. Embora essa primeira infraestrutura desenvolvida funcione e execute minitransações, foram encontrados alguns empecilhos para avaliá-la.
+
+Em primeiro lugar, não foi encontrado nenhum outro sistema que oferecesse essa funcionalidade de execução de minitransações. Não há sentido em avaliar a infraestrutura isoladamente, pois não há nenhum parâmetro de comparação. A avaliação isolada foi feita mas com caráter funcional, para garantir que a infraestrutura estava de acordo com a especificação proposta e que era possível utilizá-la.
+
+A avaliação pretendida era a comparação dos resultados de performance apresentados pela infraestrutura com outros resultados conhecidos, uma vez que um objetivo indireto desse trabalho é demonstrar a efetividade de minitransações como uma alternativa viável para o desenvolvimento de aplicações distribuídas. Porém, essa análise se mostrou mais complexa do que o esperado, pois os outros sistemas disponíveis com funcionalidades semelhantes já estavam consolidados e testados em ambientes de produção de alta-carga, em alguns casos com anos acumulados em melhorias de performance e desempenho.
+
+Surgiu então a idéia de modificar um sistema já existente, que tivesse funcionalidades semelhantes, de forma que a diferença fosse mínima na implementação dos cenários testados. Após a avaliação de alguns candidatos foi escolhido o Infinispan, pois apresentava a maioria das características desejadas para a infraestrutura e era desenvolvido em Java, linguagem com a qual o autor deste trabalho possui maior experiência.
+
+Iniciou-se então um novo esforço de aprendizado, pois o Infinispan é um sistema complexo, com muitas funcionalidade e altamente configurável. Seu código é bem estruturado e faz uso de diversos padrões, convenções e boas práticas utilizadas no desenvolvimento de sistemas distribuídos, mas mesmo assim não é de nenhuma força um código simples. Foram necessárias diversas execuções, novas linhas de log e muitas sessões de debug para que fossem idêntificados os pontos que precisavam ser alterados. 
+
+Ao estender o infinispan, nossa infraestrutura herdou toda sua funcionalidade, como a replicação e distribuição de dados e capacidade de armazenar os dados em diversas formas de armazenagem, como discos ou bancos de dados. Toda a camada de comunição intra-nós e entre a infraestrutura e os clientes também foi reaproveitada. De certa forma, o ponto principal do trabalho passou a ser permitir que o infinispan executasse minitransações, utilizando seus componentes. Isso, porém, não foi tão simples como esperado.
+
+O infinispan pode atuar tanto no modo transacional quanto não-transacional. Porém, o termo "não-transacional" pode dar a impressão de que não há transações envolvidas, o que não é verdade. O deixa de existir é a transação do JTA e a possibilidade de agrupar operações em uma grande operação lógica, demarcada pela usuário. No modo não-transacional, cada operação individual é envolvida por uma transação, criada antes logo no início da execução do comando e finalizada após o fim de sua execução.
+
+Dessa forma, o conceito de transação permeia particamente todo o infinispan, mesmo em trechos que seriam "não-transacionais". Isso dificultou um pouco a inclusão de suporte a minitransações. Por exemplo, não foi possível fazer com que PrepareMinitransactionCommand fosse uma subclasse de PrepareCommand. Inicialmente havia sido codificado dessa forma, mas havia muitos pontos em que PrepareCommand era tratado e a maioria desses pontos não fazia sentido para uma minitransação.
+
+Um outro problema é que o Infinispan faz uma série de otimizações em relação a transações. Uma delas é tratar uma transação distribuída como sendo de somente uma fase, ou seja, em alguns cenários específicos, que dependem da configuração especificada, o infinispan efetua a efetivação ou cancelamento quando processa PrepareCommand. A configuração necessária para habilitar as minitransações resultavam necessariamente nesses cenários, o que atrapalhava a execução das minitransações.
+
+Foram testadas algumas alternativas para a implementação, mas a solução final acabou sendo a mais simples. Foi criado um novo comando, PrepareMinitransactionCommand, e esse comando recebeu um tratamento separado dos outros comandos relacionados ao controle de transação do infinispan. 
+
+
+
+%\section{Avaliação e resultados obtidos}
+%\label{sec:resultados}
+
+
+%Foi necessário
+
+%A própria natureza das minitransações dificulta essa comparação pois como vimos, ela está restrita a alguns tipos de operações, sendo menos genérica do que uma transação convencional. Assim, comparar 
+
+
+%A prosposta deste trabalho é disponibilizar uma infraestrutura com suporte a minitransações para facilitar o desenvolvimento de aplicações distribuídas, mas não foi encontrado nenhum outro sistema que oferecesse essa funcionalidade.
+
+
+
+% Nesse âmbito, não foi encontrado nenhum outro sistema que oferecesse essa capacidade específica de minitransações e portanto, foi é possível compará-lo
+
+%Grande parte do esforço de desenvolvimento foi voltado a entender a base de código do infinispan. O seu código está em sua grande maioria bem estruturado, com cada classes com suas responsabilidades bem definidas. A arquitetura da aplicação também foi bem planejada, e a maneira como conceitos e padrões foram usados para viabilizar a complexa tarefa de esconder uma estrutura de cache distribuída atrás de uma interface amigável ao usuário é uma lição muito importante aprendida.
+
+
+%A primeira proposta desse trabalho era desenvolver uma infraestrutura totalmente do zero, e dessa forma todo o processamento de minitransações estaria embutido no sistema. Esse sistema chegou a ser desenvolvido e, apesar de ter funcionalidades bem simplificadas, as minitransações eram executadas corretamente e de modo integral, mas ele foi descontinuado por apresentar algumas dificuldades com relação à avaliação do sistema.
+
+%A idéia para avaliar o sistema era de comparar  
+
+%Um empecilho ao uso desse sistema era como compará-lo com outros sistemas. Não foi encontrado nenhum outro sistema com suporte a minitransações, e comp
+
+%\section{Trabalhos futuros}
+%\label{sec:trabalhos_futuros}
+
+*** TODO colocar a conclusão
 
 % cabeçalho para os apêndices
+\newpage
 \renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{\appendixname\ \thechapter}} {\MakeUppercase{#1}} }
 \fancyhead[RE,LO]{}
 \appendix
+\chapter{Códigos}
+
+Esse apêndice apresenta algumas listagens mais completas de códigos e exemplos de utilização do infinispan.
+
+\label{apx:codigo}
+\begin{lstlisting}
+public interface FlagContainer {
+
+   boolean hasFlag(Flag o);
+
+   Set<Flag> getFlags();
+
+   void setFlags(Flag... flags);
+
+   void setFlags(Collection<Flag> flags);
+
+   void reset();
+
+}
+\end{lstlisting}
 
 % ---------------------------------------------------------------------------- %
 \backmatter \singlespacing   % espaçamento simples
