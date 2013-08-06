@@ -363,7 +363,9 @@ Este capítulo apresenta o paradigma transacional como uma alternativa para o de
 
 A seção \ref{sec:termos_e_conceitos} cobre os principais conceitos relacionados a transações e cria um vocabulário que será utilizado por todo o texto deste trabalho.
 
-Na seção \ref{sec:transacao} veremos que o uso de transações permite modelar o sistema como uma série transformações atômicas que mantém o estado sempre consistente. As seções \ref{sec:atomicidade} e \ref{sec:isolamento} detalham melhor as características de atomicidade e isolamento, respectivamente, das transações.
+Na seção \ref{sec:transacao} veremos que o uso de transações permite modelar o sistema como uma série transformações atômicas que mantém o estado sempre consistente.
+
+A seção \ref{sec:aspectos_operacionais_e_semanticos} divide *** TODO acabar
 
 Por último, a seção \ref{sec:extensoes} apresenta algumas extensões do modelo de transações descrito neste capítulo.
 
@@ -407,31 +409,91 @@ A propriedade mais forte é a consistência, que é também a mais abstrata das 
 
 Um ponto importante a destacar é que a propriedade de consistência declara que o resultado da transação deve ser um estado de sistema consistente, obedecendo às invariantes impostas. Porém, a execução das operações da transação pode deixar o estado temporariamente inconsistente, até que todas as operações sejam executadas. Ao término de todas as operações e, por consequência, da transação
 
-Por exemplo, vamos supor que o estado de um sistema seja composto por duas variáveis cuja soma dos valores não pode exceder um determinado limite $L$. A aplicação permite que o usuário especifique um valor para uma das duas varíaveis somente, e utiliza uma transação para alterar os valores das varíaveis. Na primeira operação da transação, a variável especificada tem seu valor alterado. Nesse momento, o estado do sistema pode ficar inconsistente pois, como a segunda variável ainda não foi atualizada, a soma pode ser maior do que $L$. A aplicação calcula qual deve ser o valor da segunda variável, de acordo com a invariante imposta, e atualiza então a segunda variável. A transação termina e o estado do sistema continua consistente.
+Por exemplo, vamos supor que o estado de um sistema seja composto por duas variáveis, $X$ e $Y$, que representam os saldos de duas contas bancárias. O sistema em questão permite a transferência de valores entre essas duas contas. A invariante nesse sistema declara que ao efetuar uma transferência o valor do agregado das contas não pode mudar, ou seja, se $X_{t_1} + Y_{t_1} = Z$ então $X_{t_2} + Y_{t_2} = Z$, onde $t_1$ é o momento em que a transação inicia e $t_2$ é o momento seguinte ao qual ela é finalizada.
 
-Embora seja um exemplo simples e não muito útil, a transação acima nos mostra que mesmo as funcionalidades mais elementares irão deixar o estado do sistema temporariamente inconsistente. O que deve ser respeitado é o fato de que, ao término da transação, o estado do sistema esteja novamente consistente, tendo sido alterado ou não.
+\begin{algorithm}
+\caption{Transferência de valores}
+\label{alg:transferencia_transacao_1}
+\Inicio{
+	$IniciarTransacao$\;
+	$V \gets \text{Valor a transferir}$\;
+	$X \gets X - V$
+	$Y \gets Y + S$
+	$EfetivarTransacao$
+}
+\end{algorithm}
 
-Como o estado do sistema pode ficar inconsistente durante a execução da transação, uma transação $T_1$ não pode ter acesso ao resultado das transformações efetuadas por uma outra transação $T_2$ que ainda não tenha sido finalizada, pois caso contrário suas próprias transformações seriam efetuadas sobre um estado inconsistente, quebrando a regra de consistência.
+Como podemos ver no Algoritmo \ref{alg:transferencia_transacao_1}, durante a execução da transação o estado do sistema fica inconsistente. A modificação efetuada pela operação da quarta linha leva o estado do sistema à uma situação inconsistente com a invariante declarada. Essa inconsistência é corrigida na quinta linha, ao adicionar o valor removido de $X$ à variável $Y$.
 
-Assim, a propriedade de isolamento toma forma para impedir que transações sejam efetuadas em dados inconsistentes. Há diversas formas de efetuar esse isolamento entre transações cujas execuções podem se sobrepor no tempo, e algumas delas são discutidas na seção \ref{subsec:isolamento}.
+Apesar da simplicidade, a transação do Algoritmo \ref{alg:transferencia_transacao_1} nos mostra que mesmo as funcionalidades mais elementares irão deixar o estado do sistema temporariamente inconsistente. O que deve ser respeitado é o fato de que, ao término da transação, o estado do sistema esteja novamente consistente.
 
-Atomicidade é a propriedade que confere às transações o seu caráter \textbf{tudo-ou-nada}, oferecendo uma semântica simples para o desenvolvimento, permitindo estruturar a aplicação como uma série de transformações
+Como o estado do sistema pode ficar inconsistente durante a execução da transação, uma transação $T_1$ não pode ter acesso ao resultado das transformações efetuadas por uma outra transação $T_2$ que ainda não tenha sido finalizada. Se isso ocorrer, $T_1$ efetuará  suas próprias transformações a partir de um estado inicial inconsistente, quebrando a regra de consistência.
 
-Ao agrupar ações em uma transação, o desenvolvedor tem a garantia de que essas ações serão executadas como uma única operação complexa. Essa operação será finalizada com sucesso, e efetuará as possíveis transformações que as ações possam fazer, ou não será executada, e nenhuma possível transformação efetuada por alguma ação da transação será refletida no estado da aplicação. 
+Assim, a propriedade de isolamento toma forma para impedir que transações em curso que efetuaram transformações que deixaram o sistema inconsistente afetem a outras transações em execução. Retomando o exemplo anterior sobre transferência de valores, vamos supor agora que existam duas transações $T_1$ e $T_2$ sendo executadas ao mesmo tempo.
 
-A vantagem da utilização de transações é que o desenvolvedor pode tratar um conjunto de ações como uma única operação lógica, simplificando a maneira com que os requisitos da aplicação são traduzidos para uma linguagem de programação. 
+$T_1$ precisa transferir $10$ e $T_2$ precisa transferir $15$. Como visto no capítulo \ref{chap:evolucao}, uma operação simples como $X \gets X - V$, declarada em apenas uma linha em linguagens de programação de alto-nível, abstrai uma série de micro-operações efetuadas pelo processador para efetuar uma conta e armazenar o seu resultado em uma variável (na verdade, essa atribuição em conjunto com a subtração podem ser vistos como uma transação, que retorna somente se a subtração for bem sucedida e o seu resultado for armazenado no espaço de memória identificado por $X$). 
 
-O paradigma orientado a objetos utiliza o conceito de objetos como o bloco de construção primário para o desenvolvimento de aplicações. Os desenvolvedores modelam os requisitos da aplicação como objetos que se comunicam invocando métodos uns dos outros. Ao invocar um método, o desenvolvedor está interessado no resultado que esse método vai , o paradigma transacional oferece como 
+O Algoritmo \ref{alg:assembly_subtracao} descreve de forma simplificada os passos efetuados pelo hardware para executar a quarta linha do Algoritmo \ref{alg:transferencia_transacao_1}, $X = X - V$. Como podemos ver, um conjunto de operações de baixo-nível precisam ser efetuadas para que a subtração ocorra.
 
-Essas quatro propriedades visam a integridade do sistema, sendo garantidas pelo ambiente em que as transações são executadas. Esse ambiente de processamento de transações oferece um paradigma de programação transacional que permite uma abordagem de desenvolvimento tolerante a falhas.
+\begin{algorithm}
+\caption{Descrição simplificada da execução em nível de hardware}
+\label{alg:assembly_subtracao}
+\Inicio{
+	Carregar no registrador $A$ o conteúdo do endereço de memória identificado por $X$\;
+	Carregar no registrador $B$ o conteúdo do endereço de memória identificado por $V$\;
+	Somar os valores dos registradores $A$ e $B$ e armazenar o resultado no registrador $C$\; 
+	Copiar o conteúdo do registrador $C$ para o endereço de memória identificado por $X$;
+}
+\end{algorithm}
 
-A execução bem sucedida de uma transação depende tanto de aspectos operacionais relacionados ao ambiente de execução quanto de aspectos semânticos relacionados ao domínio da aplicação.
+Levando em conta os Algoritmos \ref{alg:transferencia_transacao_1} e \ref{alg:assembly_subtracao} e que os valores iniciais de $X$ seja 30 e $Y$ seja 0, se a execução das transações não fosse isolada poderíamos ter um cenário em que as escolhas do escalonador do sistema operacional levassem a um fluxo de execução como o seguinte (considerando que cada transação esteja rodando em um processo distinto):
 
-\subsection{Isolamento}
-\label{subsec:isolamento}
+\begin{enumerate}
+	\item $P_1$ inicia a transação $T_1$.
+	\item $P_1$ recebe o valor 10 e o armazena em $V$.
+	\item $P_1$ armazena o valor de $X$ no registrador $A$.
+	\item O escalonador troca a execução para o processo $P_2$, efetuando todo o chaveamento de contexto.
+	\item $P_2$ inicia a transação $T_2$.
+	\item $P_2$ recebe o valor 15 e o armazena em $V$.
+	\item $P_2$ armazena o valor de $X$ no registrador $A$.
+	\item O escalonador é executado novamente e reativa o processo $P_1$.
+	\item $P_1$ termina a execução do algoritmo \ref{alg:assembly_transacao}, armazenando 20 em $X$.
+	\item $P_1$ armazenando 10 em $Y$.
+	\item $P_1$ termina a execução do algoritmo \ref{alg:transferencia_transacao_1} efetivando a transação.
+	\item O escalonador reativa $P_2$.
+	\item $P_2$ não tem conhecimento do novo valor de $X$ armazenado por $P_1$, pois sua cópia em $A$ está desatualizada.
+	\item $P_2$ armazena em $X$ o valor 15.
+	\item $P_2$ armazena em $Y$ o valor 25.
+	\item $P_2$ efetiva a transação e termina.
+\end{enumerate}
 
-\subsection{Aspectos operacionais e semânticos}
-\label{subsec:aspectos_operacionais_e_semanticos}
+Antes do início da transação tínhamos um total de 30 somando os valores das duas contas. Após o término da transação esse total é de 40, violando a invariante declarada. Portanto, o estado desse sistema está inconsistente.
+
+A exigência de isolamento entre as transações pode ser implementada com diversos mecanismos. O mais simples deles seria simplesmente forçar que as transações fossem executadas em sequência. As transações poderiam ser enfileiradas por ordem de chegada e executadas do começo ao fim, sem interrupção. Embora seja uma solução efetiva e que faça sentido em alguns casos, em geral obrigar o sequenciamento na execução de transações diminui a taxa com que elas podem ser executadas.
+
+O mecanismo mais comum para a implementação do isolamento são as travas. *** Explicar as travas aqui, bem simples....
+
+Atomicidade é a propriedade que confere às transações o seu caráter \textbf{tudo-ou-nada} de execução. Do ponto de vista do desenvolvedor que utiliza uma transação, há somente dois caminhos possíveis: a efetivação ou o cancelamento.
+
+A efetivação é o caminho natural, em que a transação é bem-sucedida e o estado do sistema é alterado para refletir as transformações efetudas pelas operações que compõem essa transação são. O cancelamento da transação é o caso de exceção, em que eventuais transformações efetuadas pela transação devem ser descartadas.
+
+Se não houver atomicidade nas execuções, a consistência fica
+
+%Ao agrupar ações em uma transação, o desenvolvedor tem a garantia de que essas ações serão executadas como uma única operação complexa. Essa operação será finalizada com sucesso, e efetuará as possíveis transformações que as ações possam fazer, ou não será executada, e nenhuma possível transformação efetuada por alguma ação da transação será refletida no estado da aplicação. 
+
+%A vantagem da utilização de transações é que o desenvolvedor pode tratar um conjunto de ações como uma única operação lógica, simplificando a maneira com que os requisitos da aplicação são traduzidos para uma linguagem de programação. 
+
+%O paradigma orientado a objetos utiliza o conceito de objetos como o bloco de construção primário para o desenvolvimento de aplicações. Os desenvolvedores modelam os requisitos da aplicação como objetos que se comunicam invocando métodos uns dos outros. Ao invocar um método, o desenvolvedor está interessado no resultado que esse método vai , o paradigma transacional oferece como 
+
+%Essas quatro propriedades visam a integridade do sistema, sendo garantidas pelo ambiente em que as transações são executadas. Esse ambiente de processamento de transações oferece um paradigma de programação transacional que permite uma abordagem de desenvolvimento tolerante a falhas.
+
+%A execução bem sucedida de uma transação depende tanto de aspectos operacionais relacionados ao ambiente de execução quanto de aspectos semânticos relacionados ao domínio da aplicação.
+
+%\subsection{Isolamento}
+%\label{subsec:isolamento}
+
+\section{Aspectos operacionais e semânticos}
+\label{sec:aspectos_operacionais_e_semanticos}
 
 Falhas de aspecto operacional estão relacionadas a problemas, permanentes ou transitórios, encontrados nos sistemas de base utilizados pelo ambiente de execução, como sistema operacional, redes ou hardware. Trilhas danificadas no disco rígido, perda de comunicação entre máquinas, quedas no fornecimento de energia são alguns exemplos, assim como danos físicos no cabeamento de rede ou o extravio de uma máquina.
 
