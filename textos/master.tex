@@ -302,6 +302,8 @@ Este capítulo apresenta uma breve descrição da evolução dos sistemas comput
 %\label{sec:primeiros_computadores}
 Os primeiros computadores foram criados com o intuito de resolver mais rapidamente cálculos matemáticos. Essas máquinas ocupavam salas inteiras e eram programadas por meio de alterações diretas nas ligações entre os componentes físicos da máquina. 
 
+*** TODO colocar foto do eniac - fonte: http://ds.haverford.edu/bitbybit/bit-by-bit-contents/chapter-four/4-8-project-px-and-the-eniac/
+
 A maneira de representar e armazenar os programas evoluíram, as linguagens montadoras (\emph{assembly}) foram criadas, mas ainda assim a programação era totalmente dependente do tipo da máquina sendo utilizada (chamada de programação de baixo-nível). Essas linguagens eram formadas por muitos comandos que correspondiam a um ou alguns poucos comandos interpretados diretamente pelo processador. 
 
 Portanto, o programador precisava se preocupar com o número de registradores disponíveis, a quantidade de memória livre, a movimentação de dados entre registradores e memória, controlar o uso e o endereçamento de dados na memória e no disco e lidar com chamadas e interrupções de sistema, por exemplo. Havia uma grande diferença entre a intenção final de um programa e o seu texto codificado na linguagem de programação utilizada (a chamada impedância semântica, ou \emph{gap} semântico).
@@ -361,11 +363,9 @@ Este capítulo apresenta o paradigma transacional como uma alternativa para o de
 
 A seção \ref{sec:termos_e_conceitos} cobre os principais conceitos relacionados a transações e cria um vocabulário que será utilizado por todo o texto deste trabalho.
 
-Na seção \ref{sec:transacao} veremos que o uso de transações permite modelar o sistema como uma série transformações atômicas que mantém o estado sempre consistente.
+Na seção \ref{sec:transacao} veremos que o uso de transações permite modelar o sistema como uma série transformações atômicas que mantém o estado sempre consistente. As seções \ref{sec:atomicidade} e \ref{sec:isolamento} detalham melhor as características de atomicidade e isolamento, respectivamente, das transações.
 
-As seções \ref{sec:atomicidade} e \ref{sec:isolamento} detalham melhor as características de atomicidade e isolamento, respectivamente, das transações.
-
-Por último, a seção \ref{sec:extensoes} apresenta algumas extensões e propostas de extensão do modelo de transações descrito neste capítulo. Em especial, falamos sobre o modelo de transação distribuída.
+Por último, a seção \ref{sec:extensoes} apresenta algumas extensões do modelo de transações descrito neste capítulo.
 
 \section{Termos e conceitos}
 \label{sec:termos_e_conceitos}
@@ -377,45 +377,61 @@ O estado de uma aplicação é definido como um conjunto de dados relacionados d
 
 %De maneira incremental, as aplicações passam a ser geograficamente distribuídas; executando em diferentes equipamentos e plataformas; e seus requisitos de disponibilidade e tempo de resposta passam a ser mais rígidos e controlados. Esses incrementos aumentam a abrangência e a utilidade da aplicação, mas aumenta o números de cenários que podem fazer a aplicação falhar ao executar as operações.
 
-A execução de uma aplicação, por mais simples que seja, está sujeita a diversos tipos de falhas. Ao passo em que evoluem, passando a ser geograficamente distribuídas, executando em diferentes equipamentos e plataformas e aumentando seus requisitos de disponibilidade e tempo de resposta, as chances de falha aumentam consideravelmente.
+A execução de uma aplicação, por mais simples que seja, está sujeita a diversos tipos de falhas. Ao passo em que evoluem, passando a ser geograficamente distribuídas, executando em diferentes equipamentos e plataformas e aumentando seus requisitos de disponibilidade e tempo de resposta, as chances de falha aumentam consideravelmente. Manter o estado da aplicação consistente em cenários de ocorrência de falhas não é uma tarefa trivial.
 
 Falhas de hardware já foram muito comuns no passado, mas o desenvolvimento da tecnologia e de mecanismos de detecção e correção tornaram esse tipo de falha cada vez mais rara. Falhas de software são um problema bem mais frequente e difícil de resolver, a despeito do uso de processos de desenvolvimento e técnicas de teste e avaliação.
 
-A interpretação errônea dos requisitos do sistema, um projeto de sistema que traduz de maneira inexata os requisitos, ou uma implementação incorreta desse projeto são exemplos do que pode causar problemas no sistema. Além disso, o caráter dinâmico do software, com constantes adições de funcionalidades e correções de problemas, pode introduzir mais falhas nos mais bem testados sistemas
+A interpretação errônea dos requisitos do sistema, um projeto de sistema que traduz de maneira inexata os requisitos, ou uma implementação incorreta desse projeto são exemplos do que pode causar problemas no sistema. Além disso, o caráter dinâmico do software, com constantes adições de funcionalidades e correções de problemas, pode introduzir mais falhas nos mais bem testados sistemas. Situações pontuais como sobrecarga da máquina e atrasos em subsistemas como entrada e saída ou rede podem ocasionar falhas difíceis de reproduzir e corrigir.
 
-Situações pontuais como sobrecarga da máquina e atrasos em subsistemas como entrada e saída ou rede podem ocasionar falhas difíceis de reproduzir e corrigir.
-
-Uma das formas de tornar o software tolerante a falhas é utilizar uma técnica chamada de programação multi-versão (\emph{multiversion programming} ou \emph{n-version programming} \cite{n_version}), em que um programa é escrito de $n$ maneiras diferentes, gerando $n$ versões do mesmo programa. A execução do sistema vai consistir da execução em paralelo dessas versões e a resposta do sistema será tomada como o consenso entre as resposta de todas as versões. A impossibilidade de atingir um consenso implica em falha do sistema.
+Uma das formas de tornar o software tolerante a falhas é utilizar uma técnica chamada de programação \textbf{multi-versão} (\emph{multiversion programming} ou \emph{n-version programming} \cite{n_version}), em que um programa é escrito de $n$ maneiras diferentes, gerando $n$ versões do mesmo programa. A execução do sistema vai consistir da execução em paralelo dessas versões e a resposta do sistema será tomada como o consenso entre as resposta de todas as versões. A impossibilidade de atingir um consenso implica em falha do sistema.
 
 Embora efetiva, essa abordagem possui um custo de implementação elevado e é de difícil manutenção, pois a reparação em caso de erro não é trivial, uma vez que cada versão terá um estado interno diferente. Além disso, mesmo sendo criteriosamente testadas, as versões conterão problemas, o que pode levar à falta de consenso ou a um consenso em torno de uma resposta incorreta.
 
-Uma outra maneira de tornar o software tolerante a falhas é por meio do uso de transações. Uma transação é uma coleção de operações sobre o estado de um sistema. Ela pode ser vista como uma operação lógica composta por operações reais, que acessam e modificam o estado do sistema de maneira a mantê-lo sempre consistente. Uma falha em alguma das operações faz com que a transação como um todo seja abortada e o estado do sistema seja restaurado como era no início da transação \cite{garcia-molina, vaca, gray}.
+Uma outra maneira de tornar o software tolerante a falhas é por meio do uso de \textbf{transações}. Uma transação é uma coleção de operações sobre o estado de um sistema. Ela pode ser vista como uma operação lógica composta por operações mais simples, que acessam e modificam o estado do sistema de maneira a mantê-lo sempre consistente. Uma falha em alguma das operações faz com que a transação como um todo seja abortada e o estado do sistema seja restaurado como era no início da transação \cite{garcia-molina, vaca, gray}.
 
 \section{Transação}
 \label{sec:transacao}
-Transação é o bloco básico de construção para organizar uma aplicação em ações atômicas. Ela pode conter um número arbitrário de ações simples suportadas pela aplicação. O conjunto ações que compreendem a transação forma um todo indivisível do ponto de vista da aplicação
+Transação é o bloco básico de construção para organizar uma aplicação em ações atômicas. Ela pode conter um número arbitrário de ações simples suportadas pela aplicação. O conjunto de ações que compõem a transação forma um todo indivisível do ponto de vista da aplicação que utiliza essa transação.
 
-Uma transação apresenta um conjunto de propriedades que oferecem uma base simples e sólida para o desenvolvimento. Essas propriedades são chamadas conjuntamente de \emph{ACID} (\emph{Atomicity, Consistency, Isolation e Durability}, ou Atomicidade, Consistência, Isolamento e Durabilidade). 
+Transações apresentam um conjunto de propriedades que as tornam uma base simples e sólida na qual se pode basear o desenvolvimento de aplicações. Essas propriedades são chamadas conjuntamente de \emph{ACID} (\emph{Atomicity, Consistency, Isolation e Durability}, ou Atomicidade, Consistência, Isolamento e Durabilidade). 
 
 \textbf{Atomicidade} se refere ao fato que a execução da transação é atômica, ou seja, a execução da transação significa que todas as operações que a compõem foram executadas com sucesso. A atomicidade diz respeito a qualquer observador externo, que não deve ser capaz acessar nenhum estado intermediário criado pela transação durante sua execução. Os únicos dois estados que um observador externo pode acessar é o estado final, após a transação ser finalizada, ou o estado inicial, após a transação ser cancelada.
 
-%Uma falha na execução de uma das operações faz com que todas as operações da transação previamente executadas sejam canceladas e seus resultados, desfeitos.
-
-%, ou a transação como um todo é cancelada. Essa propriedade é muito importante pois ela facilita e oferece uma maneira clara de se projetar um sistema
-
 \textbf{Consistência} é a propriedade que diz que o resultado da execução de uma transação é um estado consistente. Seja esse novo estado o resultado de transformações aplicadas ao estado inicial, ou o próprio estado inicial no caso de cancelamento, o ponto principal sobre essa propriedade é que o novo estado é consistente.
 
-%A ocorrência de falhas durante a execução não pode 
-
-%A análise dessa consistência é feita sob duas óticas: operacional e semântica. A ótica operacional diz respeito a questões técnicas, como a integridade do arquivo que armazena o estado do sistema, por exemplo. A ótica semântica fica a cargo do desenvolvedor do sistema, como a garantia de que um determinado valor do estado do estado do sistema não possa exceder um limite especificado.
-
-\textbf{Isolamento} significa que o resultado das operações de uma transação $A$ não devem interferir na execução de uma outra transação $B$, enquanto $A$ não for finalizada. *** TODO escrever um pouco mais
+\textbf{Isolamento} significa que o resultado das operações de uma transação $A$ não devem interferir na execução de uma outra transação $B$, enquanto $A$ não for finalizada.
 
 \textbf{Durabilidade} impõem que uma vez que a transação tenha sido executada com sucesso, o estado resultante do sistema será mantido. Nenhuma falha posterior, seja ela causada pelo usuário, pelo ambiente ou por componentes de hardware, poderá alterar esse estado. A única maneira de faze-lo é com a execução de uma nova transação.
+
+A propriedade mais forte é a consistência, que é também a mais abstrata das quatro propriedades. Ela está relacionada à validação do estado da aplicação, que por sua vez diz respeito às invariantes impostas sobre os dados que compõem esse estado. Sua importância reside no fato que uma aplicação, para atender de maneira efetiva seus requisitos, não pode utilizar dados inconsistentes por um período indefinido de tempo. Ela é abstrata no sentido que muitas das invariantes não podem ser diretamente expressas ou validadas, o que confere a ela um caráter menos determinístico.
+
+Um ponto importante a destacar é que a propriedade de consistência declara que o resultado da transação deve ser um estado de sistema consistente, obedecendo às invariantes impostas. Porém, a execução das operações da transação pode deixar o estado temporariamente inconsistente, até que todas as operações sejam executadas. Ao término de todas as operações e, por consequência, da transação
+
+Por exemplo, vamos supor que o estado de um sistema seja composto por duas variáveis cuja soma dos valores não pode exceder um determinado limite $L$. A aplicação permite que o usuário especifique um valor para uma das duas varíaveis somente, e utiliza uma transação para alterar os valores das varíaveis. Na primeira operação da transação, a variável especificada tem seu valor alterado. Nesse momento, o estado do sistema pode ficar inconsistente pois, como a segunda variável ainda não foi atualizada, a soma pode ser maior do que $L$. A aplicação calcula qual deve ser o valor da segunda variável, de acordo com a invariante imposta, e atualiza então a segunda variável. A transação termina e o estado do sistema continua consistente.
+
+Embora seja um exemplo simples e não muito útil, a transação acima nos mostra que mesmo as funcionalidades mais elementares irão deixar o estado do sistema temporariamente inconsistente. O que deve ser respeitado é o fato de que, ao término da transação, o estado do sistema esteja novamente consistente, tendo sido alterado ou não.
+
+Como o estado do sistema pode ficar inconsistente durante a execução da transação, uma transação $T_1$ não pode ter acesso ao resultado das transformações efetuadas por uma outra transação $T_2$ que ainda não tenha sido finalizada, pois caso contrário suas próprias transformações seriam efetuadas sobre um estado inconsistente, quebrando a regra de consistência.
+
+Assim, a propriedade de isolamento toma forma para impedir que transações sejam efetuadas em dados inconsistentes. Há diversas formas de efetuar esse isolamento entre transações cujas execuções podem se sobrepor no tempo, e algumas delas são discutidas na seção \ref{subsec:isolamento}.
+
+Atomicidade é a propriedade que confere às transações o seu caráter \textbf{tudo-ou-nada}, oferecendo uma semântica simples para o desenvolvimento, permitindo estruturar a aplicação como uma série de transformações
+
+Ao agrupar ações em uma transação, o desenvolvedor tem a garantia de que essas ações serão executadas como uma única operação complexa. Essa operação será finalizada com sucesso, e efetuará as possíveis transformações que as ações possam fazer, ou não será executada, e nenhuma possível transformação efetuada por alguma ação da transação será refletida no estado da aplicação. 
+
+A vantagem da utilização de transações é que o desenvolvedor pode tratar um conjunto de ações como uma única operação lógica, simplificando a maneira com que os requisitos da aplicação são traduzidos para uma linguagem de programação. 
+
+O paradigma orientado a objetos utiliza o conceito de objetos como o bloco de construção primário para o desenvolvimento de aplicações. Os desenvolvedores modelam os requisitos da aplicação como objetos que se comunicam invocando métodos uns dos outros. Ao invocar um método, o desenvolvedor está interessado no resultado que esse método vai , o paradigma transacional oferece como 
 
 Essas quatro propriedades visam a integridade do sistema, sendo garantidas pelo ambiente em que as transações são executadas. Esse ambiente de processamento de transações oferece um paradigma de programação transacional que permite uma abordagem de desenvolvimento tolerante a falhas.
 
 A execução bem sucedida de uma transação depende tanto de aspectos operacionais relacionados ao ambiente de execução quanto de aspectos semânticos relacionados ao domínio da aplicação.
+
+\subsection{Isolamento}
+\label{subsec:isolamento}
+
+\subsection{Aspectos operacionais e semânticos}
+\label{subsec:aspectos_operacionais_e_semanticos}
 
 Falhas de aspecto operacional estão relacionadas a problemas, permanentes ou transitórios, encontrados nos sistemas de base utilizados pelo ambiente de execução, como sistema operacional, redes ou hardware. Trilhas danificadas no disco rígido, perda de comunicação entre máquinas, quedas no fornecimento de energia são alguns exemplos, assim como danos físicos no cabeamento de rede ou o extravio de uma máquina.
 
@@ -533,13 +549,10 @@ Os aspectos semânticos da transação precisam ser validados explicitamente pel
 
 \section{Atomicidade}
 \label{sec:atomicidade}
-
-Como vimos, uma transação é uma operação lógica composta por operações mais específicas, que executa de maneira atômica. Esse conceito é aplicado em computação em diversos níveis, desde das instruções de hardware, como \emph{CAS} (\emph{Compare-And-Swap}, compare e substitua) até transações distribuídas envolvendo máquinas em locais geograficamente afastados. O conceito de atomicidade é definido em relação ao usuário da operação - para o usuário a operação executou corretamente e retornou ou ela foi abortada, não sendo executada.
+Como vimos, uma transação é uma operação lógica composta por ações mais simples, executada de maneira atômica. Esse conceito é aplicado em computação em diversos níveis, desde das instruções de hardware, como \emph{CAS} (\emph{Compare-And-Swap}, compare e substitua) até transações distribuídas envolvendo máquinas em locais geograficamente afastados. O conceito de atomicidade é definido em relação ao usuário da operação - para o usuário a operação executou corretamente e retornou ou ela foi abortada, não sendo executada.
 
 Efetuar o controle de atomicidade de uma transação requer um grande esforço de projeto e desenvolvimento do ambiente em que a transação é executada.
 
-\section{Isolamento}
-\label{sec:isolamento}
 
 \section{Extensões do modelo de transações}
 \label{sec:extensoes}
@@ -650,6 +663,7 @@ em transações distribuídas.
 
 \section{O protocolo de efetivação em duas fases}
 \label{sec:2pc}
+*** TODO página 562 e 643 do gray 
 
 Uma transação distribuída é uma transação que engloba operações que executam em diversos gerenciadores de recursos na forma de sub-transações, subordinadas à transação, e que é finalizada por uma requisição para efetivar ou abortar a transação \cite{gray-lamport}. Por exemplo, vamos considerar novamente o problema da transferência entre contas, como descrito na Seção \ref{sec:transacoes}, porém agora as contas estão em dois gerenciadores de recursos transacionais distintos ($G_O$ e $G_D$), como na Figura \ref{fig:transacao_distribuida}.
 
