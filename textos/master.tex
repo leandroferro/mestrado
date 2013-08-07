@@ -371,7 +371,7 @@ Por último, a seção \ref{sec:extensoes} apresenta algumas extensões do model
 
 \section{Termos e conceitos}
 \label{sec:termos_e_conceitos}
-A utilização de um paradigma transacional surge com os sistemas de processamento de transação utilizados para desenvolver aplicações. Esses sistemas tem como objetivo facilitar e automatizar a programação, execução e administração dessas aplicações.
+%A utilização de um paradigma transacional surge com os sistemas de processamento de transação utilizados para desenvolver aplicações. Esses sistemas tem como objetivo facilitar e automatizar a programação, execução e administração dessas aplicações.
 
 O estado de uma aplicação é definido como um conjunto de dados relacionados de alguma maneira. Esses relacionamentos podem ser vistos como invariantes em relação aos dados e em relação a como esses dados são alterados. Quando todas essas invariantes definidas estiverem satisfeitas, o estado da aplicação é dito consistente.
 
@@ -405,11 +405,13 @@ Transações apresentam um conjunto de propriedades que as tornam uma base simpl
 
 \textbf{Durabilidade} impõem que uma vez que a transação tenha sido executada com sucesso, o estado resultante do sistema será mantido. Nenhuma falha posterior, seja ela causada pelo usuário, pelo ambiente ou por componentes de hardware, poderá alterar esse estado. A única maneira de faze-lo é com a execução de uma nova transação.
 
+\subsection{Consistência}
+\label{subsec:consistencia}
 A propriedade mais forte é a consistência, que é também a mais abstrata das quatro propriedades. Ela está relacionada à validação do estado da aplicação, que por sua vez diz respeito às invariantes impostas sobre os dados que compõem esse estado. Sua importância reside no fato que uma aplicação, para atender de maneira efetiva seus requisitos, não pode utilizar dados inconsistentes por um período indefinido de tempo. Ela é abstrata no sentido que muitas das invariantes não podem ser diretamente expressas ou validadas, o que confere a ela um caráter menos determinístico.
 
 Um ponto importante a destacar é que a propriedade de consistência declara que o resultado da transação deve ser um estado de sistema consistente, obedecendo às invariantes impostas. Porém, a execução das operações da transação pode deixar o estado temporariamente inconsistente, até que todas as operações sejam executadas. Ao término de todas as operações e, por consequência, da transação
 
-Por exemplo, vamos supor que o estado de um sistema seja composto por duas variáveis, $X$ e $Y$, que representam os saldos de duas contas bancárias. O sistema em questão permite a transferência de valores entre essas duas contas. A invariante nesse sistema declara que ao efetuar uma transferência o valor do agregado das contas não pode mudar, ou seja, se $X_{t_1} + Y_{t_1} = Z$ então $X_{t_2} + Y_{t_2} = Z$, onde $t_1$ é o momento em que a transação inicia e $t_2$ é o momento seguinte ao qual ela é finalizada.
+Por exemplo, vamos supor que o estado de um sistema seja composto por duas variáveis, $X$ e $Y$, que representam os saldos de duas contas bancárias. O sistema em questão permite a transferência de valores entre essas duas contas. As invariantes nesse sistema declaram que o valor de todas as contas precisa ser no mínimo zero e que ao efetuar uma transferência o valor do agregado das contas não pode mudar, ou seja, se $X_{t_1} + Y_{t_1} = Z$ então $X_{t_2} + Y_{t_2} = Z$, onde $t_1$ é o momento em que a transação inicia e $t_2$ é o momento seguinte ao qual ela é finalizada.
 
 \begin{algorithm}
 \caption{Transferência de valores}
@@ -417,9 +419,9 @@ Por exemplo, vamos supor que o estado de um sistema seja composto por duas vari�
 \Inicio{
 	$IniciarTransacao$\;
 	$V \gets \text{Valor a transferir}$\;
-	$X \gets X - V$
-	$Y \gets Y + S$
-	$EfetivarTransacao$
+	$X \gets X - V$\;
+	$Y \gets Y + S$\;
+	$EfetivarTransacao$\;
 }
 \end{algorithm}
 
@@ -429,7 +431,11 @@ Apesar da simplicidade, a transação do Algoritmo \ref{alg:transferencia_transa
 
 Como o estado do sistema pode ficar inconsistente durante a execução da transação, uma transação $T_1$ não pode ter acesso ao resultado das transformações efetuadas por uma outra transação $T_2$ que ainda não tenha sido finalizada. Se isso ocorrer, $T_1$ efetuará  suas próprias transformações a partir de um estado inicial inconsistente, quebrando a regra de consistência.
 
-Assim, a propriedade de isolamento toma forma para impedir que transações em curso que efetuaram transformações que deixaram o sistema inconsistente afetem a outras transações em execução. Retomando o exemplo anterior sobre transferência de valores, vamos supor agora que existam duas transações $T_1$ e $T_2$ sendo executadas ao mesmo tempo.
+Assim, a propriedade de isolamento toma forma para impedir que transações em curso que efetuaram transformações que deixaram o sistema inconsistente afetem a outras transações em execução. 
+
+\subsection{Isolamento}
+\label{subsec:isolamento}
+Retomando o exemplo anterior sobre transferência de valores, vamos supor agora que existam duas transações $T_1$ e $T_2$ sendo executadas ao mesmo tempo.
 
 $T_1$ precisa transferir $10$ e $T_2$ precisa transferir $15$. Como visto no capítulo \ref{chap:evolucao}, uma operação simples como $X \gets X - V$, declarada em apenas uma linha em linguagens de programação de alto-nível, abstrai uma série de micro-operações efetuadas pelo processador para efetuar uma conta e armazenar o seu resultado em uma variável (na verdade, essa atribuição em conjunto com a subtração podem ser vistos como uma transação, que retorna somente se a subtração for bem sucedida e o seu resultado for armazenado no espaço de memória identificado por $X$). 
 
@@ -469,15 +475,69 @@ Levando em conta os Algoritmos \ref{alg:transferencia_transacao_1} e \ref{alg:as
 
 Antes do início da transação tínhamos um total de 30 somando os valores das duas contas. Após o término da transação esse total é de 40, violando a invariante declarada. Portanto, o estado desse sistema está inconsistente.
 
-A exigência de isolamento entre as transações pode ser implementada com diversos mecanismos. O mais simples deles seria simplesmente forçar que as transações fossem executadas em sequência. As transações poderiam ser enfileiradas por ordem de chegada e executadas do começo ao fim, sem interrupção. Embora seja uma solução efetiva e que faça sentido em alguns casos, em geral obrigar o sequenciamento na execução de transações diminui a taxa com que elas podem ser executadas.
+%A exigência de isolamento entre as transações pode ser implementada com diversos mecanismos. O mais simples deles seria simplesmente forçar que as transações fossem executadas em sequência. As transações poderiam ser enfileiradas por ordem de chegada e executadas do começo ao fim, sem interrupção. Embora seja uma solução efetiva e que faça sentido em alguns casos, em geral obrigar o sequenciamento na execução de transações diminui a taxa com que elas podem ser executadas.
 
-O mecanismo mais comum para a implementação do isolamento são as travas. *** Explicar as travas aqui, bem simples....
+O mecanismo mais comum para a implementação do isolamento são as travas (\emph{locks}), que a mecanismos de controle de concorrência oferecidos nos sistemas operacionais, como semáforos. A implementação mais simples de travas associa a cada dado que compõem o estado do sistema uma trava. Quando uma transação precisa acessar um determinado dado, o ambiente de execução automaticamente tenta atribuir a trava associada a esse dado à transação. Se a trava não estiver associada a nenhuma outra transação no momento, ela será atribuída à transação solicitante, e essa atribuição irá perdurar até o final da transação. Se essa trava já estiver associada a uma outra transação, a primeira transação irá esperar até que a trava esteja liberada para poder continuar.
 
-Atomicidade é a propriedade que confere às transações o seu caráter \textbf{tudo-ou-nada} de execução. Do ponto de vista do desenvolvedor que utiliza uma transação, há somente dois caminhos possíveis: a efetivação ou o cancelamento.
+Diversas variações e otimizações desse mecanismo de travas foram criadas, visando aumentar o grau de concorrência e a performance das transações, mas o conceito básico é o descrito acima.
 
-A efetivação é o caminho natural, em que a transação é bem-sucedida e o estado do sistema é alterado para refletir as transformações efetudas pelas operações que compõem essa transação são. O cancelamento da transação é o caso de exceção, em que eventuais transformações efetuadas pela transação devem ser descartadas.
+O isolamento na execução de transações concorrentes permite ao desenvolvedor ignorar questões ligadas ao controle de concorrência nas aplicações, pois essas são gerenciadas pelo ambiente de execução. Assim, o software resultante fica menos complexo e mais claro.
 
-Se não houver atomicidade nas execuções, a consistência fica
+\subsection{Atomicidade}
+\label{subsec:atomicidade}
+Atomicidade é a propriedade que confere às transações o seu caráter \textbf{tudo-ou-nada} de execução. Esse caráter facilita o modelo de desenvolvimento ao apresentar um protocolo simples ao desenvolvedor: a transação é efetivada e as possíveis alterações de estado são aplicadas ao sistema ou a transação é cancelada e nenhuma alteração de estado é notada pela aplicação. 
+
+A efetivação é o caminho natural e é atingida somente se todas as operações que compõem a transação forem executadas sem nenhuma erro. O estado do sistema é alterado para refletir quaisquer alterações que a transação possa ter produzido. A consistência desse novo estado é assumido como válido pelo ambiente de execução, uma vez que a transação não foi cancelada explicitamente. Assim fica a cargo do desenvolvedor compor a transação de maneira correta, utilizando as operações de tal forma que o resultado final seja consistente.
+
+O cancelamento da transação é um caso de exceção e pode ocorrer por dois motivos: por solicitação da aplicação ou devido a algum problema durante a execução da transação. 
+
+A aplicação pode solicitar explicitamente que a transação seja cancelada, descartando quaisquer alterações efetuadas e retornando o estado para o apresentado no início da transação. Esse cancelamento explícito faz parte do controle de consistência que a aplicação efetua. Se a aplicação identificar que suas ações irão deixar o estado inconsistente, ou que o fluxo de execução não pode continuar por algum motivo, a solicitação de cancelamento é a ferramenta à disposição da aplicação para manter o estado consistente.
+
+O Algoritmo \ref{alg:transferencia_transacao_2} ilustra essa situação de cancelamento explícito da transação. A aplicação verifica se o valor da conta $X$ continua válido (maior do que zero) após o débito do valor. Se esse valor for negativo, a transação é cancelada.
+
+\begin{algorithm}
+\caption{Transferência de valores com cancelamento explícito}
+\label{alg:transferencia_transacao_2}
+\Inicio{
+	$IniciarTransacao$\;
+	$V \gets \text{Valor a transferir}$\;
+	$X \gets X - V$\;
+	\eSe{$X < 0$}
+	{
+		$CancelarTransacao$\;
+	}
+	{
+		$Y \gets Y + S$\;
+		$EfetivarTransacao$\;
+	}
+}
+\end{algorithm}
+
+Em alguns ambientes de execução, como SGBD's, essa restrição de que o valor da conta não pode ser negativo pode ser expressa diretamente no ambiente de execução, de forma que ele possa efetuar a validação e cancelar a transação caso a validação falhe. Aqui, essa validação é feita explicitamente pela aplicação.
+
+O cancelamento devido a algum problema durante a execução da transação é solicitado automaticamente pelo ambiente de execução. Falhas de hardware, software ou rede, como trilhas de discos danificadas, erros de programação ou perda na ligação entre duas sub-redes são exemplos de problemas que fazem com que o ambiente de execução cancele automaticamente uma transação.
+
+A atomicidade é implementada com o auxílio de um registro de atividades (\emph{log}) das transações. Nesse registro são armazenadas estruturas que representam informações sobre a execução das transações. Essa estrutura pode variar para incluir diversos tipos de informação, de acordo com o ambiente de execução utilizado, mas as informações principais estão descritas a seguir.
+
+Cada operação efetuada por uma transação que modifica o estado do sistema é incluída nesse registro, em conjunto com informações adicionais como os valores do subconjunto do estado da aplicação modificado (tanto os valores antigos quanto os novos), a transação da qual a operação faz parte, o momento da execução da operação e um identificador único desse registro. 
+
+Para efetuar o cancelamento de uma transação, o registro de atividades é lido do fim para o início, ou seja, a leitura começa na atividade mais recente da transação sendo cancelada, e continua nesse sentido até chegar à primeira operação registrada da transação. A cada operação lida, os valores alterados são retornado para o valor correspondente ao apresentado pelo sistema antes do início dessa operação. Dessa forma, ao final desse procedimento o subconjunto do estado do sistema alterado pela transação terá sido totalmente recuperado.
+
+A efetivação de uma transação consiste em disponibilizar as modificações efetuadas para todas as outras transações. Isso é feito por meio da leitura do registro de atividades, a partir da operação mais antiga que compõe a transação. O ambiente de execução altera o subconjunto do estado que consta no registro de acordo com os valores armazenados no registro.
+
+*** TODO terminar
+
+\subsection{Durabilidade}
+\label{subsec:durabilidade} 
+Durabilidade é a propriedade que diz que uma vez finalizada, o resultado da execução de uma transação não pode ser desfeito arbitrariamente pelo ambiente de execução. A única forma de desfazer o resultado de uma transação finalizada é por meio da execução de uma nova transação, que efetua operações com o objetivo de reverter as modificações efetuadas pela primeira transação.
+
+
+
+% O desenvolvedor que utiliza uma transação só pode  Do ponto de vista do desenvolvedor que utiliza uma transação, há somente dois caminhos possíveis: a efetivação ou o cancelamento. Do ponto de vista do ambiente de execução da transação, 
+
+%A efetivação é o caminho natural, em que a transação é bem-sucedida e o estado do sistema é alterado para refletir as transformações efetudas pelas operações que compõem essa transação. O cancelamento da transação é o caso de exceção, em que eventuais transformações efetuadas pela transação devem ser descartadas.
+
+%Se não houver atomicidade nas execuções, a consistência fica
 
 %Ao agrupar ações em uma transação, o desenvolvedor tem a garantia de que essas ações serão executadas como uma única operação complexa. Essa operação será finalizada com sucesso, e efetuará as possíveis transformações que as ações possam fazer, ou não será executada, e nenhuma possível transformação efetuada por alguma ação da transação será refletida no estado da aplicação. 
 
