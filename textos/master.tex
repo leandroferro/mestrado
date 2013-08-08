@@ -361,7 +361,7 @@ Como máquinas podem ser adicionadas ou removidas durante a execução do sistem
 \label{chap:transacao}
 Este capítulo apresenta o paradigma transacional como uma alternativa para o desenvolvimento de software. Esse paradigma utiliza o conceito de transação para definir unidades de execução de grupos de operações sobre o estado do sistema.
 
-A seção \ref{sec:termos_e_conceitos} cobre os principais conceitos relacionados a transações e cria um vocabulário que será utilizado por todo o texto deste trabalho.
+A seção \ref{sec:tolerancia_a_falhas} cobre os principais conceitos relacionados a transações e cria um vocabulário que será utilizado por todo o texto deste trabalho.
 
 Na seção \ref{sec:transacao} veremos que o uso de transações permite modelar o sistema como uma série transformações atômicas que mantém o estado sempre consistente.
 
@@ -369,8 +369,8 @@ A seção \ref{sec:aspectos_operacionais_e_semanticos} divide *** TODO acabar
 
 Por último, a seção \ref{sec:extensoes} apresenta algumas extensões do modelo de transações descrito neste capítulo.
 
-\section{Termos e conceitos}
-\label{sec:termos_e_conceitos}
+\section{Tolerância a Falhas}
+\label{sec:tolerancia_a_falhas}
 %A utilização de um paradigma transacional surge com os sistemas de processamento de transação utilizados para desenvolver aplicações. Esses sistemas tem como objetivo facilitar e automatizar a programação, execução e administração dessas aplicações.
 
 O estado de uma aplicação é definido como um conjunto de dados relacionados de alguma maneira. Esses relacionamentos podem ser vistos como invariantes em relação aos dados e em relação a como esses dados são alterados. Quando todas essas invariantes definidas estiverem satisfeitas, o estado da aplicação é dito consistente.
@@ -405,9 +405,11 @@ Transações apresentam um conjunto de propriedades que as tornam uma base simpl
 
 \textbf{Durabilidade} impõem que uma vez que a transação tenha sido executada com sucesso, o estado resultante do sistema será mantido. Nenhuma falha posterior, seja ela causada pelo usuário, pelo ambiente ou por componentes de hardware, poderá alterar esse estado. A única maneira de faze-lo é com a execução de uma nova transação.
 
+Embora separadas e nomeadas de forma a gerar um acrônimo com sonoridade atraente, essas propriedades não são totalmente independentes umas das outras, e suas definições em geral fazem referência às outras, como veremos nas seções a seguir.
+
 \subsection{Consistência}
 \label{subsec:consistencia}
-A propriedade mais forte é a consistência, que é também a mais abstrata das quatro propriedades. Ela está relacionada à validação do estado da aplicação, que por sua vez diz respeito às invariantes impostas sobre os dados que compõem esse estado. Sua importância reside no fato que uma aplicação, para atender de maneira efetiva seus requisitos, não pode utilizar dados inconsistentes por um período indefinido de tempo. Ela é abstrata no sentido que muitas das invariantes não podem ser diretamente expressas ou validadas, o que confere a ela um caráter menos determinístico.
+A propriedade mais básica é a consistência, que é também a mais abstrata das quatro propriedades. Ela está relacionada à validação do estado da aplicação, que por sua vez diz respeito às invariantes impostas sobre os dados que compõem esse estado. Sua importância reside no fato que uma aplicação, para atender de maneira efetiva seus requisitos, não pode utilizar dados inconsistentes por um período indefinido de tempo. Ela é abstrata no sentido que muitas das invariantes não podem ser diretamente expressas ou validadas, o que confere a ela um caráter menos determinístico.
 
 Um ponto importante a destacar é que a propriedade de consistência declara que o resultado da transação deve ser um estado de sistema consistente, obedecendo às invariantes impostas. Porém, a execução das operações da transação pode deixar o estado temporariamente inconsistente, até que todas as operações sejam executadas. Ao término de todas as operações e, por consequência, da transação
 
@@ -507,7 +509,7 @@ O Algoritmo \ref{alg:transferencia_transacao_2} ilustra essa situação de cance
 		$CancelarTransacao$\;
 	}
 	{
-		$Y \gets Y + S$\;
+		$Y \gets Y + V$\;
 		$EfetivarTransacao$\;
 	}
 }
@@ -517,19 +519,35 @@ Em alguns ambientes de execução, como SGBD's, essa restrição de que o valor 
 
 O cancelamento devido a algum problema durante a execução da transação é solicitado automaticamente pelo ambiente de execução. Falhas de hardware, software ou rede, como trilhas de discos danificadas, erros de programação ou perda na ligação entre duas sub-redes são exemplos de problemas que fazem com que o ambiente de execução cancele automaticamente uma transação.
 
-A atomicidade é implementada com o auxílio de um registro de atividades (\emph{log}) das transações. Nesse registro são armazenadas estruturas que representam informações sobre a execução das transações. Essa estrutura pode variar para incluir diversos tipos de informação, de acordo com o ambiente de execução utilizado, mas as informações principais estão descritas a seguir.
+A atomicidade é implementada com o auxílio de um registro de atividades (\emph{log}) das transações. Nesse registro são armazenadas estruturas que representam informações sobre a execução das transações. O registro serve a duas funções principais: permitir a restauração do estado da aplicação no caso do cancelamento da transação (atomicidade) e garantir que um novo estado gerado pela execução bem sucedida de uma transação não seja perdido (durabilidade, que será descrita na próxima seção). Essa estrutura pode variar para incluir diversos tipos de informação, de acordo com o ambiente de execução utilizado, mas as informações principais estão descritas a seguir.
 
-Cada operação efetuada por uma transação que modifica o estado do sistema é incluída nesse registro, em conjunto com informações adicionais como os valores do subconjunto do estado da aplicação modificado (tanto os valores antigos quanto os novos), a transação da qual a operação faz parte, o momento da execução da operação e um identificador único desse registro. 
+Todas as atividades da transação são armazenadas nesse registro. Uma pseudo-atividade é criada para indicar o início da transação, quando $IniciarTransacao$ é executada no algoritmo \ref{alg:transferencia_transacao_2}. Cada operação efetuada pela transação que modifica o estado do sistema é incluída nesse registro, em conjunto com informações adicionais como os valores do subconjunto do estado da aplicação modificado (tanto os valores antigos quanto os novos), a transação da qual a operação faz parte, o momento da execução da operação e um identificador único desse registro. 
 
-Para efetuar o cancelamento de uma transação, o registro de atividades é lido do fim para o início, ou seja, a leitura começa na atividade mais recente da transação sendo cancelada, e continua nesse sentido até chegar à primeira operação registrada da transação. A cada operação lida, os valores alterados são retornado para o valor correspondente ao apresentado pelo sistema antes do início dessa operação. Dessa forma, ao final desse procedimento o subconjunto do estado do sistema alterado pela transação terá sido totalmente recuperado.
+Para finalizar, $CancelarTransacao$ e $EfetivarTransacao$ geram também pseudo-atividades que são armazenadas no registro, indicando como a transação deve ser finalizada, revertendo ou armazenando as modificações. 
 
-A efetivação de uma transação consiste em disponibilizar as modificações efetuadas para todas as outras transações. Isso é feito por meio da leitura do registro de atividades, a partir da operação mais antiga que compõe a transação. O ambiente de execução altera o subconjunto do estado que consta no registro de acordo com os valores armazenados no registro.
+Para efetuar o cancelamento de uma transação, o registro de atividades é lido do fim para o início, ou seja, a leitura começa na atividade mais recente da transação sendo cancelada, e continua nesse sentido até chegar à primeira operação registrada da transação. A cada operação lida, os valores alterados são substituídos pelo valor correspondente ao apresentado pelo sistema antes do início dessa operação. Dessa forma, ao final desse procedimento os valores iniciais do subconjunto do estado do sistema alterado pela transação terá sido totalmente recuperado.
 
-*** TODO terminar
+A efetivação de uma transação consiste em aplicar todas as modificações efetuadas por essa transação ao estado do sistema. Como uma consequência da propriedade de isolamento, a efetivação de uma transação não pode interferir na execução de outras transações que estiverem executando concorrentemente e ainda não tenham sido efetivadas.
+
+A aplicação das modificações efetuadas pela transação é feita por meio da leitura do registro de atividades. Esse leitura é feita em ordem crescente de tempo, ou seja, da operação mais antiga para a mais nova da transação. A cada operação lida, a modificação é aplicada, alterando o estado do sistema. Ao fim desse procedimento, os dados estarão atualizados, refletindo as modificações executadas pela transação.
+
+%A garantia da atomicidade envolve procedimentos que vão além de efetivar ou cancelar a transação no momento em que ela é finalizada.  
+
+%Por exemplo, em geral escritas de dados em discos rígidos são postergadas para melhorar a performance. Os dados são agrupados e mantidos temporariamente na memória principal, em um \emph{buffer}, para depois serem enviados realmente para a gravação física no disco.
+
+%Considerando a execução de um programa implementando o algoritmo \ref{alg:transferencia_transacao_2}, que armazena tanto o estado quanto o registro de atividades no disco, podemos imaginar um cenário que ocorra o seguinte :
+
+%\begin{itemize}
+%	\item As operações $IniciarTransacao$, $X = X - V$ e $Y = Y + V$ já foram executadas e registradas, e o registro foi armazenado no disco.
+%	\item A aplicação executa $EfetivarTransacao$, que é registrada no \emph{log}, mas esse registro não é gravado no disco ainda.
+%	\item A aplicação continua sua execução, assumindo que as modificações.
+%\end{itemize}
 
 \subsection{Durabilidade}
 \label{subsec:durabilidade} 
-Durabilidade é a propriedade que diz que uma vez finalizada, o resultado da execução de uma transação não pode ser desfeito arbitrariamente pelo ambiente de execução. A única forma de desfazer o resultado de uma transação finalizada é por meio da execução de uma nova transação, que efetua operações com o objetivo de reverter as modificações efetuadas pela primeira transação.
+Durabilidade é a propriedade que diz que uma vez finalizada a transação, o resultado de sua execução não pode ser desfeito arbitrariamente pelo ambiente de execução. Ou seja, o novo estado gerado pela execução da transação deve ser mantido a despeito de falhas ou problemas que possam ocorrer em um momento posterior à finalização da transação.
+
+Isso não quer dizer que esse novo estado não possa ser modificado. O que essa propriedade assegura é que a única forma de modificar o resultado de uma transação finalizada é por meio da execução de uma nova transação, que efetua operações que revertem ou alteram os dados modificados pela primeira transação.
 
 
 
