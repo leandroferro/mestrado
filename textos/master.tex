@@ -203,10 +203,6 @@ the applications.
 
 \chapter{Introdução}
 \label{chap:introducao}
-%Há diversos motivos para construirmos uma aplicação de forma distribuída, como por exemplo o compartilhamento de recursos, tolerância a falhas e escalabilidade, mas desenvolver um sistema distribuído com essas características não é uma tarefa simples nem trivial. 
-
-%Múltiplos fatores fazem com que o desenvolvimento de aplicações distribuídas exija um esforço adicional em relação ao necessário para construir sistemas  convencionais. Dentre esses fatores podemos mencionar diferentes plataformas de hardware, diferentes sistemas operacionais, comunicação não síncrona entre as máquinas, e falhas e conhecimento parcial do sistema.
-
 Um sistema distribuído é uma coleção de dispositivos computacionais individuais que podem se comunicar uns com os outros \cite{tanenbaum, distributed_computing}. Essa definição engloba uma gama de sistemas computacionais atuais, desde placas de circuitos integrados contendo diversos processadores até a \emph{Internet}. 
 
 Os sistemas distribuídos aos quais este trabalho se refere são compostos por diversos computadores interligados por uma rede de comunicação. Cada computador nesses sistemas possui acesso somente ao seu próprio sistema de armazenamento e a única forma de compartilhar informação é por meio da troca de dados pela rede de comunicação.
@@ -216,12 +212,6 @@ Como exemplos podemos citar desde sistemas clássicos como o serviço de nomes d
 A implementação de sistemas distribuídos em larga escala é complexa, pois esses sistemas precisam lidar e se recuperar de falhas, controlar e gerenciar o acesso e modificação concorrente do estado do sistema, detectar e corrigir possíveis conflitos que esse acesso concorrente possa causar, tudo isso evitando que o sistema fique indisponível ou que o estado do sistema seja perdido.
 
 Diversas técnicas e mecanismos são utilizados para atingir os objetivos descritos acima, de forma que os usuários possam utilizar esses sistemas de maneira consistente. Aos usuários é exposto um conceito ao mesmo tempo simples e poderoso: transação. Uma transação permite que operações no sistema sejam consideradas como uma única operação lógica, e encapsulam toda a complexidade envolvendo as ações que precisam ser executadas para que essa operação lógica seja bem sucedida.   
-
-%Implementar o compartilhamento de estado da aplicação utilizando a troca de dados na rede não é trivial, em especial quando os dados possuem restrições semânticas que precisam ser mantidas e validadas. Por exemplo, se considerarmos um sistema bancário em que as contas dos usuários estão distribuídas entre diversas máquinas e que temos uma solicitação de transferência entre contas que estão em duas máquinas diferentes, é esperado que essa transferência subtraia uma certa quantia da conta de origem e adicione essa mesma quantia na conta de destino, sem alterar o valor total das contas envolvidas. Se a máquina que armazena os dados da conta de destino falhar, a quantia subtraída da conta de origem deve ser reposta.
-
-%O problema descrito acima exige que as operações efetuadas em cada máquina sejam consideradas como uma única operação lógica, ou uma transação. Para satisfazer essa exigência pode ser utilizado o protocolo de efetivação em duas fases (\emph{two-phase commit} ou \emph{2PC}). O \emph{2PC} coordena a efetivação de operações executadas em diversas máquinas, garantido que essa efetivação só ocorra se houver um consenso entre as máquinas participantes da transação. Com a utilização do \emph{2PC} são necessárias duas rodadas adicionais de comunicação entre as máquinas, aumentando o tempo e a complexidade de uma transação.
-
-%Uma transação pode ser efetivada ou cancelada, e o resultado de suas ações deve ser consolidado ou descartado do sistema, de acordo com cada caso. A efetivação ou cancelamento da transação precisa ser comunicada e coordenada entre as máquinas que compõem o sistema. O mecanismo mais comum para efetuar essa comunicação e coordenação é o protocolo de efetivação em duas fases (\emph{two-phase commit} ou \emph{2PC}).
 
 Neste trabalho propomos a utilização de minitransações como uma abordagem viável e semanticamente mais coerente para o desenvolvimento de aplicações distribuídas. Os aspectos semânticos de uma transação ficam claramente especificados em uma minitransação, o que leva a uma maior clareza e coerência do código. Uma infraestrutura com suporte à minitransações foi desenvolvida para demonstrar a praticidade e efetividade do uso dessas minitransações no desenvolvimento de sistemas distribuídos.
 
@@ -235,29 +225,23 @@ Essa clareza é obtida ao custo de uma redução do escopo em que as minitransa�
 
 Este trabalho abrangeu também o desenvolvimento de uma infraestrutura com suporte à execução de minitransações e a criação e avaliação de algumas aplicações de teste, para validar e demonstrar o uso das minitransações. O desenvolvimento dessa infraestrutura é documentado e explicado também neste texto, assim como as avaliações e o resultado dos testes efetuados.
 
-%O objetivo deste trabalho é apresentar o conceito de minitransação e disponibilizar uma infraestrutura para o desenvolvimento de sistemas distribuídos que oferece suporte a essas minitransações.
-
-%Essa infraestrutura oferece uma abstração de estado compartilhado entre as máquinas na forma de um repositório de dados utilizando minitransações para garantir a atomicidade na execução de grupos de operações sobre esse repositório. Ao invés de trocarem mensagens explicitamente, as máquinas verão um repositório que pode crescer de forma a acomodar grandes quantidades de dados e que permite que todas as máquinas tenham sempre acesso a dados consistentes. Assim, esperamos que o desenvolvimento das aplicações distribuídas seja mais simples e ajude os desenvolvedores a direcionar o esforço de trabalho para as necessidades reais das aplicações. O desenvolvimento da infraestrutura foi baseado no \emph{Infinispan} \cite{infinispan}, uma plataforma de dados distribuídos de código aberto
-
 \section{Organização do texto}
 \label{sec:organizacao_do_texto}
-Este texto está organizado em cinco capítulos, cuja ordem segue um desenvolvimento linear de conceitos e apresentações. A leitura sequencial do texto é recomendada, mas alguns trechos podem ser suprimidos, caso haja familiaridade com o assunto apresentado em determinada seção.
+Este texto está organizado em sete capítulos, cuja ordem segue um desenvolvimento linear de conceitos e apresentações. A leitura sequencial do texto é recomendada, mas alguns trechos podem ser suprimidos, caso haja familiaridade com o assunto apresentado em determinada seção.
 
 Este primeiro capítulo resume sucinta e brevemente o assunto principal do trabalho. Ele também oferece uma ambientação na qual será baseada o desenvolvimento do restante do texto, e aborda rapidamente termos essenciais utilizados em toda esta dissertação. Também são apresentados outros trabalhos que podem ser relacionados de alguma forma a este.
 
 O segundo capítulo descreve a evolução histórica dos sistemas computacionais, relatando superficialmente os diferentes tipos de abordagens para o desenvolvimento de sistemas e culminando no foco deste trabalho, os sistemas distribuídos. As diversas formas em que se apresentam e os variados problemas que devem tratar levam ao assunto do capítulo seguinte.
 
-No terceito capítulo detalhada e aprofunda a noção de uma transação e o paradigma de programação que ela impõem para aplicações que a utilizam. Somente alguns aspectos de uma transação, os mais relevantes às minitransações, são abordados, devido à abrangência do tema.
+No terceiro capítulo detalhada e aprofunda a noção de uma transação e o paradigma de programação que ela impõem para aplicações que a utilizam. Somente alguns aspectos de uma transação, os mais relevantes às minitransações, são abordados, devido à abrangência do tema.
 
 O quarto capítulo apresenta as minitransações e é, portanto, o capítulo principal deste trabalho. Uma definição é formalizada para uma minitransação, seu escopo de utilização é delimitado e as vantagens e desvantagens são abordadas.
 
-O quinto capítulo é o mais técnico deste texto, descrevendo a infraestrutura desenvolvida e detalhando os pontos principais, relacionados à execução de minitransações. %Alguns trechos de código foram inseridos no texto, mas a sua compreensão não é essencial para o entendimento do texto que o compreende.
+O quinto capítulo é o mais técnico deste texto, descrevendo a infraestrutura desenvolvida e detalhando os pontos principais, relacionados à execução de minitransações.
 
 O sexto capítulo é composto pela avaliação e resultados obtidos de testes e validações efetuadas em aplicações desenvolvidas utilizando a infraestrutura apresentada no capítulo cinco.
 
 O sétimo e último capítulo conclui este trabalho. Ele aborda os problemas encontrados, as soluções utilizadas, as lições aprendidas e possíveis melhorias e continuações deste trabalho.
-
-%O capítulo \ref{chap:conceitos} apresenta uma motivação para o uso de transações, sua utilização em um ambiente distribuído e a necessidade de um protocolo de efetivação nesse contexto, detalhando o \emph{2PC} e o conceito original de minitransação. O capítulo \ref{chap:implementacao} descreve como o Infinispan foi modificado para permitir a execução de minitransações. O capítulo \ref{chap:conclusao} apresenta os resultados obtidos e as conclusoes sobre o uso de minitransações para a implementação de transações distribuídas.
 
 \section{Trabalhos relacionados}
 \label{sec:trabalhos_relacionados}
@@ -282,24 +266,8 @@ neste trabalho em operações de leitura e escrita na memória principal do comp
 
 \chapter{Evolução dos sistemas computacionais}
 \label{chap:evolucao}
-%Os sistemas computacionais evoluiram acompanhando o desenvolvimento das plataformas de \emph{hardware} ao longo do tempo. Inicialmente muito grandes e caros, os primeiros computadores eram utilizados basicamente para executar sistemas relacionados a cálculos, em grandes salas de universidades.
-
-%Grandes empresas passaram a utilizar computadores e geraram a demanda por novos sistemas, responsáveis por gerenciar e manipular informações de importância estratégica. 
-
-%A evolução no desenvolvimento e miniaturização de circuitos levou à diminuição no tamanho dos computadores, permitindo então que as pessoas pudessem levar para dentro de suas casas essas máquinas que antes eram exclusividade de grandes corporações e universidades.
-
-%Uma enorme gama de novos tipos de sistemas foram criados para esses computadores pessoais, e o compartilhamento de informações entre esses computadores era feita principalmente por meio de dispositivos de armazenamento de dados removíveis.
-
-%Com o desenvolvimento das redes de computadores e a popularização da mais famosa delas, a \emph{Internet}, foram surgindo sistemas cada vez mais complexos, que utilizam de forma intensa a comunicação entre os computadores.
-
-%A miniaturização segue, fazendo com que hoje um número cada vez maior de dispositivos móveis sejam dotados de capacidades de processamento superiores a muitos computadores comuns. Os sistemas estão cada vez mais espalhados, sendo executados em ambientes cada vez mais diferentes.
-
-%A computação em nuvem (\emph{cloud computing}) dá um passo adiante em relação ao ambiente de execução: os recursos computacionais necessários são alocados e disponibilizados de acordo com a necessidade, permitindo de sistemas em dimensões antes não alcancáveis.
-
 Este capítulo apresenta uma breve descrição da evolução dos sistemas computacionais e da maneira como foram e são construídos. O tamanho e a complexidade desses sistemas evoluiram acompanhando, e muitas vezes incentivando, a evolução das plataformas de \emph{hardware} em que executam. Essa descrição não é completa e nem exaustiva, uma vez que o intuito é apresentar os tipos mais representativos de sistemas e as técnicas e arquiteturas utilizadas em seu desenvolvimento.
 
-%\section{Primeiros computadores}
-%\label{sec:primeiros_computadores}
 Os primeiros computadores foram criados com o intuito de resolver mais rapidamente cálculos matemáticos. Essas máquinas ocupavam salas inteiras e eram programadas por meio de alterações diretas nas ligações entre os componentes físicos da máquina. 
 
 *** TODO colocar foto do eniac - fonte: http://ds.haverford.edu/bitbybit/bit-by-bit-contents/chapter-four/4-8-project-px-and-the-eniac/
@@ -324,10 +292,6 @@ Enquanto um computador físico compreende instruções simples e específicas qu
 
 *** TODO colocar um exemplo de if simples em Java
 
-%Linguagens como Fortran \cite{fortran}, COBOL \cite{cobol} e Lisp \cite{lisp} foram umas das primeiras dessas linguagens de alto-nível criadas, e de certa forma, muito da estrutura e dos conceitos utilizados por elas está presente ainda hoje em linguagens mais atuais. Fortran possui uma grande aplicabilidade em aplicações que precisam efetuar cálculos numéricos e científicos. COBOL foi concebida com o intuito de desenvolver sistemas corporativos que envolvem tarefas gerenciais e administrativas e trabalham com um grande volume de informações. Lisp foi criada originalmente como uma notação matemática prática para programas de computadores, e deu origem que é conhecido hoje como paradigma funcional.
-
-%As redes de computadores, que permitiam que máquinas se comunicassem e trocassem informações, cresceram também em popularidade e utilização. Redes de interconexão foram criadas e assim também sistemas que executavam em computadores separados e utilizavam essas redes para
-
 As plataformas evoluíram para oferecer novos comandos e modos de execução, permitindo a execução de diversos programas ao mesmo tempo, oferecendo espaços de endereçamento de memória maiores e mesmo a criação de computadores virtuais dentro de uma mesma máquina física, emulando outros modelos e sistemas. Com a criação dos circuitos integrados os computadores diminuíram ainda mais seu tamanho, consumo de energia e custo. O surgimento do computador pessoal aumentou a popularidade dessas máquinas, que começaram a ser utilizadas e programadas para os mais diversos fins. Novos ambientes e sistemas visuais aumentaram a qualidade da experiência do usuário.
 
 Os sistemas operacionais funcionam também como uma camada de abstração das funcionalidades presentes no hardware das máquinas, facilitando tarefas como gerenciamento e uso de memória virtual, utilização de dispositivos conectados e compartilhamento de recursos por dois ou mais programas ao mesmo tempo \cite{so}. Ao esconder detalhes específicos do hardware utilizado e apresenta uma camada coesa e unificada aos programas, os sistemas operacionais também permitem que um programa escrito em uma certa linguagem para um determinado sistema operacional execute em qualquer plataforma de hardware em que esse sistema esteja disponível. 
@@ -348,36 +312,21 @@ Essa crescente demanda de aplicações espalhadas pela \emph{Internet} e disposi
 
 Como máquinas podem ser adicionadas ou removidas durante a execução do sistema, esse deve estar preparado para lidar e tratar requisiçoes duplicadas, tentativas de reconexão e redistribuição de carga. O sistema deve ser capaz de manter seu estado global consistente e válido, e fazer isso face a mudanças bruscas na configuração do sistema não é uma tarefa trivial. Como veremos no capítulo seguinte, transações são uma ferramenta de grande utilidade para realizar essa tarefa de manter o estado do sistema consistente. 
 
-%Porém, a criação de sistemas para esses ambientes deve ser mais criteriosa, e seus benefícios não são aproveitados se o desenvolvimento não levar em conta as implicações que a execução nesses ambientes podem trazer. 
-
-%uma capacidade computacional que pode escalar para atender necessidades crescentes de recursos. Aplicações atuais fazem uso de serviços de computação em nuvem para evitar construir uma infraestrutura de máquinas, rede e recursos humanos, reaproveitando e compartilhando recursos ociosos de grandes provedores de serviço.
-
-%\section{Popularização}
-%\label{sec:comunicacao_e_mobilidade}
-
-%\section{}
+*** TODO ver se dá pra pegar aquela parte do booch que ele explica a evolução das linguagens...
 
 \chapter{Paradigma transacional}
 \label{chap:transacao}
 Este capítulo apresenta o paradigma transacional como uma alternativa para o desenvolvimento de software. Esse paradigma utiliza o conceito de transação para definir unidades de execução de grupos de operações sobre o estado do sistema.
 
-A seção \ref{sec:tolerancia_a_falhas} cobre os principais conceitos relacionados a transações e cria um vocabulário que será utilizado por todo o texto deste trabalho.
+A seção \ref{sec:tolerancia_a_falhas} apresenta uma idéia da necessidade e da origem da utilização de transações.
 
-Na seção \ref{sec:transacao} veremos que o uso de transações permite modelar o sistema como uma série transformações atômicas que mantém o estado sempre consistente.
-
-A seção \ref{sec:aspectos_operacionais_e_semanticos} divide *** TODO acabar
+Na seção \ref{sec:transacao} veremos as propriedades que essas transações devem possui para oferecer uma ferramenta de desenvolvimento efetiva ao desenvolvedor.
 
 Por último, a seção \ref{sec:extensoes} apresenta algumas extensões do modelo de transações descrito neste capítulo.
 
 \section{Tolerância a Falhas}
 \label{sec:tolerancia_a_falhas}
-%A utilização de um paradigma transacional surge com os sistemas de processamento de transação utilizados para desenvolver aplicações. Esses sistemas tem como objetivo facilitar e automatizar a programação, execução e administração dessas aplicações.
-
 O estado de uma aplicação é definido como um conjunto de dados relacionados de alguma maneira. Esses relacionamentos podem ser vistos como invariantes em relação aos dados e em relação a como esses dados são alterados. Quando todas essas invariantes definidas estiverem satisfeitas, o estado da aplicação é dito consistente.
-
-%Aplicações de processamento de transações suportam uma série de clientes executando operações para acessar e alterar o estado da aplicação. Com o tempo as operações oferecidas, o número e tipo de clientes e a complexidade do estado da aplicação evoluem. 
-
-%De maneira incremental, as aplicações passam a ser geograficamente distribuídas; executando em diferentes equipamentos e plataformas; e seus requisitos de disponibilidade e tempo de resposta passam a ser mais rígidos e controlados. Esses incrementos aumentam a abrangência e a utilidade da aplicação, mas aumenta o números de cenários que podem fazer a aplicação falhar ao executar as operações.
 
 A execução de uma aplicação, por mais simples que seja, está sujeita a diversos tipos de falhas. Ao passo em que evoluem, passando a ser geograficamente distribuídas, executando em diferentes equipamentos e plataformas e aumentando seus requisitos de disponibilidade e tempo de resposta, as chances de falha aumentam consideravelmente. Manter o estado da aplicação consistente em cenários de ocorrência de falhas não é uma tarefa trivial.
 
@@ -389,12 +338,20 @@ Uma das formas de tornar o software tolerante a falhas é utilizar uma técnica 
 
 Embora efetiva, essa abordagem possui um custo de implementação elevado e é de difícil manutenção, pois a reparação em caso de erro não é trivial, uma vez que cada versão terá um estado interno diferente. Além disso, mesmo sendo criteriosamente testadas, as versões conterão problemas, o que pode levar à falta de consenso ou a um consenso em torno de uma resposta incorreta.
 
-Uma outra maneira de tornar o software tolerante a falhas é por meio do uso de \textbf{transações}. Uma transação é uma coleção de operações sobre o estado de um sistema. Ela pode ser vista como uma operação lógica composta por operações mais simples, que acessam e modificam o estado do sistema de maneira a mantê-lo sempre consistente. Uma falha em alguma das operações faz com que a transação como um todo seja abortada e o estado do sistema seja restaurado como era no início da transação \cite{garcia-molina, vaca, gray}.
+Uma outra maneira de tornar o software tolerante a falhas é por meio do uso de \textbf{transações}, descritas na seção seguinte.
 
 \section{Transação}
 \label{sec:transacao}
-Transação é o bloco básico de construção para organizar uma aplicação em ações atômicas. Ela pode conter um número arbitrário de ações simples suportadas pela aplicação. O conjunto de ações que compõem a transação forma um todo indivisível do ponto de vista da aplicação que utiliza essa transação.
+Uma transação é uma coleção de operações sobre o estado de um sistema. Ela pode ser vista como uma operação lógica composta por operações mais simples, que acessam e modificam o estado do sistema de maneira a mantê-lo sempre consistente. Uma falha em alguma das operações faz com que a transação como um todo seja abortada e o estado do sistema seja restaurado como era no início da transação \cite{garcia-molina, vaca, gray}.
 
+Transação é o bloco básico de construção no paradigma transacional que oferece uma abstração de desenvolvimento que facilita a organizar uma aplicação em transações compostas por um conjunto de operações que, do ponto de vista da aplicação, são executadas de forma atômica. 
+
+Ao longo do tempo foram identificadas quatro propriedades que definem uma transação. Essas propriedades acabaram por se tornar sinônimo de transação, e a sua sigla, \emph{ACID}, está usualmente associada à transações. Essas propriedades estão descritas na seção \ref{subsec:acid}.
+
+A descrição de transação apresentada neste capítulo pode ser considerada como convencional. Hoje em dia existem diversas extensões desse modelo convencional, criadas para adequar ou otimizar a execução das transações a um determinado cenário. Essas extensões são apresentadas resumidamente na seção \ref{subsec:extensoes}.
+
+\subsection{ACID}
+\label{subsec:acid}
 Transações apresentam um conjunto de propriedades que as tornam uma base simples e sólida na qual se pode basear o desenvolvimento de aplicações. Essas propriedades são chamadas conjuntamente de \emph{ACID} (\emph{Atomicity, Consistency, Isolation e Durability}, ou Atomicidade, Consistência, Isolamento e Durabilidade). 
 
 \textbf{Atomicidade} se refere ao fato que a execução da transação é atômica, ou seja, a execução da transação significa que todas as operações que a compõem foram executadas com sucesso. A atomicidade diz respeito a qualquer observador externo, que não deve ser capaz acessar nenhum estado intermediário criado pela transação durante sua execução. Os únicos dois estados que um observador externo pode acessar é o estado final, após a transação ser finalizada, ou o estado inicial, após a transação ser cancelada.
@@ -407,8 +364,11 @@ Transações apresentam um conjunto de propriedades que as tornam uma base simpl
 
 Embora separadas e nomeadas de forma a gerar um acrônimo com sonoridade atraente, essas propriedades não são totalmente independentes umas das outras, e suas definições em geral fazem referência às outras, como veremos nas seções a seguir.
 
-\subsection{Consistência}
-\label{subsec:consistencia}
+Garantir a atomicidade e durabilidade na execução de múltiplas transações concorrentes em situações de erro é uma tarefa complexa. Fazê-la atendendo a requisitos de performance e economia de recursos torna-a mais complicada. 
+
+\emph{ARIES} (\emph{Algorithm for Recovery and Isolation Exploiting Semantics}, \cite{aries}) é o método mais utilizado para efetuar implementar os mecanismos que asseguram ao um ambiente de execução transacional as propriedades \emph{ACID}. Esse método utiliza o conceito de registros de atividades e de travas como base para a implementação dos mecanismos, e sua idéia geral está distribuída nas seções seguintes.
+
+\subsubsection*{Consistência}
 A propriedade mais básica é a consistência, que é também a mais abstrata das quatro propriedades. Ela está relacionada à validação do estado da aplicação, que por sua vez diz respeito às invariantes impostas sobre os dados que compõem esse estado. Sua importância reside no fato que uma aplicação, para atender de maneira efetiva seus requisitos, não pode utilizar dados inconsistentes por um período indefinido de tempo. Ela é abstrata no sentido que muitas das invariantes não podem ser diretamente expressas ou validadas, o que confere a ela um caráter menos determinístico.
 
 Um ponto importante a destacar é que a propriedade de consistência declara que o resultado da transação deve ser um estado de sistema consistente, obedecendo às invariantes impostas. Porém, a execução das operações da transação pode deixar o estado temporariamente inconsistente, até que todas as operações sejam executadas. Ao término de todas as operações e, por consequência, da transação
@@ -435,8 +395,7 @@ Como o estado do sistema pode ficar inconsistente durante a execução da transa
 
 Assim, a propriedade de isolamento toma forma para impedir que transações em curso que efetuaram transformações que deixaram o sistema inconsistente afetem a outras transações em execução. 
 
-\subsection{Isolamento}
-\label{subsec:isolamento}
+\subsubsection*{Isolamento}
 Retomando o exemplo anterior sobre transferência de valores, vamos supor agora que existam duas transações $T_1$ e $T_2$ sendo executadas ao mesmo tempo.
 
 $T_1$ precisa transferir $10$ e $T_2$ precisa transferir $15$. Como visto no capítulo \ref{chap:evolucao}, uma operação simples como $X \gets X - V$, declarada em apenas uma linha em linguagens de programação de alto-nível, abstrai uma série de micro-operações efetuadas pelo processador para efetuar uma conta e armazenar o seu resultado em uma variável (na verdade, essa atribuição em conjunto com a subtração podem ser vistos como uma transação, que retorna somente se a subtração for bem sucedida e o seu resultado for armazenado no espaço de memória identificado por $X$). 
@@ -477,16 +436,13 @@ Levando em conta os Algoritmos \ref{alg:transferencia_transacao_1} e \ref{alg:as
 
 Antes do início da transação tínhamos um total de 30 somando os valores das duas contas. Após o término da transação esse total é de 40, violando a invariante declarada. Portanto, o estado desse sistema está inconsistente.
 
-%A exigência de isolamento entre as transações pode ser implementada com diversos mecanismos. O mais simples deles seria simplesmente forçar que as transações fossem executadas em sequência. As transações poderiam ser enfileiradas por ordem de chegada e executadas do começo ao fim, sem interrupção. Embora seja uma solução efetiva e que faça sentido em alguns casos, em geral obrigar o sequenciamento na execução de transações diminui a taxa com que elas podem ser executadas.
-
 O mecanismo mais comum para a implementação do isolamento são as travas (\emph{locks}), que a mecanismos de controle de concorrência oferecidos nos sistemas operacionais, como semáforos. A implementação mais simples de travas associa a cada dado que compõem o estado do sistema uma trava. Quando uma transação precisa acessar um determinado dado, o ambiente de execução automaticamente tenta atribuir a trava associada a esse dado à transação. Se a trava não estiver associada a nenhuma outra transação no momento, ela será atribuída à transação solicitante, e essa atribuição irá perdurar até o final da transação. Se essa trava já estiver associada a uma outra transação, a primeira transação irá esperar até que a trava esteja liberada para poder continuar.
 
 Diversas variações e otimizações desse mecanismo de travas foram criadas, visando aumentar o grau de concorrência e a performance das transações, mas o conceito básico é o descrito acima.
 
 O isolamento na execução de transações concorrentes permite ao desenvolvedor ignorar questões ligadas ao controle de concorrência nas aplicações, pois essas são gerenciadas pelo ambiente de execução. Assim, o software resultante fica menos complexo e mais claro.
 
-\subsection{Atomicidade}
-\label{subsec:atomicidade}
+\subsubsection*{Atomicidade}
 Atomicidade é a propriedade que confere às transações o seu caráter \textbf{tudo-ou-nada} de execução. Esse caráter facilita o modelo de desenvolvimento ao apresentar um protocolo simples ao desenvolvedor: a transação é efetivada e as possíveis alterações de estado são aplicadas ao sistema ou a transação é cancelada e nenhuma alteração de estado é notada pela aplicação. 
 
 A efetivação é o caminho natural e é atingida somente se todas as operações que compõem a transação forem executadas sem nenhuma erro. O estado do sistema é alterado para refletir quaisquer alterações que a transação possa ter produzido. A consistência desse novo estado é assumido como válido pelo ambiente de execução, uma vez que a transação não foi cancelada explicitamente. Assim fica a cargo do desenvolvedor compor a transação de maneira correta, utilizando as operações de tal forma que o resultado final seja consistente.
@@ -531,215 +487,20 @@ A efetivação de uma transação consiste em aplicar todas as modificações ef
 
 A aplicação das modificações efetuadas pela transação é feita por meio da leitura do registro de atividades. Esse leitura é feita em ordem crescente de tempo, ou seja, da operação mais antiga para a mais nova da transação. A cada operação lida, a modificação é aplicada, alterando o estado do sistema. Ao fim desse procedimento, os dados estarão atualizados, refletindo as modificações executadas pela transação.
 
-%A garantia da atomicidade envolve procedimentos que vão além de efetivar ou cancelar a transação no momento em que ela é finalizada.  
-
-%Por exemplo, em geral escritas de dados em discos rígidos são postergadas para melhorar a performance. Os dados são agrupados e mantidos temporariamente na memória principal, em um \emph{buffer}, para depois serem enviados realmente para a gravação física no disco.
-
-%Considerando a execução de um programa implementando o algoritmo \ref{alg:transferencia_transacao_2}, que armazena tanto o estado quanto o registro de atividades no disco, podemos imaginar um cenário que ocorra o seguinte :
-
-%\begin{itemize}
-%	\item As operações $IniciarTransacao$, $X = X - V$ e $Y = Y + V$ já foram executadas e registradas, e o registro foi armazenado no disco.
-%	\item A aplicação executa $EfetivarTransacao$, que é registrada no \emph{log}, mas esse registro não é gravado no disco ainda.
-%	\item A aplicação continua sua execução, assumindo que as modificações.
-%\end{itemize}
-
-\subsection{Durabilidade}
-\label{subsec:durabilidade} 
+\subsubsection*{Durabilidade}
 Durabilidade é a propriedade que diz que uma vez finalizada a transação, o resultado de sua execução não pode ser desfeito arbitrariamente pelo ambiente de execução. Ou seja, o novo estado gerado pela execução da transação deve ser mantido a despeito de falhas ou problemas que possam ocorrer em um momento posterior à finalização da transação.
 
 Isso não quer dizer que esse novo estado não possa ser modificado. O que essa propriedade assegura é que a única forma de modificar o resultado de uma transação finalizada é por meio da execução de uma nova transação, que efetua operações que revertem ou alteram os dados modificados pela primeira transação.
 
+A implementação da durabilidade é feita também com o auxílio do registro de atividades, sendo utilizado quando o ambiente de execução é reiniciado, em geral após alguma falha. Nesses casos, o registro é analisado e o estado do sistema é analisado, em busca de transações que tenham sido registradas como efetivadas mas cujas alterações não estão refletidas no estado do sistema.
 
+Transações nessa situação são reexecutadas automaticamente, efetuando novamente as operações da transação. Um controle especial precisa ser feito pois pode acontecer de somente algumas operações não estarem refletidas no estado do sistema, e portanto a implementação não pode reexecutar essas transações.
 
-% O desenvolvedor que utiliza uma transação só pode  Do ponto de vista do desenvolvedor que utiliza uma transação, há somente dois caminhos possíveis: a efetivação ou o cancelamento. Do ponto de vista do ambiente de execução da transação, 
+Esse procedimento acaba por assegurar também a atomicidade, pois pode ocorrer da transação estar registrada como cancelada mas o estado do sistema não estar refletindo a situação inicial, antes do início da transação. Nesse caso, as alterações são desfeitas.
 
-%A efetivação é o caminho natural, em que a transação é bem-sucedida e o estado do sistema é alterado para refletir as transformações efetudas pelas operações que compõem essa transação. O cancelamento da transação é o caso de exceção, em que eventuais transformações efetuadas pela transação devem ser descartadas.
+%*** TODO colocar a imagem da página 168 do gray aqui...
 
-%Se não houver atomicidade nas execuções, a consistência fica
-
-%Ao agrupar ações em uma transação, o desenvolvedor tem a garantia de que essas ações serão executadas como uma única operação complexa. Essa operação será finalizada com sucesso, e efetuará as possíveis transformações que as ações possam fazer, ou não será executada, e nenhuma possível transformação efetuada por alguma ação da transação será refletida no estado da aplicação. 
-
-%A vantagem da utilização de transações é que o desenvolvedor pode tratar um conjunto de ações como uma única operação lógica, simplificando a maneira com que os requisitos da aplicação são traduzidos para uma linguagem de programação. 
-
-%O paradigma orientado a objetos utiliza o conceito de objetos como o bloco de construção primário para o desenvolvimento de aplicações. Os desenvolvedores modelam os requisitos da aplicação como objetos que se comunicam invocando métodos uns dos outros. Ao invocar um método, o desenvolvedor está interessado no resultado que esse método vai , o paradigma transacional oferece como 
-
-%Essas quatro propriedades visam a integridade do sistema, sendo garantidas pelo ambiente em que as transações são executadas. Esse ambiente de processamento de transações oferece um paradigma de programação transacional que permite uma abordagem de desenvolvimento tolerante a falhas.
-
-%A execução bem sucedida de uma transação depende tanto de aspectos operacionais relacionados ao ambiente de execução quanto de aspectos semânticos relacionados ao domínio da aplicação.
-
-%\subsection{Isolamento}
-%\label{subsec:isolamento}
-
-\section{Aspectos operacionais e semânticos}
-\label{sec:aspectos_operacionais_e_semanticos}
-
-Falhas de aspecto operacional estão relacionadas a problemas, permanentes ou transitórios, encontrados nos sistemas de base utilizados pelo ambiente de execução, como sistema operacional, redes ou hardware. Trilhas danificadas no disco rígido, perda de comunicação entre máquinas, quedas no fornecimento de energia são alguns exemplos, assim como danos físicos no cabeamento de rede ou o extravio de uma máquina.
-
-Essas falhas de aspecto operacional estão fora do controle do desenvolvedor, mas podem ser manipuladas diretamente pelo ambiente de execução. Em geral, o cancelamento da transação e uma nova execução em um momento futuro podem corrigir o problema, como no caso de falhas transitórias. Falhas permanentes exigem a manutenção dos elementos afetados, mas uma vez corrigidas, uma nova execução da transação será bem-sucedida.
-
-%o caratér atômico de uma transação é de extrema importância nesse caso, pois uma falha irá causar o cancelamento da transação e um retorno ao estado apresentado no início da transação, garantindo a consistência dos dados.
-
-Falhas de aspecto semântico são dependentes do domínio da aplicação e precisam ser garantidas pelo desenvolvedor. Elas estão relacionadas a violações das invariantes definidas sobre o estado da aplicação e não podem ser diretamente tratadas pelo ambiente de execução. O desenvolvedor deve verificar essas invariantes e efetuar o cancelamento da transação caso necessário.
-
-*** TODO colocar a imagem da página 168 do gray aqui...
-%Considerando os tipos de falhas descritos acima, a figura \ref{fig:outcomes_transacao} apresenta os três possíveis outcomes (?) de uma transação. O primeiro outcome ocorrer quando a transação é bem-sucedida e o resultado das operações é efetivado
-
-Podemos mostrar as vantagens de utilizar transações com um exemplo simples e clássico: transferência de valores. O Algoritmo \ref{alg:transferencia_valores_sem_transacao}, que implementa a transferência de valores entre duas contas, origem e destino, sem fazer nenhum controle ou verificação de falhas. Digamos que as funções $Ler$ e $Escrever$ implementam as operações de leitura e escrita em um gerenciador de recursos que armazene os dados das contas. Essas operações são executadas imediatamente e abortam a execução do programa caso algum erro ocorra.
-
-O algoritmo irá obter uma referência às contas, verificar se o saldo da conta de origem é suficiente, subtrair o valor da conta de origem, somar esse mesmo valor na conta de destino e escrever os novos valores nos recursos correspondentes. Se um erro ocorrer ao executar a escrita do novo valor na conta de destino os dados ficarão inconsistentes, pois o valor terá sido retirado da conta de origem ($Escrever(O, V_O - V)$ já aconteceu), mas não terá sido adicionado à conta de destino ($Escrever(D, V_D + V)$ falhou).
-
-\begin{algorithm}
-\caption{Transferência de valores}
-\label{alg:transferencia_valores_sem_transacao}
-\Inicio{
-    $O \gets \text{Recurso referente à conta de origem}$\;
-    $D \gets \text{Recurso referente à conta de destino}$\;
-    $V \gets \text{Valor a ser transferido}$\;
-    $V_O \gets Ler(O)$\;
-    \eSe{$V_O >= V$}
-    {
-        $V_D \gets Ler(D)$\;
-        $Escrever(O, V_O - V)$\;
-        $Escrever(D, V_D + V)$\;
-    }
-    {
-        $Imprimir(\text{Saldo insuficiente})$\;
-    }
-}
-\end{algorithm}
-
-O algoritmo \ref{alg:transferencia_valores_checar_erro} refina nossa primeiro algoritmo fazendo uso de duas novas funções, $Ler_M$ e $Escrever_M$. Essas funções implementam as mesmas operações das originais $Ler$ e $Escrever$, mas não abortam o programa caso ocorra uma falha. Ao invés disso, elas colocam o programa em um estado de erro que pode ser verificado com a função $HouveErro$, que indica se a última operação $Ler_M$ ou $Escrever_M$ falhou. Com essas novas funções, podemos criar um novo algoritmo, efetuando operações para desfazer alterações no estado do sistema em caso de falha.
-
-\begin{algorithm}
-\caption{Transferência de valores - tratamento de erros}
-\label{alg:transferencia_valores_checar_erro}
-\Inicio{
-    $O \gets \text{Recurso referente à conta de origem}$\;
-    $D \gets \text{Recurso referente à conta de destino}$\;
-    $V \gets \text{Valor a ser transferido}$\;
-    $V_O \gets Ler_M(O)$\;
-    \eSe{$V_O >= V$}
-    {
-        $V_D \gets Ler_M(D)$\;
-        $Escrever_M(O, V_O - V)$\;
-        \eSe{$HouveErro()$}
-        {
-            $Imprimir(\text{ERRO - não foi possível debitar valor})$\;
-        }
-        {
-            $Escrever_M(D, V_D + V)$\;
-            \Se{$HouveErro()$}
-            {   
-                $Escrever_M(O, V_O + V)$\;
-                \Se{$HouveErro()$}
-                {
-                    $Imprimir(\text{ERRO - dados ficarão inconsistentes!})$\;
-                }
-            }
-        }
-    }
-    {
-        $Imprimir(\text{Saldo insuficiente})$\;
-    }
-}
-\end{algorithm}
-
-Como podemos observar no Algoritmo \ref{alg:transferencia_valores_checar_erro}, o tratamento manual é tedioso e suscetível a erros. O número de casos a serem tratados pode aumentar rapidamente conforme a combinação entre as operações. Além disso, em alguns cenários pode não ser possível desfazer algumas alterações, o que envolveria um mecanismo de retentativas mais complexo.
-
-Uma abordagem transacional permite uma abordagem clara e uma linha de raciocínio mais direta, como podemos ver no algoritmo \ref{alg:transferencia_valores_transacao}. Nesse algoritmo, $IniciarTransacao$ é utilizada para criar uma nova transação, retornando um identificador para a transação criada; $Efetivar(T)$ comunica ao ambiente de execução que a transação $T$ foi bem sucedida e que as alterações efetuadas por ela podem ser realmente executadas; e $Abortar(T)$ sinaliza que algum erro semântico ocorreu e portanto as alterações efetuadas pela transação $T$ não podem ser efetivadas. As funções $Ler_T$ e $Escrever_T$, baseadas respectivamente em $Ler$ e $Escrever$, associam a leitura ou escrita do valor de uma determinada conta com a transação $T$.
-
-\begin{algorithm}
-\caption{Transferência de valores - uso de transações}
-\label{alg:transferencia_valores_transacao}
-\Inicio{
-    $O \gets \text{Recurso referente à conta de origem}$\;
-    $D \gets \text{Recurso referente à conta de destino}$\;
-    $V \gets \text{Valor a ser transferido}$\;
-    $T \gets IniciarTransacao()$\;
-    $V_O \gets Ler_T(T, O)$\;
-    \eSe{$V_O >= V$}
-    {    
-        $V_D \gets Ler_T(T, D)$\;
-        $Escrever_T(T, O, V_O - V)$\;
-        $Escrever_T(T, D, V_D + V)$\;
-        $Efetivar(T)$\;
-    }
-    {
-        $Imprimir(\text{Saldo insuficiente})$\;
-        $Abortar(T)$\;
-    }
-}
-\end{algorithm}
-
-Nesse algoritmo o comportamento das funções $Ler_T$ e $Escrever_T$ é parecido com o comportamento apresentado no Algoritmo \ref{alg:transferencia_valores_sem_transacao}: se ocorrer um erro, o programa é terminado. Agora, porém, antes de terminar o programa, as funções irão abortar a transação, utilizando $Abortar(T)$, mantendo os dados inalterados.
-
-O uso da transação permitiu que o formato do Algoritmo \ref{alg:transferencia_valores_transacao} ficasse muito parecido com o do Algoritmo \ref{alg:transferencia_valores_sem_transacao}. As únicas diferenças são relacionadas à criação da transação, para demarcar o início das operações que devem ser executadas de forma atômica, e os momentos da efetivação ou cancelamento. No caso de efetivação, nenhum erro ocorreu e o gerenciador de recursos irá efetivar as alterações efetuadas pelas operações da transação. Caso a conta de origem não possua saldo suficiente, a transação será cancelada.
-
-As falhas de caráter operacional estão sendo tratadas implicitamente pelo ambiente de execução. Se o recurso $D$ falhar ao efetuar a escrita de dados da linha 9 por algum motivo, a escrita efetuada em $O$ na linha 8 não surtirá efeito. Isso deixa o código mais limpo e claro, exprimindo melhor a intenção do programa.
-
-Os aspectos semânticos da transação precisam ser validados explicitamente pelo programa. Nesse caso, o valor a ser transferido não pode ser maior do que o valor da conta de origem. Assim, a linha 6 efetua essa comparação e cancela a transação na linha 13 caso não haja saldo suficiente.
-
-%A atomicidade na garante que se o programa executou sem erros, a transferência foi efetuada. Falhas operacionais causariam o cancelamento da transação pela ambiente de execução, e falhas semânticas fariam o programa cancelar a transação explicitamente. De uma forma ou de outra, ao final da execução do programa, tanto em caso de sucesso quanto de falha, é garantido que o estado do sistema esteja consistente.
-
-%Os recursos $O$ e $D$ referentes às contas de origem e destino, respectivamente, podem estar localizados tanto na mesma máquina que executa o programa de transferência quanto em máquinas distintas. Essa uniformidade na forma de utilização, tanto em ambientes não-dstribuídos quanto em ambientes distribuídos, é também uma grande vantagem da abordagem transacional.
-
-%Embora o cenário distribuído esteja suscetível a mais tipos de erro, o formato e, mais importante, a semântica da transação são mantidos. Isso permite também que um sistema seja executado inicialmente em um ambiente não distribuído e possa migrar para um ambiente distribuído conforme a necessidade.
-
-*** TODO copiar o diagrama de transição de estado de uma transação do gray, página 181
-
-\section{Atomicidade}
-\label{sec:atomicidade}
-Como vimos, uma transação é uma operação lógica composta por ações mais simples, executada de maneira atômica. Esse conceito é aplicado em computação em diversos níveis, desde das instruções de hardware, como \emph{CAS} (\emph{Compare-And-Swap}, compare e substitua) até transações distribuídas envolvendo máquinas em locais geograficamente afastados. O conceito de atomicidade é definido em relação ao usuário da operação - para o usuário a operação executou corretamente e retornou ou ela foi abortada, não sendo executada.
-
-Efetuar o controle de atomicidade de uma transação requer um grande esforço de projeto e desenvolvimento do ambiente em que a transação é executada.
-
-
-\section{Extensões do modelo de transações}
-\label{sec:extensoes}
-*** TODO Citar aqui extensões do modelo de transação capitulo 4 do gray
-
-Savepoint, Transações encadeadas, Transações aninhadas, Transações distribuídas, Transações multinível, Transações aninhadas abertas, Transações de longa-duração
-
-%Esse exemplo simples demonstra a efetividade da abordagem transacional e também a sua generalidade. Os algoritmos apresentados funcionam tanto em ambientes 
-
-%Partindo de um estado inicial consistente, uma vez que a falha na execução de uma das operações da transação faz com que todas as operações previamente executadas sejam canceladas e tenham seus resultados desfeitos, o estado do sistema é mantido consistente.
-
-%A atomicidade é referente à transação como um todo. As operações individuais que a compõem vão eventualmente 
-
-% como solução para diversos problemas que um sistema distribuído deve resolver, como tolerância e recuperação de falhas, controle e gerenciamento de concorrência, etc.
-
-%Este capítulo descreve o conceito de transação como uma abordagem segura e eficaz para o desenvolvimento de sistemas distribuídos, e descreve os principais tópicos envolvidos na definição de uma transação.
-
-%A quase totalidade deste capítulo foi baseado em \cite{gray}. Outras fontes que eventualmente foram usadas serão citadas pontualmente.
-
-%\section{Operações e Transações}
-%\label{sec:operacoes_e_transacoes}
-
-
-
-%\section{Tolerância e recuperação de falhas}
-%\label{sec:recuperacao_falhas}
-
-%\section{Controle de concorrência}
-%\label{sec:controle_concorrencia}
-
-%\section{Gerenciamento de travas}
-%\label{sec:gerenciamento_travas}
-
-%\section{ACID}
-%\label{sec:acid}
-
-%\section{2PC}
-%\label{sec:2pc}
-
-\chapter{Minitransação}
-\label{chap:minitransacao}
-Este capítulo apresenta a motivação para o uso de transações em aplicações (Seção \ref{sec:transacoes}), ilustrando os exemplos com alguns algoritmos simples. Naturalmente estendemos o conceito de transação para envolver mais de uma máquina, o que nos leva às transações distribuídas e ao problema de efetivar uma transação desse tipo (Seção \ref{sec:transacoes_distribuidas}), onde descrevemos também o protocolo de efetivação em duas fases, de ampla utilização. Por fim é apresentado o conceito de minitransação (Seção \ref{sec:minitransacoes}), uma extensão do protocolo de efetivação em duas fases que oferece melhor desempenho e escalabilidade ao mesmo tempo que garante atomicidade de operações
-em transações distribuídas.
-
-%\section{Transações}
-%\label{sec:transacoes}
-%Aplicações executam operações, de variados tipos e para diversas finalidades, como somar dois números, ler uma tecla digitada do teclado ou enviar um \emph{e-mail} através da rede. Vamos considerar por exemplo %o Algoritmo \ref{alg:transferencia_valores_sem_transacao}, que implementa a transferência de valores entre duas contas, origem e destino. Digamos que as funções $Ler$ e $Escrever$ implementam as operações de leitura e escrita em um gerenciador de recursos que armazene os dados das contas. Essas operações são executadas imediatamente e abortam a execução do programa caso algum erro ocorra.
+%Podemos mostrar as vantagens de utilizar transações com um exemplo simples e clássico: transferência de valores. O Algoritmo \ref{alg:transferencia_valores_sem_transacao}, que implementa a transferência de valores entre duas contas, origem e destino, sem fazer nenhum controle ou verificação de falhas. Digamos que as funções $Ler$ e $Escrever$ implementam as operações de leitura e escrita em um gerenciador de recursos que armazene os dados das contas. Essas operações são executadas imediatamente e abortam a execução do programa caso algum erro ocorra.
 
 %O algoritmo irá obter uma referência às contas, verificar se o saldo da conta de origem é suficiente, subtrair o valor da conta de origem, somar esse mesmo valor na conta de destino e escrever os novos valores nos recursos correspondentes. Se um erro ocorrer ao executar a escrita do novo valor na conta de destino os dados ficarão inconsistentes, pois o valor terá sido retirado da conta de origem ($Escrever(O, V_O - V)$ já aconteceu), mas não terá sido adicionado à conta de destino ($Escrever(D, V_D + V)$ falhou).
 
@@ -763,7 +524,7 @@ em transações distribuídas.
 %}
 %\end{algorithm}
 
-%Para manter a consistência dos dados em caso de falha, vamos criar duas novas funções $Ler_M$ e $Escrever_M$ que implementam as mesmas operações das originais $Ler$ e $Escrever$, mas que não abortam o programa caso ocorra uma falha. Vamos criar também uma nova função $HouveErro$, que permite verificar se a última operação $Ler_M$ ou $Escrever_M$ falhou. Com essas novas funções, podemos criar um novo algoritmo, efetuando operações para desfazer alterações no estado do sistema em caso de falha.
+%O algoritmo \ref{alg:transferencia_valores_checar_erro} refina nossa primeiro algoritmo fazendo uso de duas novas funções, $Ler_M$ e $Escrever_M$. Essas funções implementam as mesmas operações das originais $Ler$ e $Escrever$, mas não abortam o programa caso ocorra uma falha. Ao invés disso, elas colocam o programa em um estado de erro que pode ser verificado com a função $HouveErro$, que indica se a última operação $Ler_M$ ou $Escrever_M$ falhou. Com essas novas funções, podemos criar um novo algoritmo, efetuando operações para desfazer alterações no estado do sistema em caso de falha.
 
 %\begin{algorithm}
 %\caption{Transferência de valores - tratamento de erros}
@@ -784,7 +545,7 @@ em transações distribuídas.
 %        {
 %            $Escrever_M(D, V_D + V)$\;
 %            \Se{$HouveErro()$}
-%%            {   
+%            {   
 %                $Escrever_M(O, V_O + V)$\;
 %                \Se{$HouveErro()$}
 %                {
@@ -799,25 +560,235 @@ em transações distribuídas.
 %}
 %\end{algorithm}
 
+%Como podemos observar no Algoritmo \ref{alg:transferencia_valores_checar_erro}, o tratamento manual é tedioso e suscetível a erros. O número de casos a serem tratados pode aumentar rapidamente conforme a combinação entre as operações. Além disso, em alguns cenários pode não ser possível desfazer algumas alterações, o que envolveria um mecanismo de retentativas mais complexo.
+
+%Uma abordagem transacional permite uma abordagem clara e uma linha de raciocínio mais direta, como podemos ver no algoritmo \ref{alg:transferencia_valores_transacao}. Nesse algoritmo, $IniciarTransacao$ é utilizada para criar uma nova transação, retornando um identificador para a transação criada; $Efetivar(T)$ comunica ao ambiente de execução que a transação $T$ foi bem sucedida e que as alterações efetuadas por ela podem ser realmente executadas; e $Abortar(T)$ sinaliza que algum erro semântico ocorreu e portanto as alterações efetuadas pela transação $T$ não podem ser efetivadas. As funções $Ler_T$ e $Escrever_T$, baseadas respectivamente em $Ler$ e $Escrever$, associam a leitura ou escrita do valor de uma determinada conta com a transação $T$.
+
+%\begin{algorithm}
+%\caption{Transferência de valores - uso de transações}
+%\label{alg:transferencia_valores_transacao}
+%\Inicio{
+%    $O \gets \text{Recurso referente à conta de origem}$\;
+%    $D \gets \text{Recurso referente à conta de destino}$\;
+%    $V \gets \text{Valor a ser transferido}$\;
+%    $T \gets IniciarTransacao()$\;
+%    $V_O \gets Ler_T(T, O)$\;
+%    \eSe{$V_O >= V$}
+%    {    
+%        $V_D \gets Ler_T(T, D)$\;
+%        $Escrever_T(T, O, V_O - V)$\;
+%        $Escrever_T(T, D, V_D + V)$\;
+%        $Efetivar(T)$\;
+%    }
+%    {
+%        $Imprimir(\text{Saldo insuficiente})$\;
+%        $Abortar(T)$\;
+%    }
+%}
+%\end{algorithm}
+
+%Nesse algoritmo o comportamento das funções $Ler_T$ e $Escrever_T$ é parecido com o comportamento apresentado no Algoritmo \ref{alg:transferencia_valores_sem_transacao}: se ocorrer um erro, o programa é terminado. Agora, porém, antes de terminar o programa, as funções irão abortar a transação, utilizando $Abortar(T)$, mantendo os dados inalterados.
+
+%O uso da transação permitiu que o formato do Algoritmo \ref{alg:transferencia_valores_transacao} ficasse muito parecido com o do Algoritmo \ref{alg:transferencia_valores_sem_transacao}. As únicas diferenças são relacionadas à criação da transação, para demarcar o início das operações que devem ser executadas de forma atômica, e os momentos da efetivação ou cancelamento. No caso de efetivação, nenhum erro ocorreu e o gerenciador de recursos irá efetivar as alterações efetuadas pelas operações da transação. Caso a conta de origem não possua saldo suficiente, a transação será cancelada.
+
+%As falhas de caráter operacional estão sendo tratadas implicitamente pelo ambiente de execução. Se o recurso $D$ falhar ao efetuar a escrita de dados da linha 9 por algum motivo, a escrita efetuada em $O$ na linha 8 não surtirá efeito. Isso deixa o código mais limpo e claro, exprimindo melhor a intenção do programa.
+
+%Os aspectos semânticos da transação precisam ser validados explicitamente pelo programa. Nesse caso, o valor a ser transferido não pode ser maior do que o valor da conta de origem. Assim, a linha 6 efetua essa comparação e cancela a transação na linha 13 caso não haja saldo suficiente.
+
+\subsection{Extensões}
+\label{subsec:extensoes}
+A característica tudo-ou-nada das transações convencionais apresenta uma semântica de tratamento de falhas muito simples: se algum erro ocorrer, todas as operações serão canceladas. Essa semântica facilita drasticamente o tratamento de erros pela aplicação, mas pode não ser a melhor forma de lidar com falhas, dependendo da situação.
+
+Algumas aplicações precisam efetuar um controle maior sobre a efetivação ou o cancelamento de transações. Nesse contexto, uma série de extensões e variações do modelo convencional foram criadas ao longo do tempo.
+
+Essas extensões estão descritas sucintamente e de forma não exaustiva nesta seção.
+
+\subsubsection*{Pontos de salvamento}
+Esse tipo de transação permite a especificação de pontos de salvamento (\emph{savepoint}) para demarcar momentos no tempo ao longo da execução da transação.
+
+Esses pontos de salvamento são unicamente identificados e é possível solicitar o cancelamento da transação até um desses pontos. Dessa forma é possível cancelar apenas uma parte das operações e continuar a execução a partir do ponto especificado.
+
+Isso fornece maior flexibilidade na composição e no desenvolvimento da transação, mas a semântica de tratamento de erros passa ser uma pouco mais complexa do que em uma transação convencional.
+
+Os pontos de salvamento são voláteis, e qualquer falha durante a execução da transação irá causar a perda deles. O cancelamento será feito em toda a transação e ela precisará ser reinciada do início.
+
+\subsubsection*{Transações encadeadas}
+Esse tipo de transação estende a idéia de pontos de salvamento, trocando os pontos por efetivações. A idéia é permitir efetivar a transação aos poucos, evitando a perda que pode ocorrer com a utilização dos pontos de salvamento, mas mantendo o contexto transacional.
+
+Isso forma um encadeamento de transações que representa passos em uma transação maior. Por fim, o que ocorre é similar a uma transação de transações.
+
+Por outro lado, como é efetuada uma efetivação, a única possibilidade de cancelamento é da transação atual no fim da cadeia. No caso de pontos de salvamento, é possível voltar para qualquer um dos pontos salvos. Novamente, essa flexibilidade pode ocasionar perda de operações.
+
+\subsubsection*{Transações aninhadas}
+Transações aninhadas são uma generalização da idéia de pontos de salvamento. Enquanto nesse tipo de transação permitem organizar uma transação como uma sequência de ações que podem ser canceladas individualmente, as transações aninhadas formam uma hierarquia de unidades de trabalho.
+
+Cada subtransação nesse hierarquia é uma nova transação, com as propriedades de atomicidade, consistência e isolamento, que pode ser completamente efetivada ou cancelada. 
+
+A efetivação de uma subtransação torna as modificações efetuadas por ela visíveis apenas para a transação imediatamente superior na hierarquia. A efetivação total é efetuada quando a transação no nível mais alto da hierarquia for efetivada.
+
+Da mesma forma, o cancelamento de uma transação irá ser propagado e, por consequência, cancelará todas as transações hierarquicamente subordinadas a ela.
+
+\subsubsection*{Transações distribuídas}
+Uma transação distribuída é uma transação convencional que executa em um ambiente distribuído e por isso visita vários nós.
+
+Enquanto nas transações aninhadas as transações são decompostas de forma funcional, uma transação distribuída é decomposta de acordo com a distribuição dos dados na rede.
+
+Essa decomposição em subtransações não reflete a hierarquia estrutural dos programas a serem executados, mas sim a localização dos dados dentro da rede. Essas subtransações representam mais fatias em que a transação principal foi cortada do que uma subdivisão funcional da transação principal.
+
+A efetivação ou o cancelamento das subtransações não pode ser feito de forma individual. Todas as substranções precisam chegar a um consenso sobre qual deve ser a ação a ser executada na finalização da transação.
+
+\subsubsection*{Transações multinível}
+Esse tipo de transação é uma forma mais liberal e genérica de transação aninhada.
+
+Com as transações multinível é possível pré-efetivar uma subtransação, excluíndo a possibilidade de um cancelamento unilateral de atualizações.
+
+Aqui, é assumida a existência de transações compensatórias, que são capazes de reverter semanticamente as alterações efetuadas por uma subtransação/transação no caso de a transação pai ser cancelada. 
+
+\chapter{Minitransação}
+\label{chap:minitransacao}
+%Este capítulo apresenta o conceito de minitransação como uma forma de tornar explícitos os aspectos semânticos de uma transação. 
+
+Embora originalmente proposta como uma otimização do protocolo de efetivação em duas fases (\emph{2PC}, \emph{Two-Phase Commit}), nosso trabalho aborda o conceito de minitransação como uma forma de representar uma transação de maneira a explicitar os seus aspectos semânticos.
+
+A seção \ref{sec:aspectos_operacionais_e_semanticos} aborda os aspectos sob os quais podemos analisar uma transação e apresenta a diferença entre os aspectos operacionais e semânticos.
+
+A seção \ref{sec:minitransacao_original} fala sobre a definição original de minitransação e sua origem a partir de otimizações no \emph{2PC}.
+
+A seção \ref{sec:formalizacao} apresenta a formalização da definição de minitransações com uma abor as vantagens dessa forma de utilizá-las e restrições 
+
+%Na seção \ref{sec:minitransacao} o conceito de minitransação é definido formalmente
+
+%Uma minitransação permite expressar de maneira explícita os aspectos semânticos de uma transação. A seção \ref{sec:formalizacao} apresenta uma conceitação mais formal de uma minitransação.
 
 
-\section{O protocolo de efetivação em duas fases}
-\label{sec:2pc}
-*** TODO página 562 e 643 do gray 
+%Este capítulo apresenta a motivação para o uso de transações em aplicações (Seção \ref{sec:transacoes}), ilustrando os exemplos com alguns algoritmos simples. Naturalmente estendemos o conceito de transação para envolver mais de uma máquina, o que nos leva às transações distribuídas e ao problema de efetivar uma transação desse tipo (Seção \ref{sec:transacoes_distribuidas}), onde descrevemos também o protocolo de efetivação em duas fases, de ampla utilização. Por fim é apresentado o conceito de minitransação (Seção \ref{sec:minitransacoes}), uma extensão do protocolo de efetivação em duas fases que oferece melhor desempenho e escalabilidade ao mesmo tempo que garante atomicidade de operações em transações distribuídas.
 
-Uma transação distribuída é uma transação que engloba operações que executam em diversos gerenciadores de recursos na forma de sub-transações, subordinadas à transação, e que é finalizada por uma requisição para efetivar ou abortar a transação \cite{gray-lamport}. Por exemplo, vamos considerar novamente o problema da transferência entre contas, como descrito na Seção \ref{sec:transacoes}, porém agora as contas estão em dois gerenciadores de recursos transacionais distintos ($G_O$ e $G_D$), como na Figura \ref{fig:transacao_distribuida}.
+\section{Aspectos operacionais e semânticos de uma transação}
+\label{sec:aspectos_operacionais_e_semanticos}
+%Uma transação agrupa operações que atuam sobre o estado do sistema. Esse agrupamento
 
-A efetivação das sub-transações geradas em $G_O$ e $G_D$ precisa ser efetuada atomicamente e precisa levar em conta que mais problemas podem ocorrer em comparação com o caso não distribuído, como por exemplo: as conexões de rede podem falhar, fazendo com que a aplicação consiga se comunicar somente com um dos gerenciadores; mensagens na rede podem ser duplicadas ou perdidas, exigindo um tratamento especial para esses casos.
+Nós podemos dividir as operações de uma transação em dois grupos: modificação e consulta. Operações de modificação alteram o estado do sistema, seja introduzindo novos dados ou modificando dados já existentes. Operações de consulta permitem que a aplicação observe o estado do sistema (na verdade, o que a aplicação ve é uma fotografia do estado no momento em que a transação iniciou).
 
-Para lidar com esses problemas e garantir que a efetivação seja atômica, é necessário o uso de um protocolo que irá coordenar a efetivação da transação distribuída e garantir que essa só será considerada efetivada se todas as sub-transações forem efetivadas. O mais conhecido desses protocolos é o protocolo de efetivação em duas fases (\emph{two-phase commit protocol} ou \emph{2PC}).
+Esse agrupamento das operações é importante pois os dois grupos resultantes possuem objetivos diferentes e, por consequência, possuem influências diferenciadas sobre a execução da transação. A possibilidade de misturar esses dois tipos de operações em um só transação influencia também a maneira como os ambientes de execução implementam a execução dessas transações.
+
+Operações com caráter de modificação são as responsáveis por introduzir no estado do sistema os resultados da transação. O efeito produzido por essas operações é que deve ser isolado de transações concorrentes até o momento da efetivação da transação, e as modificações produzidas por essas operações é que devem ser descartadas no caso do cancelamento da transação. 
+
+As operações de consulta permitem à aplicação obter acesso ao estado do sistema, utilizando os dados obtidos para efetuadas verificações sobre o estado do sistema. Esses dados podem ser utilizados também como base para modificar o estado do sistema.
+
+Não há nenhuma regra que obrigue limitar ou ordenar o número ou a sequência em que esses dois tipos de operações podem ser utilizadas em uma transação. Como essas operações são agrupadas e ordenadas fica totalmente a cargo desenvolvedor da aplicação. Essa generalidade, aliada à simplicidade no tratamento de erros, oferecida pela transação é o que a torna uma ferramenta de grande utilidade para o desenvolvimento de aplicações.
+
+Ao utilizar uma transação, só há três possíveis cenários de finalização: efetivação, cancelamento explícito ou cancelamento automático. Esse número enxuto facilita projetar as aplicações, pois oferecem uma maneira simplificada e ao mesmo tempo completa de agrupar as operações em unidades lógicas.
+
+Esses três cenários estão ilustrados na figura \ref{fig:cenarios_finalizacao}. A aplicação pode solicitar tanto a efetivação quanto o cancelamento (casos \textbf{a} e \textbf{b} da figura). Em qualquer um desses casos, essa solicitação indica também o final da transação. O caso \textbf{c} da figura acontece quando ocorre um erro durante a execução da transação, implicando em seu cancelamento automático.
 
 \begin{figure}
   \centering
-  \includegraphics[width=.40\textwidth]{transacao_distribuida} 
-  \caption{Esquematização de uma transação distribuída}
-  \label{fig:transacao_distribuida} 
+  \includegraphics[width=\textwidth]{cenarios_finalizacao} 
+  \caption{Cenários de finalização de uma transação}
+  \label{fig:cenarios_finalizacao} 
 \end{figure}
 
+A efetivação é o caminho natural a ser seguido. A maneira como as operações são utilizadas e como os dados são tratados é sempre planejada de forma a resultar em naturalmente na efetivação da transação.
+
+A atomicidade gera a necessidade do cancelamento automático, evitando que erros ocorridos durante a execução de uma transação faz o estado do sistema refletir parcialmente os resultados de uma transação.
+
+O cancelamento explícito da transação representa um caso de exceção. O intuito inicial de qualquer transação é ser efetivada, e o seu cancelamento por parte da aplicação significa que alguma situação não esperada foi encontrada durante a execução dessa transação.
+
+\begin{algorithm}
+\caption{Transferência de valores com cancelamento explícito (reprodução)}
+\label{alg:transferencia_transacao_3}
+\Inicio{
+	$IniciarTransacao$\;
+	$V \gets \text{Valor a transferir}$\;
+	$X \gets X - V$\;
+	\eSe{$X < 0$}
+	{
+		$CancelarTransacao$\;
+	}
+	{
+		$Y \gets Y + V$\;
+		$EfetivarTransacao$\;
+	}
+}
+\end{algorithm}
+
+Por exemplo, o algoritmo \ref{alg:transferencia_transacao_3} (que reproduz o algoritmo \ref{alg:transferencia_transacao_2} aqui por questões de clareza) apresenta um exemplo de cancelamento explícito. Como podemos ver, esse cancelamento ocorre por que o valor de $X$ ficou negativo, ou seja, a decisão sobre o cancelamento da transação foi feita com base na verificação do estado do sistema.
+
+Os cancelamentos explícitos apresentam a característica descrita acima: são baseados em verificações a respeito do estado da aplicação. Assim, no caso do algoritmo \ref{alg:transferencia_transacao_3}, a operação de consulta $X < 0$ é que determina o cancelamento ou efetivação da transação.
+
+Portanto, além de classificar as operações como sendo de modificação ou consulta, podemos diferenciá-las em relação ao seu caráter operacional ou semântico na transação.
+
+Uma operação com caráter operacional é aquela que não participa na decisão sobre o cancelamento explícito de uma transação. Note que a operação pode ainda sim ocasionar um cancelamento automático, caso a sua execução gere um erro no ambiente. Porém, a classificação é em relação ao cancelamento explícito da transação. Tanto operações de modificação quanto de consulta podem ser classificadas como operacionais.
+
+Operações de caratér semântico são aquelas que influciam a decisão sobre um cancelamento explícito da transação. Somente operações de consulta podem ser consideradas de caráter semântico.
+
+Ao analisar o algoritmo \ref{alg:transferencia_transacao_3}, poderíamos considerar que a operação $X \gets X - V$ é de caráter semântico. Afinal de contas, é essa a única operação que pode levar a condição $X < 0$ a ser verdadeira. Embora isso seja verdade, a influência dessa operação sobre a decisão não é absoluta. Considere por exemplo o algoritmo \ref{alg:transferencia_transacao_4}.
+
+\begin{algorithm}
+\caption{Transferência de valores com cancelamento explícito modificado}
+\label{alg:transferencia_transacao_4}
+\Inicio{
+	$IniciarTransacao$\;
+	$V \gets \text{Valor a transferir}$\;
+	\eSe{$X < V$}
+	{
+		$CancelarTransacao$\;
+	}
+	{
+		$X \gets X - V$\;
+		$Y \gets Y + V$\;
+		$EfetivarTransacao$\;
+	}
+}
+\end{algorithm}
+
+Como podemos ver no algoritmo \ref{alg:transferencia_transacao_4}, a operação de modificação $X \gets X - V$ deixou de influenciar a decisão sobre o cancelamento. Essa modificação deixa claro que a operação de modificação não possui caráter semântico.
+
+\begin{algorithm}
+\caption{Transferência de valores com saldo negativo}
+\label{alg:transferencia_transacao_5}
+\Inicio{
+	$IniciarTransacao$\;
+	$V \gets \text{Valor a transferir}$\;
+	\eSe{$X < V$}
+	{
+		$X_n \gets X_n + (V - X)$\;
+		\Se{$X_n > L_X$}
+		{
+			$CancelarTransacao$\;
+		}
+		$X \gets 0$\;
+	}
+	{
+		$X \gets X - V$\;
+		$Y \gets Y + V$\;
+	}
+	$EfetivarTransacao$\;
+}
+\end{algorithm}
+
+Da mesma forma, nem toda operação de consulta possui caráter semântico. Por exemplo, o algoritmo \ref{alg:transferencia_transacao_5} apresenta uma outra variação do algoritmo de transferência, que permite controlar o saldo negativo de uma conta. Agora, $X_n$ representa o saldo negativo da conta $X$, e esse saldo pode ser no máximo um limite definido previamente $L_X$. A comparação $X < V$ deixou de ter caráter semântico, pois não participa na decisão sobre o cancelamento da transação diretamente.
+
+A classificação em relação ao caráter operacional ou semântico envolve uma análise da intenção e da composição da transação.
+Embora a relação entre a operação e o cancelamento exista, esse relação se dá no nível da intenção do desenvolvedor, e não está explícita na transação.
+
+Uma \textbf{minitransação} é uma maneira de representar uma transação de forma a separar explicitamente os aspectos semânticos e operacionais de uma transação. Essa separação permite analisar e entender melhor o objetivo da transação, podendo ser utilizada para otimizações.
+
+%Falhas de aspecto operacional estão relacionadas a problemas, permanentes ou transitórios, encontrados nos sistemas de base utilizados pelo ambiente de execução, como sistema operacional, redes ou hardware. Trilhas danificadas no disco rígido, perda de comunicação entre máquinas, quedas no fornecimento de energia são alguns exemplos, assim como danos físicos no cabeamento de rede ou o extravio de uma máquina.
+
+%Essas falhas de aspecto operacional estão fora do controle do desenvolvedor, mas podem ser manipuladas diretamente pelo ambiente de execução. Em geral, o cancelamento da transação e uma nova execução em um momento futuro podem corrigir o problema, como no caso de falhas transitórias. Falhas permanentes exigem a manutenção dos elementos afetados, mas uma vez corrigidas, uma nova execução da transação será bem-sucedida.
+
+%Falhas de aspecto semântico são dependentes do domínio da aplicação e precisam ser garantidas pelo desenvolvedor. Elas estão relacionadas a violações das invariantes definidas sobre o estado da aplicação e não podem ser diretamente tratadas pelo ambiente de execução. O desenvolvedor deve verificar essas invariantes e efetuar o cancelamento da transação caso necessário.
+
+%\section{Representação dos aspectos semânticos em uma transação}
+%\label{sec:representacao_aspectos}
+
+\section{Definição original}
+\label{sec:minitransacao_original}
+A definição original de minitransação é apresentada em um trabalho de Aguilera et al. \cite{sinfonia}. Nesse trabalho, os autores efetuam algumas observações sobre o protocolo \emph{2PC}, de forma a obter uma otimização desse protocolo. Essa otimização visa a diminuição na quantidade de mensagens utilizadas para efetuar o \emph{2PC}, com o intuito de criar um ambiente de execução transacional para aplicações com requisitos de performance rígidos, como gerenciadores de sistemas de arquivos distribuídos, por exemplo. 
+
+\subsection{O protocolo de efetivação em duas fases}
+\label{subsec:2pc}
 A idéia desse protocolo é simples e utilizada a bastante tempo \cite{2pc}: verificar se todos os gerenciadores de recurso envolvidos em uma transação estão aptos a efetivar suas respectivas sub-transações. Se estiverem, a transação será efetivada. Se algum gerenciador não puder efetivar, por qualquer motivo, a transação será abortada. O \emph{2PC} necessita de um gerenciador que atue como o \textbf{coordenador} da transação, responsável por gerenciar a execução do protocolo e tomar a decisão sobre efetivar ou abortar a transação comunicando-se com os outros \textbf{participantes}, que executam as sub-transações associadas à transação. O coordenador pode ser um participante da transação também.
 
 O protocolo é dividido em duas fases. Na primeira fase o coordenador solicita que os participantes enviem seus votos, indicando se estão aptos a efetivar a sub-transação executada. Os votos são coletados e o coordenador decide se a transação pode ser efetivada (caso todos os participantes tenham votado de acordo) ou se deve ser abortada (caso algum participante tenha votado para não efetivar a transação). Decidido o resultado da votação, o coordenador efetua a segunda fase, em que os participantes são notificados do resultado da votação. 
@@ -898,39 +869,10 @@ A premissa que norteia o protocolo é que qualquer gerenciador envolvido na tran
 
 É importante notar que esse protocolo não define como as operações da transação devem ser executadas nas máquinas participantes, mas sim como a efetivação da transação deve proceder. As sub-transações ocorrem em cada participante antes que o protocolo de efetivação inicie. Portanto, a utilização desse protocolo aumenta o número de mensagens e consequentemente o tempo e o esforço necessários para que uma transação seja executada. Algumas otimizações podem ocorrer, como no caso de transações que efetuam somente operações de leitura ou de transações que envolvam dados em somente uma máquina do sistema mas, de forma geral, a execução do \emph{2PC} é custosa \cite{gray-lamport}.
 
-\section{Minitransações}
-\label{sec:minitransacoes}
-Minitransação é uma primitiva que permite que as operações de uma transação sejam executadas durante o protocolo de efetivação. Esse protocolo de efetivação é uma modificação do \emph{2PC}, e oferece um mecanismo simples para ler e alterar dados de forma condicional em um ambiente distribuído garantindo atomicidade na execução das operações \cite{sinfonia}. Dessa forma, o número de mensagens e o tempo de execução da transação são reduzidos. 
+*** TODO página 562 e 643 do gray 
 
-Porém, o uso das minitransações impõe certas restrições em relação ao que pode ser feito, diminuindo sua aplicabilidade. Por exemplo, o condicionamento das operações de leitura e escrita é baseado somente em comparações de igualdade, e a única forma da aplicação cliente abortar a minitransação é se essa comparação falhar, como será detalhado. Com as minitransações originais não é possível efetuar a transferência entre contas distribuídas como no Algoritmo \ref{alg:transferencia_valores_transacao}, pois a comparação de maior ou igual ($>=$) não pode ser feita. A nossa infraestrutura irá permitir que essa e outras comparações sejam feitas.
-
-Na subseção \ref{subsec:derivando-minitransacoes} é apresentado como o \emph{2PC} pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações. Na subseção \ref{subsec:estrutura-minitransacoes} definimos formalmente o conceito de minitransação.
-
-\subsection{Otimização do \emph{2PC}}
-\label{subsec:derivando-minitransacoes}
-A decisão pela efetivação ou cancelamento de uma transação distribuída depende tanto de aspectos operacionais, relacionados ao ambiente de execução, quanto de aspectos semânticos, específicos do domínio da aplicação. A falha na execução de uma subtransação em alguma máquina do ambiente inviabiliza a efetivação da transação como um todo, e por isso o coordenador é forçado a cancelar a transação. Esse tipo de falha operacional não está ligada ao domínio da aplicação, mas sim ao ambiente em que essa aplicação está rodando e está, portanto, fora do controle do coordenador, que pode somente cancelar a transação e, opcionalmente, tentar executá-la novamente. Por outro lado, o aspecto semântico envolvido na decisão pela efetivação ou cancelamento da transação é específico de cada aplicação e depende, direta ou indiretamente, dos dados do sistema.
-
-Considerando novamente o sistema bancário e a operação de transferência de uma determinada quantia entre uma conta de origem e de destino, a transferência só pode ocorrer se o saldo na conta de origem da transferência for maior ou igual à quantia a ser transferida. Essa checagem deve ser feita pela aplicação após a leitura da informação da máquina que armazena os dados da conta de origem, e a decisão pelo cancelamento ou não da transação fica subordinada à semântica dada aos dados do sistema. Isso exige que uma requisição de leitura seja feita e uma resposta seja enviada, para só então a aplicação decidir se vai efetivar e então, após a execução do restante da transação, iniciar a primeira fase do protocolo \emph{2PC} (votação).
-
-Podemos ver que, do ponto de vista semântico, as operações que influenciam na decisão pela possível efetivação ou pelo cancelamento da transação são operações de leitura. As operações de escrita não influenciam nessa decisão, a não ser pelo ponto de vista operacional, ou seja, se ocorrer realmente um erro na operação de escrita. Assim, se tivermos uma transação cuja última ação não afete a decisão do coordenador sobre efetivar a transação, podemos embutir essa última ação na mensagem de votação da primeira fase do protocolo de efetivação.
-
-O aspecto semântico da transação em relação aos dados pode ser tratado nos participantes também, e não somente no coordenador, caso o participante saiba como o coordenador irá utilizar o dado para fazer sua decisão sobre efetivar ou cancelar a transação. Se isso for possível, podemos então embutir também operações de leitura que influenciam a decisão do coordenador no protocolo de efetivação e fazer o participante adequar seu voto à maneira como o coordenador faria ao analisar o dado retornado.
-
-As minitransações surgem no contexto em que todas as operações de uma sub-transação podem ser embutidas dentro do protocolo de efetivação, utilizando somente as trocas de mensagens que ocorreriam no protocolo de efetivação, após a execução dos comandos. Para que isso possa ocorrer, o protocolo \emph{2PC} precisa ser alterado.
-
-\subsection{Definição}
-\label{subsec:estrutura-minitransacoes}
-Uma minitransação é composta por três conjuntos: itens de comparação, itens de leitura e itens de escrita, como pode ser visto na figura \ref{fig:estrutura_minitransacao}. Todos os itens possuem uma referência a qual dado deve ser utilizado ($ID_{A...D}$), e os itens de comparação e escrita incluem também os dados ($DADO_{1...4}$) que serão comparados com ou substituirão os dados armazenados \cite{sinfonia}. 
-
-\begin{figure}
-  \centering
-  \includegraphics[width=.40\textwidth]{estrutura_minitransacao} 
-  \caption{Estrutura de uma minitransação}
-  \label{fig:estrutura_minitransacao} 
-\end{figure}
-
-Formalmente, uma minitransação pode ser vista como uma tupla na forma $(I, C, L, E)$. $I$ é o identificador da minitransação, gerado pelo criador da minitransação. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((Id, Dado)\), em que \(Id\) é o identificador do dado e \(Dado\) é o valor para se comparar com o valor identificado por $Id$ ou para substituí-lo.
-
+\subsection{Otimização do 2PC}
+\label{subsec:otimizacao_2pc}
 Sendo uma extensão do \emph{2PC}, o protocolo de minitransações possui também um coordenador responsável por iniciar e gerenciar a execução do protocolo entre os participantes da transação. O protocolo de minitransações é composto também por duas fases, mas agora a primeira fase passa a ser uma fase de execução, em que as minitransações são executadas em cada participante e seus votos são enviados para o coordenador. O coordenador coleta os votos de todos os participantes e, como no protocolo original, irá decidir por efetivar a transação somente se os votos forem unânimes. Na segunda fase os participantes são notificados da decisão do coordenador e devem atuar de acordo, efetivando as operações da minitransação ou desfazendo suas ações.
 
 Um operador especial, $Id[X]$, representa o conjunto formado pelo elemento $Id$ de todas as tuplas no formato $(Id, Dado)$ do conjunto $X$. Esse operador permite obter o conjunto $D$ de todos os identificadores utilizados pela minitransação: $D \gets L \cup Id[C] \cup Id[E]$. Cada elemento de $D$ fica sob responsabilidade de um participante $p$ específico da minitransação, e $\forall d \in D$ o participante responsável pelo identificador $d$ é definido por $Participante(d)$, uma função que indica que $p$ é a possível localização de $d$ entre os participantes, uma vez que o identificador $d$ pode ainda não ter sido inserido em $p$.
@@ -967,6 +909,76 @@ Ao coletar todas as respostas, o coordenador irá apurar os votos de cada partic
 \end{figure}
 
 Quando os participantes são notificados do cancelamento da minitransação, as operações de escrita da minitransação presentes no \emph{log} do participante não serão efetuadas, deixando os dados inalterados, e será registrado no \emph{log} que a minitransação foi abortada. Se a notificação for de efetivação, as operações de escrita do \emph{log} serão efetuadas, alterando dados existentes ou inserindo novos dados no participante, e será registrado no \emph{log} que a minitransação foi efetivada. O \emph{log} será gravado em disco e a minitransação será considerada oficialmente efetivada ou abortada no momento que esse registro do \emph{log} estiver gravado em disco.
+
+
+%Embora não utilizem esses termos, os autores originais efetuam a separação entre o caráter operacional e o caráter semântico das operações de uma transação. Conforme eles notaram, operações de escrita não influenciam na decisão sobre o cancelamento explícito 
+
+%Essa separação os leva a uma estrutura como a descrita na figura \ref{fig:estrutura_minitransacao}.
+
+%\begin{figure}
+%  \centering
+%  \includegraphics[width=.40\textwidth]{estrutura_original_minitransacao} 
+%  \caption{Estrutura original de uma minitransação}
+%  \label{fig:estrutura_original_minitransacao} 
+%\end{figure}
+
+%O intuito dessa otimização era 
+
+\section{Formalização}
+\label{sec:formalizacao}
+Uma minitransação é composta por três conjuntos: itens de comparação, itens de leitura e itens de escrita, como pode ser visto na figura \ref{fig:estrutura_minitransacao}. Todos os itens possuem uma referência a qual dado deve ser utilizado ($ID_{A...D}$), e os itens de comparação e escrita incluem também os dados ($DADO_{1...4}$) que serão comparados com ou substituirão os dados armazenados \cite{sinfonia}. 
+
+
+Formalmente, uma minitransação pode ser vista como uma tupla na forma $(I, C, L, E)$. $I$ é o identificador da minitransação, gerado pelo criador da minitransação. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((Id, Dado)\), em que \(Id\) é o identificador do dado e \(Dado\) é o valor para se comparar com o valor identificado por $Id$ ou para substituí-lo.
+
+
+
+
+%Uma transação distribuída é uma transação que engloba operações que executam em diversos gerenciadores de recursos na forma de sub-transações, subordinadas à transação, e que é finalizada por uma requisição para efetivar ou abortar a transação \cite{gray-lamport}. Por exemplo, vamos considerar novamente o problema da transferência entre contas, como descrito na Seção \ref{sec:transacoes}, porém agora as contas estão em dois gerenciadores de recursos transacionais distintos ($G_O$ e $G_D$), como na Figura \ref{fig:transacao_distribuida}.
+
+%A efetivação das sub-transações geradas em $G_O$ e $G_D$ precisa ser efetuada atomicamente e precisa levar em conta que mais problemas podem ocorrer em comparação com o caso não distribuído, como por exemplo: as conexões de rede podem falhar, fazendo com que a aplicação consiga se comunicar somente com um dos gerenciadores; mensagens na rede podem ser duplicadas ou perdidas, exigindo um tratamento especial para esses casos.
+
+%Para lidar com esses problemas e garantir que a efetivação seja atômica, é necessário o uso de um protocolo que irá coordenar a efetivação da transação distribuída e garantir que essa só será considerada efetivada se todas as sub-transações forem efetivadas. O mais conhecido desses protocolos é o protocolo de efetivação em duas fases (\emph{two-phase commit protocol} ou \emph{2PC}).
+
+%\begin{figure}
+%  \centering
+%  \includegraphics[width=.40\textwidth]{transacao_distribuida} 
+%  \caption{Esquematização de uma transação distribuída}
+%  \label{fig:transacao_distribuida} 
+%\end{figure}
+
+%\section{Minitransações}
+%\label{sec:minitransacoes}
+%Minitransação é uma primitiva que permite que as operações de uma transação sejam executadas durante o protocolo de efetivação. Esse protocolo de efetivação é uma modificação do \emph{2PC}, e oferece um mecanismo simples para ler e alterar dados de forma condicional em um ambiente distribuído garantindo atomicidade na execução das operações \cite{sinfonia}. Dessa forma, o número de mensagens e o tempo de execução da transação são reduzidos. 
+
+%Porém, o uso das minitransações impõe certas restrições em relação ao que pode ser feito, diminuindo sua aplicabilidade. Por exemplo, o condicionamento das operações de leitura e escrita é baseado somente em comparações de igualdade, e a única forma da aplicação cliente abortar a minitransação é se essa comparação falhar, como será detalhado. Com as minitransações originais não é possível efetuar a transferência entre contas distribuídas como no Algoritmo \ref{alg:transferencia_valores_transacao}, pois a comparação de maior ou igual ($>=$) não pode ser feita. A nossa infraestrutura irá permitir que essa e outras comparações sejam feitas.
+
+%Na subseção \ref{subsec:derivando-minitransacoes} é apresentado como o \emph{2PC} pode ser usado como ponto de partida para otimizações e para a obtenção do protocolo de minitransações. Na subseção \ref{subsec:estrutura-minitransacoes} definimos formalmente o conceito de minitransação.
+
+%\subsection{Otimização do \emph{2PC}}
+%\label{subsec:derivando-minitransacoes}
+%A decisão pela efetivação ou cancelamento de uma transação distribuída depende tanto de aspectos operacionais, relacionados ao ambiente de execução, quanto de aspectos semânticos, específicos do domínio da aplicação. A falha na execução de uma subtransação em alguma máquina do ambiente inviabiliza a efetivação da transação como um todo, e por isso o coordenador é forçado a cancelar a transação. Esse tipo de falha operacional não está ligada ao domínio da aplicação, mas sim ao ambiente em que essa aplicação está rodando e está, portanto, fora do controle do coordenador, que pode somente cancelar a transação e, opcionalmente, tentar executá-la novamente. Por outro lado, o aspecto semântico envolvido na decisão pela efetivação ou cancelamento da transação é específico de cada aplicação e depende, direta ou indiretamente, dos dados do sistema.
+
+%Considerando novamente o sistema bancário e a operação de transferência de uma determinada quantia entre uma conta de origem e de destino, a transferência só pode ocorrer se o saldo na conta de origem da transferência for maior ou igual à quantia a ser transferida. Essa checagem deve ser feita pela aplicação após a leitura da informação da máquina que armazena os dados da conta de origem, e a decisão pelo cancelamento ou não da transação fica subordinada à semântica dada aos dados do sistema. Isso exige que uma requisição de leitura seja feita e uma resposta seja enviada, para só então a aplicação decidir se vai efetivar e então, após a execução do restante da transação, iniciar a primeira fase do protocolo \emph{2PC} (votação).
+
+%Podemos ver que, do ponto de vista semântico, as operações que influenciam na decisão pela possível efetivação ou pelo cancelamento da transação são operações de leitura. As operações de escrita não influenciam nessa decisão, a não ser pelo ponto de vista operacional, ou seja, se ocorrer realmente um erro na operação de escrita. Assim, se tivermos uma transação cuja última ação não afete a decisão do coordenador sobre efetivar a transação, podemos embutir essa última ação na mensagem de votação da primeira fase do protocolo de efetivação.
+
+%O aspecto semântico da transação em relação aos dados pode ser tratado nos participantes também, e não somente no coordenador, caso o participante saiba como o coordenador irá utilizar o dado para fazer sua decisão sobre efetivar ou cancelar a transação. Se isso for possível, podemos então embutir também operações de leitura que influenciam a decisão do coordenador no protocolo de efetivação e fazer o participante adequar seu voto à maneira como o coordenador faria ao analisar o dado retornado.
+
+%As minitransações surgem no contexto em que todas as operações de uma sub-transação podem ser embutidas dentro do protocolo de efetivação, utilizando somente as trocas de mensagens que ocorreriam no protocolo de efetivação, após a execução dos comandos. Para que isso possa ocorrer, o protocolo \emph{2PC} precisa ser alterado.
+
+%\subsection{Definição}
+%\label{subsec:estrutura-minitransacoes}
+%Uma minitransação é composta por três conjuntos: itens de comparação, itens de leitura e itens de escrita, como pode ser visto na figura \ref{fig:estrutura_minitransacao}. Todos os itens possuem uma referência a qual dado deve ser utilizado ($ID_{A...D}$), e os itens de comparação e escrita incluem também os dados ($DADO_{1...4}$) que serão comparados com ou substituirão os dados armazenados \cite{sinfonia}. 
+
+%\begin{figure}
+%  \centering
+%  \includegraphics[width=.40\textwidth]{estrutura_minitransacao} 
+%  \caption{Estrutura de uma minitransação}
+%  \label{fig:estrutura_minitransacao} 
+%\end{figure}
+
+%Formalmente, uma minitransação pode ser vista como uma tupla na forma $(I, C, L, E)$. $I$ é o identificador da minitransação, gerado pelo criador da minitransação. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((Id, Dado)\), em que \(Id\) é o identificador do dado e \(Dado\) é o valor para se comparar com o valor identificado por $Id$ ou para substituí-lo.
 
 \chapter{A infraestrutura}
 \label{chap:implementacao}
