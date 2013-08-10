@@ -802,7 +802,7 @@ Na subseção \ref{subsec:transacoes_distribuidas} nós apresentamos uma descri�
 
 A subseção \ref{subsec:2pc} descreve os detalhes do protocolo de efetivação em duas fases, utilizado para coordenar a efetivação de transações distruídas.
 
-Em \ref{subsec:otimizacao_2pc} é explicado de que maneira os autores originais otimizaram o \emph{2PC}, criando o protocolo de minitransações.
+Em \ref{subsec:modificacao_2pc} é explicado de que maneira os autores originais modificaram o \emph{2PC}, criando o protocolo de minitransações.
 
 \subsection{Transações distribuídas}
 \label{subsec:transacoes_distribuidas}
@@ -954,44 +954,125 @@ A figura \ref{fig:fase_notificacao_2pc} apresenta uma ilustração da execução
 
 %*** TODO página 562 e 643 do gray 
 
-\subsection{Otimização do 2PC}
-\label{subsec:otimizacao_2pc}
-Sendo uma extensão do \emph{2PC}, o protocolo de minitransações possui também um coordenador responsável por iniciar e gerenciar a execução do protocolo entre os participantes da transação. O protocolo de minitransações é composto também por duas fases, mas agora a primeira fase passa a ser uma fase de execução, em que as minitransações são executadas em cada participante e seus votos são enviados para o coordenador. O coordenador coleta os votos de todos os participantes e, como no protocolo original, irá decidir por efetivar a transação somente se os votos forem unânimes. Na segunda fase os participantes são notificados da decisão do coordenador e devem atuar de acordo, efetivando as operações da minitransação ou desfazendo suas ações.
+\subsection{Modificação do 2PC}
+\label{subsec:modificacao_2pc}
+O trabalho descrito em \cite{sinfonia} altera a maneira como a transação e o protocolo 2PC são executados, utilizando a primeira fase do 2PC para executar as operações da transação. Embora esse trabalho não faça referência explícita aos aspectos operacionais e semânticos de uma transação, a modificação efetuada por eles acaba por utilizar o conceito desses aspectos para obter um mecanismo de execução que tire vantagem do aspecto semântico das transações.
 
-Um operador especial, $Id[X]$, representa o conjunto formado pelo elemento $Id$ de todas as tuplas no formato $(Id, Dado)$ do conjunto $X$. Esse operador permite obter o conjunto $D$ de todos os identificadores utilizados pela minitransação: $D \gets L \cup Id[C] \cup Id[E]$. Cada elemento de $D$ fica sob responsabilidade de um participante $p$ específico da minitransação, e $\forall d \in D$ o participante responsável pelo identificador $d$ é definido por $Participante(d)$, uma função que indica que $p$ é a possível localização de $d$ entre os participantes, uma vez que o identificador $d$ pode ainda não ter sido inserido em $p$.
+Em primeiro lugar, Aguilera et al. notaram que o cancelamento explícito de uma transação depende somente de operações de consulta, como foi detalhado em \ref{sec:aspectos_operacionais_e_semanticos}. Dessa forma, se uma transação fosse composta somente por operações de modificação, essas operações poderiam ser enviadas aos nós participantes dessa transação na primeira fase do 2PC, em uma só mensagem pela rede. Qualquer erro que ocorresse na execução dessas operações faria com que o participante respondesse negativamente à votação, cancelando a transação.
 
-O conjunto $Participantes$ é formado por todos os participantes da minitransação. Cada participante $P_j \in Participantes$ possui um conjunto $K_j$ de identificadores sob sua responsabilidade, e para cada participante o coordenador constrói uma nova minitransação \(M_j = (I_t, C_j, L_j, E_j)\) tal que:
+No caso de transações que contém somente operações de modificação, a intenção explícita da aplicação é efetivar a transação. Como nenhum dado foi lido, entende-se que a intenção da aplicação é simplesmente alterar o estado do sistema, sem nenhum condicionamento. Assim, a efetivação é o resultado natural dessas transações, e o participante da transação sabe que essa transação será efetivada.
+
+A intenção dos autores era empacotar todas as operações da transação na mensagem enviada na primeira fase do 2PC pelo coordenador para os participantes. No entanto, as operações de consulta não poderiam sempre ser enviadas dessa maneira, pois devido ao caráter semântico que podem assumir, o resultado de sua execução pode ser necessário para a aplicação decidir se a transação precisa ser cancelada explicitamente. Isso faz com que um participante da transação tenha que aguardar a aplicação utilizar a informação lida e decidir se vai efetivar a transação ou não.
+
+Porém, se o participante da transação souber como esses dados serão utilizados pela aplicação, ele mesmo poderá efetuar a comparação e verificar, durante a própria execução da operação, se a aplicação iria solicitar um cancelamento ou não da transação.
+
+%Por exemplo, considerando novamente um programa executando o algoritmo descrito em \ref{alg:transferencia_transacao_4}, se o Nó \textbf{A}, que armazena o valor $X$, pudesse efetuar a comparação $X < V$, ele poderia de antemão saber que a transação seria cancelada.
+
+O que o trabalho descrito em \cite{sinfonia} fez foi dotar os nós participantes da transação com a capacidade de efetuar comparações que a aplicação efetuaria com o resultado de uma operação de consulta. Com isso, eles foram capazes de enviar tanto os comandos com caráter operacional quanto os comandos com caráter semântico na mensagem da primeira fase do 2PC.
+
+Essa maneira de executar as operações de uma transação de uma só vez na primeira fase do protocolo 2PC foi chamada de \textbf{minitransação}. O protocolo resultante dessa modificação do 2PC foi utilizado para implementar o \emph{Sinfonia}, explicado brevemente em seguida.
+
+Como veremos também, as minitransações oferecidas pelo Sinfonia possuem um escopo de utilização limitado devido ao tipo de comparação que conseguem efetuar. O escopo dessas comparações atende ao requisitos do Sinfonia mas, como veremos, ele é muito limitante. A definição e a implementação apresentadas neste trabalho aumentam esse escopo e, portanto, a abrangência do uso de minitransações.
+
+\subsubsection*{Sinfonia}
+Sinfonia é um serviço distribuído que permite o armazenamento de dados em um ambiente tolerante a falhas, escalável e consistente. O foco do sinfonia é prover a execução transacional de operações sobre esses dados para o que os autores chamam de aplicações de infraestrutura de centrais de dados (\emph{data center infraestructure applications}) como sistemas de arquivos distribuídos, gerenciadores de travas e serviços de comunicação de grupos de aplicações. Essas aplicações precisam ser tolerantes a falha e escaláveis, além de quase sempre precisarem oferecer consistência aos seus usuários e performance em um nível razoável.
+
+Esse serviço procura oferecer um balanceamento entre funcionalidade e escalabilidade. A chave para alcançar escalabilidade é separar operações executadas por diferentes nós o máximo possível, de tal forma que essas operações possam ser executadas de maneira independente. Para oferecer essa escalabilidade, o Sinfonia oferece um espaço de endereçamento bem granularizado para acessar os dados armazenados, sem impor nenhum tipo de estrutura, ficando a cargo da aplicação organizar os dados da maneira mais conveniente.
+
+O Sinfonia oferece uma primitiva de minitransação que as aplicações podem utilizar para acessar e modificar os dados, de maneira atômica e condicional, em diversos \textbf{nós de memória}. Além disso, as aplicações utilizam uma biblioteca de interface para efetuar a execução das minitransações. Essa biblioteca é responsável por coordenar a execução da minitransação entre os diversos nós de memória participantes, e assume assim o papel de coordenador descrito no 2PC.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{sinfonia} 
+  \caption{Estrutura do Sinfonia}
+  \label{fig:sinfonia} 
+\end{figure}
+
+A figura \ref{fig:sinfonia} ilustra a divisão entre a aplicação e a biblioteca de interface e os nós de memória, que compõem o Sinfonia. A aplicação utiliza somente as funcionalidades disponibilizadas pela biblioteca de interface. Essa fica responsável por encapsular o ambiente distribuído do Sinfonia e gerenciar a execução do protocolo que executa e finaliza as minitransações.
+
+Os nós de memória armazenam os dados e são responsáveis pela execução das operações que compõem a minitransação. Cada nó de memória mantém uma sequência opaca de palavras de memória com algum comprimento padrão (a implementação descrita utiliza 1 \emph{byte} como comprimento). 
+
+Esses bytes são organizados como um espaço de endereçamento linear sem nenhuma estrutura. Cada nó de memória possui um espaço de endereçamento separado. Portanto, qualquer dado no Sinfonia é referenciado por meio de um par contendo o identificador do nó de memória e o endereço do byte a ser acessado.
+
+O formato das minitransações utilizadas para acessar e modificar os dados e a maneira como elas são executadas no Sinfonia estão descritos a seguir.
+
+\subsubsection*{Minitransações no sinfonia}
+As minitransações oferecidas pelo Sinfonia possuem uma estrutura composta por três tipos de operações, como ilustrado na figura \ref{fig:minitransacao_sinfonia}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{minitransacao_sinfonia} 
+  \caption{Estrutura das minitransações do Sinfonia}
+  \label{fig:minitransacao_sinfonia} 
+\end{figure}
+
+Os campos do comando de comparação estão descritos a seguir:
 
 \begin{itemize}
-    \item $I_t \gets IdentificadorUnico(I)$
-    \item $\forall i_l \in L_j, i_l \in K_j$;
-    \item $\forall i_c \in Id[C_j], i_c \in K_j$; e
-    \item $Id[E_j] \supseteq K_j$
+	\item[Id-Nó] identificador do nó de memória
+	\item[Endereço] número do byte no espaço de endereçamento do nó identificado por \textbf{Id-Nó}
+	\item[Tamanho] especifica quantos bytes, a partir de \textbf{Endereço}, devem ser comparados
+	\item[Dados] é uma sequência de \textbf{Tamanho} bytes com a qual o conteúdo do nó será comparado
 \end{itemize}
 
-O identificador $I_t$ é unicamente definido e associado ao identificador $I$ por meio da função $IdentificadorUnico$. Como o identificador $I$ é fornecido pela aplicação cliente, nada garante que ele seja único, e por isso utilizamos $IdentificadorUnico$ para criar um novo identificador globalmente único associado à $I$. Os identificadores de $E_j$ são tratados como um superconjunto de $K_j$ pois a operação de escrita pode inserir novos dados no sistema, e não somente alterar dados que já existem.
+Nos campos do comando de escrita e leitura os campos \textbf{Id-Nó} e \textbf{Endereço} possuem a mesmo significado que os do comando de comparação. O significado de \textbf{Tamanho} e \textbf{Dados} nos comandos de leitura e escrita está apresentado a seguir:
 
-Cada $M_j$ é enviada ao respectivo $P_j$ pelo coordenador, que irá esperar pela execução e resposta de cada participante. Ao receber uma minitransação, cada participante irá tentar ler os dados identificados por $Id[C_j]$ e compará-los (comparação de igualdade) com os respectivos $Dado[C_j]$. Caso a comparação não seja bem sucedida, esse participante nem tentará ler ou modificar os dados em $L_j$ e $E_j$, e responderá para o coordenador com um voto $ABORTAR$. A Figura \ref{fig:minitransacao_1fase} ilustra essa primeira fase, que combina a primeira fase do \emph{2PC} com a execução das operações da transação.
+\begin{itemize}
+	\item[Tamanho] identifica quantos bytes devem ser lidos, no caso de leitura, ou modificados, no caso de escrita
+	\item[Dados] é uma sequência de \textbf{Tamanho} bytes que deve ser gravado a partir do byte identificado por \textbf{Endereço}. Esse campo é sempre vazio nos comandos de leitura
+\end{itemize}
 
-\begin{figure}
-  \centering
-  \includegraphics[width=.65\textwidth]{minitransacao_1fase} 
-  \caption{Fase de execução de uma minitransação}
-  \label{fig:minitransacao_1fase} 
-\end{figure}
+A comparação efetuada pelo Sinfonia e da igualdade byte a byte, ou seja, o conteúdo armazenado no nó será comparado byte a byte com o valor especificado em \textbf{Dados}. O comando de leitura especifica um bloco de dados a ser retornado e o comando de escrita especifica um bloco de dados a ser modificado.
 
-Se a comparação for bem sucedida para todos os elementos de $Id[C_j]$, então o participante irá ler os dados identificados por $L_J$ e agrupá-los no conjunto de resposta $R_j$. Os dados $Dado[E_j]$ identificados por $Id[E_j]$ serão inseridos no conjunto de dados ou irão alterar algum dado já existente. Na verdade, a operação de inserir ou alterar um dado é registrada no \emph{log} do participante. O participante envia então um voto $EFETIVAR$ para o coordenador, junto com o conjunto $R_j$. 
+A execução de uma minitransação segue os seguintes passos:
 
-Ao coletar todas as respostas, o coordenador irá apurar os votos de cada participante. Para cada resposta $EFETIVAR$ o coordenador agrega os respectivos $R_j$ em um conjunto de respostas $R$. Se uma das respostas for $ABORTAR$, a transação precisa ser abortada, notificando os participantes do cancelamento, e a aplicação cliente precisa ser notificada desse erro, como podemos ver na Figura \ref{fig:minitransacao_2fase} \textbf{b}. Se não houve nenhum voto $ABORTAR$, o coordenador decide então por efetivar a transação, enviando o conjunto $R$ para a aplicação cliente e notificando os participantes da efetivação, como ilustrado na Figura \ref{fig:minitransacao_2fase} \textbf{a}.
+\begin{enumerate}
+	\item As comparações são efetuadas, uma a uma.
+	\item Se alguma comparação falhar, o nó de memória irá cancelar a subtransação e responder para o coordenador indicando que a minitransação precisa ser cancelada.
+	\item Se todas as comparações forem bem sucedidas, o nó de memória irá ler todos os blocos especificados pelas operações de leitura e modificar todos blocos especificados pelas operações de escrita.
+	\item O nó de memória irá responder para o coordenador indicando que a minitransação pode ser efetivada. Nessa resposta são retornados também todos os blocos lidos.
+\end{enumerate}
 
-\begin{figure}
-  \centering
-  \includegraphics[width=.65\textwidth]{minitransacao_2fase} 
-  \caption{Fase de notificação de uma minitransação}
-  \label{fig:minitransacao_2fase} 
-\end{figure}
+Essa é a primeira fase do protocolo, que nesse caso é chamada de fase de execução. A fase de notificação é análoga à do 2PC, em que o coordenador recebe todas as respostas dos nós participantes e calcula qual será a finalização da minitransação.
 
-Quando os participantes são notificados do cancelamento da minitransação, as operações de escrita da minitransação presentes no \emph{log} do participante não serão efetuadas, deixando os dados inalterados, e será registrado no \emph{log} que a minitransação foi abortada. Se a notificação for de efetivação, as operações de escrita do \emph{log} serão efetuadas, alterando dados existentes ou inserindo novos dados no participante, e será registrado no \emph{log} que a minitransação foi efetivada. O \emph{log} será gravado em disco e a minitransação será considerada oficialmente efetivada ou abortada no momento que esse registro do \emph{log} estiver gravado em disco.
+Todos os mecanismos descritos anteriormente são utilizados, como o \emph{log} para registrar as atividades da transação e as travas para garantir o isolamento entre as minitransações.
+
+%Sendo uma extensão do \emph{2PC}, o protocolo de minitransações possui também um coordenador responsável por iniciar e gerenciar a execução do protocolo entre os participantes da transação. O protocolo de minitransações é composto também por duas fases, mas agora a primeira fase passa a ser uma fase de execução, em que as minitransações são executadas em cada participante e seus votos são enviados para o coordenador. O coordenador coleta os votos de todos os participantes e, como no protocolo original, irá decidir por efetivar a transação somente se os votos forem unânimes. Na segunda fase os participantes são notificados da decisão do coordenador e devem atuar de acordo, efetivando as operações da minitransação ou desfazendo suas ações.
+
+%Um operador especial, $Id[X]$, representa o conjunto formado pelo elemento $Id$ de todas as tuplas no formato $(Id, Dado)$ do conjunto $X$. Esse operador permite obter o conjunto $D$ de todos os identificadores utilizados pela minitransação: $D \gets L \cup Id[C] \cup Id[E]$. Cada elemento de $D$ fica sob responsabilidade de um participante $p$ específico da minitransação, e $\forall d \in D$ o participante responsável pelo identificador $d$ é definido por $Participante(d)$, uma função que indica que $p$ é a possível localização de $d$ entre os participantes, uma vez que o identificador $d$ pode ainda não ter sido inserido em $p$.
+
+%O conjunto $Participantes$ é formado por todos os participantes da minitransação. Cada participante $P_j \in Participantes$ possui um conjunto $K_j$ de identificadores sob sua responsabilidade, e para cada participante o coordenador constrói uma nova minitransação \(M_j = (I_t, C_j, L_j, E_j)\) tal que:
+
+%\begin{itemize}
+%    \item $I_t \gets IdentificadorUnico(I)$
+%    \item $\forall i_l \in L_j, i_l \in K_j$;
+%    \item $\forall i_c \in Id[C_j], i_c \in K_j$; e
+%    \item $Id[E_j] \supseteq K_j$
+%\end{itemize}
+
+%O identificador $I_t$ é unicamente definido e associado ao identificador $I$ por meio da função $IdentificadorUnico$. Como o identificador $I$ é fornecido pela aplicação cliente, nada garante que ele seja único, e por isso utilizamos $IdentificadorUnico$ para criar um novo identificador globalmente único associado à $I$. Os identificadores de $E_j$ são tratados como um superconjunto de $K_j$ pois a operação de escrita pode inserir novos dados no sistema, e não somente alterar dados que já existem.
+
+%Cada $M_j$ é enviada ao respectivo $P_j$ pelo coordenador, que irá esperar pela execução e resposta de cada participante. Ao receber uma minitransação, cada participante irá tentar ler os dados identificados por $Id[C_j]$ e compará-los (comparação de igualdade) com os respectivos $Dado[C_j]$. Caso a comparação não seja bem sucedida, esse participante nem tentará ler ou modificar os dados em $L_j$ e $E_j$, e responderá para o coordenador com um voto $ABORTAR$. A Figura \ref{fig:minitransacao_1fase} ilustra essa primeira fase, que combina a primeira fase do \emph{2PC} com a execução das operações da transação.
+
+%\begin{figure}
+%  \centering
+%  \includegraphics[width=.65\textwidth]{minitransacao_1fase} 
+%  \caption{Fase de execução de uma minitransação}
+%  \label{fig:minitransacao_1fase} 
+%\end{figure}
+
+%Se a comparação for bem sucedida para todos os elementos de $Id[C_j]$, então o participante irá ler os dados identificados por $L_J$ e agrupá-los no conjunto de resposta $R_j$. Os dados $Dado[E_j]$ identificados por $Id[E_j]$ serão inseridos no conjunto de dados ou irão alterar algum dado já existente. Na verdade, a operação de inserir ou alterar um dado é registrada no \emph{log} do participante. O participante envia então um voto $EFETIVAR$ para o coordenador, junto com o conjunto $R_j$. 
+
+%Ao coletar todas as respostas, o coordenador irá apurar os votos de cada participante. Para cada resposta $EFETIVAR$ o coordenador agrega os respectivos $R_j$ em um conjunto de respostas $R$. Se uma das respostas for $ABORTAR$, a transação precisa ser abortada, notificando os participantes do cancelamento, e a aplicação cliente precisa ser notificada desse erro, como podemos ver na Figura \ref{fig:minitransacao_2fase} \textbf{b}. Se não houve nenhum voto $ABORTAR$, o coordenador decide então por efetivar a transação, enviando o conjunto $R$ para a aplicação cliente e notificando os participantes da efetivação, como ilustrado na Figura \ref{fig:minitransacao_2fase} \textbf{a}.
+
+%\begin{figure}
+%  \centering
+%  \includegraphics[width=.65\textwidth]{minitransacao_2fase} 
+%  \caption{Fase de notificação de uma minitransação}
+%  \label{fig:minitransacao_2fase} 
+%\end{figure}
+
+%Quando os participantes são notificados do cancelamento da minitransação, as operações de escrita da minitransação presentes no \emph{log} do participante não serão efetuadas, deixando os dados inalterados, e será registrado no \emph{log} que a minitransação foi abortada. Se a notificação for de efetivação, as operações de escrita do \emph{log} serão efetuadas, alterando dados existentes ou inserindo novos dados no participante, e será registrado no \emph{log} que a minitransação foi efetivada. O \emph{log} será gravado em disco e a minitransação será considerada oficialmente efetivada ou abortada no momento que esse registro do \emph{log} estiver gravado em disco.
 
 
 %Embora não utilizem esses termos, os autores originais efetuam a separação entre o caráter operacional e o caráter semântico das operações de uma transação. Conforme eles notaram, operações de escrita não influenciam na decisão sobre o cancelamento explícito 
