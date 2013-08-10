@@ -368,6 +368,15 @@ Garantir a atomicidade e durabilidade na execução de múltiplas transações c
 
 \emph{ARIES} (\emph{Algorithm for Recovery and Isolation Exploiting Semantics}, \cite{aries}) é o método mais utilizado para efetuar implementar os mecanismos que asseguram ao um ambiente de execução transacional as propriedades \emph{ACID}. Esse método utiliza o conceito de registros de atividades e de travas como base para a implementação dos mecanismos, e sua idéia geral está distribuída nas seções seguintes.
 
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{transicao_estado} 
+  \caption{Transição de estados de uma transação}
+  \label{fig:transicao_estado} 
+\end{figure}
+
+*** TODO explicar a transição de estados ou colocar em uma outra seção melhor...
+
 \subsubsection*{Consistência}
 A propriedade mais básica é a consistência, que é também a mais abstrata das quatro propriedades. Ela está relacionada à validação do estado da aplicação, que por sua vez diz respeito às invariantes impostas sobre os dados que compõem esse estado. Sua importância reside no fato que uma aplicação, para atender de maneira efetiva seus requisitos, não pode utilizar dados inconsistentes por um período indefinido de tempo. Ela é abstrata no sentido que muitas das invariantes não podem ser diretamente expressas ou validadas, o que confere a ela um caráter menos determinístico.
 
@@ -650,7 +659,7 @@ Aqui, é assumida a existência de transações compensatórias, que são capaze
 
 Embora originalmente proposta como uma otimização do protocolo de efetivação em duas fases (\emph{2PC}, \emph{Two-Phase Commit}), nosso trabalho aborda o conceito de minitransação como uma forma de representar uma transação de maneira a explicitar os seus aspectos semânticos.
 
-A seção \ref{sec:aspectos_operacionais_e_semanticos} aborda os aspectos sob os quais podemos analisar uma transação e apresenta a diferença entre os aspectos operacionais e semânticos.
+A seção \ref{sec:aspectos_operacionais_e_semanticos} aborda os aspectos sob os quais podemos analisar uma transação e apresenta a diferença entre os aspectos operacionais e semânticos de uma transação.
 
 A seção \ref{sec:minitransacao_original} fala sobre a definição original de minitransação e sua origem a partir de otimizações no \emph{2PC}.
 
@@ -785,91 +794,165 @@ Uma \textbf{minitransação} é uma maneira de representar uma transação de fo
 
 \section{Definição original}
 \label{sec:minitransacao_original}
-A definição original de minitransação é apresentada em um trabalho de Aguilera et al. \cite{sinfonia}. Nesse trabalho, os autores efetuam algumas observações sobre o protocolo \emph{2PC}, de forma a obter uma otimização desse protocolo. Essa otimização visa a diminuição na quantidade de mensagens utilizadas para efetuar o \emph{2PC}, com o intuito de criar um ambiente de execução transacional para aplicações com requisitos de performance rígidos, como gerenciadores de sistemas de arquivos distribuídos, por exemplo. 
+A definição original de minitransação é apresentada em um trabalho de Aguilera et al. \cite{sinfonia}. Nesse trabalho, os autores efetuam algumas observações sobre o protocolo \emph{2PC}, de forma a obter uma otimização desse protocolo. 
+
+Essa otimização visa a diminuição na quantidade de mensagens utilizadas para efetuar o \emph{2PC}, com o intuito de criar um ambiente de execução transacional para aplicações com requisitos de performance rígidos, como gerenciadores de sistemas de arquivos distribuídos, por exemplo. 
+
+Na subseção \ref{subsec:transacoes_distribuidas} nós apresentamos uma descrição mais detalhada das transações distribuídas do que a apresentada em \ref{subsec:extensoes}.
+
+A subseção \ref{subsec:2pc} descreve os detalhes do protocolo de efetivação em duas fases, utilizado para coordenar a efetivação de transações distruídas.
+
+Em \ref{subsec:otimizacao_2pc} é explicado de que maneira os autores originais otimizaram o \emph{2PC}, criando o protocolo de minitransações.
+
+\subsection{Transações distribuídas}
+\label{subsec:transacoes_distribuidas}
+Uma transação distribuída é uma transação convencional que é executada em um ambiente de execução distribuído, envolvendo diversas máquinas (nós) que coletivamente gerenciam o estado da aplicação. Em cada um desses nós é encontrado um gerenciador de recursos, responsável por gerenciar o subconjunto do estado da aplicação naquele nó, executando os comandos da transação distribuída que acessam ou modificam esse subconjunto.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.4\textwidth]{transferencia_valores_distribuido} 
+  \caption{Transferência de valores em um ambiente de execução distribuído}
+  \label{fig:transferencia_valores_distribuido} 
+\end{figure}
+
+Na figura \ref{fig:transferencia_valores_distribuido} apresentamos uma visualização da execução do algoritmo \ref{alg:transferencia_transacao_4} em um ambiente distribuído. O valor da conta $X$ está armazenado no nó A, e o valor da conta $Y$ está armazenado no nó B.
+
+Uma transação distribuída é composta por subtransações que executam em cada um dos nós envolvidos na transação. Como podemos ver na figura \ref{fig:transferencia_valores_distribuido}, a transação \textbf{T} criada para efetuar a transferência cria duas subtransações, \textbf{SA} e \textbf{SB}, nos nós \textbf{A} e \textbf{B}, respectivamente.
+
+Essas subtransações são como transações convencionais executando nos nós envolvidos. Elas representam trechos da transação original, só fazem sentido no contexto dessa transação. A efetivação ou o cancelamento da transação original \textbf{T} implica na mesma finalização em cada uma das subtransações. Da mesma forma, não é possível que uma subtransação seja cancelada sem que a transação original seja cancelada também.
+
+Como as subtransações são transações convencionais executando nos nós participantes, não existe diferença nos mecanismos utilizados na execução da transação descritos no capítulo anterior. A diferença se apresenta no momento da finalização da transação.
+
+Para efetuar a efetivação da transação é preciso que todos os nós participantes concordem com tal finalização. Se algum deles não puder efetuar a efetivação, seja por qualquer problema, a transação, e nenhuma das suas subtransações, poderá ser efetivada. 
+
+A decisão pela efetivação deve ser unânime, para preservar as propriedades \emph{ACID} da transação. Na subseção \ref{subsec:2pc} será descrito um protocolo para garantir a efetivação em um ambiente de execução distribuído.
 
 \subsection{O protocolo de efetivação em duas fases}
 \label{subsec:2pc}
-A idéia desse protocolo é simples e utilizada a bastante tempo \cite{2pc}: verificar se todos os gerenciadores de recurso envolvidos em uma transação estão aptos a efetivar suas respectivas sub-transações. Se estiverem, a transação será efetivada. Se algum gerenciador não puder efetivar, por qualquer motivo, a transação será abortada. O \emph{2PC} necessita de um gerenciador que atue como o \textbf{coordenador} da transação, responsável por gerenciar a execução do protocolo e tomar a decisão sobre efetivar ou abortar a transação comunicando-se com os outros \textbf{participantes}, que executam as sub-transações associadas à transação. O coordenador pode ser um participante da transação também.
+O protocolo de efetivação em duas fases, ou 2PC (\emph{two-phase commit}, \cite{2pc}), é o protocolo padrão utilizado para coordenar a finalização de transações distribuídas.
 
-O protocolo é dividido em duas fases. Na primeira fase o coordenador solicita que os participantes enviem seus votos, indicando se estão aptos a efetivar a sub-transação executada. Os votos são coletados e o coordenador decide se a transação pode ser efetivada (caso todos os participantes tenham votado de acordo) ou se deve ser abortada (caso algum participante tenha votado para não efetivar a transação). Decidido o resultado da votação, o coordenador efetua a segunda fase, em que os participantes são notificados do resultado da votação. 
+Quando a aplicação termina de executar todos os comandos da transação, ela solicita ao ambiente de execução que essa transação seja efetivada. Nesse momento é executado o 2PC para verificar se todos os participantes estão aptos a efetivar suas respectivas subtransações.
 
-De forma mais detalhada, o \emph{2PC} pode ser descrito pelos algoritmos \ref{alg:2pc_coordenador}, \ref{alg:2pc_participante1} e  \ref{alg:2pc_participante2}. O Algoritmo \ref{alg:2pc_coordenador} descreve as ações do coordenador ao ser notificado que o protocolo deve  iniciar. Os algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} descrevem as ações executadas pelos participantes ao receberem uma solicitação de votação (primeira fase) e o resultado da votação (segunda fase), respectivamente. 
+Caso todos os participantes respondam confirmando a efetivação, todos os outros serão notificados e a transação termina. Se algum dos participantes não responder, ou responder negativamente, indicando que não pode efetivar a subtransação, todos os nós participantes são notificados e a transação e suas subtransações são canceladas.
 
-Uma estrutura de dados essencial na execução do \emph{2PC} é o registro de operações, ou \emph{log}. Ele é responsável por registrar as decisões do coordenador e dos participantes, e é gravado localmente em cada gerenciador de recursos envolvido na transação para evitar que essas informações sejam perdidas caso ocorra alguma falha. No Algoritmo \ref{alg:2pc_coordenador} $log_c$ representa o \emph{log} do coordenador e nos algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} $log_i$ é o \emph{log} do participante $p_i$ executando o algoritmo em questão.
-
-A função $Adicionar$ representa a operação de adicionar um elemento ao final do \emph{log}. A função $Enviar(d, m)$ representa o envio de uma mensagem $m$ para um destinatário $d$ pela rede de comunicação, e a função $Receber(r)$ representa o recebimento de uma mensagem de um remetente $r$. Uma simulação da execução do algoritmo pode ser vista nas figuras \ref{fig:2PC_1fase} e \ref{fig:2PC_2fase}.
-
-\begin{algorithm}
-\caption{Coordenador 2PC}
-\label{alg:2pc_coordenador}
-\Inicio{
-    $Adicionar(log_c, (PREPARAR, T))$\;
-    \ParaTodo{$p_i \in Participantes$}
-    {
-    	$Enviar(p_i, (PREPARAR, T))$\;
-    }
-    $d \gets EFETIVAR$\;
-    \ParaTodo{$p_i \in Participantes$}
-    {    
-        $v \gets Receber(p_i)$\;
-        \Se{$v = ABORTAR$}
-        {
-            $d \gets ABORTAR$\;
-        }
-    }
-    $Adicionar(log_c, (d, T))$\;
-    \ParaTodo{$p_i \in Participantes$}
-    {
-    	$Enviar(p_i, (d, T))$\;
-    }
-}
-\end{algorithm}
-
-\begin{algorithm}
-\caption{Votação 2PC - $p_i$ recebe $(PREPARAR, T)$ de $c$}
-\label{alg:2pc_participante1}
-\Inicio{
-    $v \gets Decidir(T)$\;
-    $Adicionar(log_i, (v, T))$\;
-    $Enviar(c, v)$\;
-}
-\end{algorithm}
-
-\begin{algorithm}
-\caption{Notificação 2PC - $p_i$ recebe $(d, T)$ de $c$}
-\label{alg:2pc_participante2}
-\Inicio{
-    \eSe{$d = EFETIVAR$}
-    {
-        $Efetivar(T)$\;
-        $Adicionar(log_i, (EFETIVAR, T))$\;
-    }
-    {
-    	$Abortar(T)$\;
-    	$Adicionar(log_i, (ABORTAR, T))$\;
-    }
-}
-\end{algorithm}
-
-A premissa que norteia o protocolo é que qualquer gerenciador envolvido na transação pode decidir abortá-la de forma unilateral, ou falhar em executar uma sub-transação, exigindo assim unanimidade na decisão pela efetivação da transação. As mensagens enviadas durante a execução do protocolo indicam uma decisão do remetente, e para garantir que essa decisão sobreviva a falhas no gerenciador que enviou a mensagem, os dados do \emph{log} são gravados em um meio de armazenamento estável, como um disco rígido, antes da  mensagem ser enviada. A transação $T$ é considerada oficialmente efetivada (ou abortada) no momento que o registro de $(EFETIVAR, T)$ (ou $(ABORTAR, T)$) do \emph{log} do coordenador for escrito para a área de armazenamento estável da máquina. Falhas posteriores não podem mudar a decisão do coordenador registrada em seu \emph{log} e gravada em disco.
+Assim, esse protocolo é executado em duas rodadas, ou fases, para verificar a ação a ser tomada na finalização da transação. A primera rodada é a votação, que questiona os participantes se a subtransação pode ser efetivada. A segunda rodada, de notificação, é utilizada para comunicar aos participantes a decisão tomada por todos.
 
 \begin{figure}
   \centering
-  \includegraphics[width=.40\textwidth]{2PC_1fase} 
-  \caption{Primeira fase 2PC - O coordenador inicia a votação e os participantes respondem com seus votos $V_i$}
-  \label{fig:2PC_1fase} 
+  \includegraphics[width=.50\textwidth]{fase_votacao_2pc} 
+  \caption{Fase de votação do 2PC - o coordenador verifica se cada participante pode efetivar}
+  \label{fig:fase_votacao_2pc} 
 \end{figure}
+
+A figura \ref{fig:fase_votacao_2pc} ilustra a primeira fase do protocolo. Como pode ser visto, o 2PC estabelece o papel de um \textbf{coordenador}, um elemento do ambiente de execução que irá coordenar a execução do protocolo e decidirá qual deve ser o tipo de finalização da transação. Na figura o coordenador está logicamente separado da aplicação e dos nós participantes, mas fisicamente ele pode estar rodando em qualquer nó do ambiente, inclusive em algum participante ou na própria aplicação.
+
+Cada nó participante irá verificar se a subtransação associada à transação T pode ser efetivada. Alguns ambientes de execução podem postergar para o momento da efetivação checagens de invariantes. Por exemplo, SGBD's podem optar por efetuar a validação de restrições (\emph{constraints}) sobre os dados alterados para o momento da efetivação, por questões de performance. Se as invariantes forem válidas, e nenhum outro tipo de problema ocorrer, o participante responderá votando pela efetivação da transação. Se alguma variante for violada, ou se algum erro ocorrer, o participante responderá votando pelo cancelamento da transação.
 
 \begin{figure}
   \centering
-  \includegraphics[width=.40\textwidth]{2PC_2fase} 
-  \caption{Segunda fase 2PC- O coordenador apura os votos e notifica os participantes. Em (a) os participantes são notificados de uma efetivação. Em (b), a transação foi abortada.}
-  \label{fig:2PC_2fase} 
+  \includegraphics[width=\textwidth]{fase_votacao_2pc_respostas} 
+  \caption{Fase de votação do 2PC - resposta dos participantes}
+  \label{fig:fase_votacao_2pc_respostas} 
 \end{figure}
 
-É importante notar que esse protocolo não define como as operações da transação devem ser executadas nas máquinas participantes, mas sim como a efetivação da transação deve proceder. As sub-transações ocorrem em cada participante antes que o protocolo de efetivação inicie. Portanto, a utilização desse protocolo aumenta o número de mensagens e consequentemente o tempo e o esforço necessários para que uma transação seja executada. Algumas otimizações podem ocorrer, como no caso de transações que efetuam somente operações de leitura ou de transações que envolvam dados em somente uma máquina do sistema mas, de forma geral, a execução do \emph{2PC} é custosa \cite{gray-lamport}.
+Na figura \ref{fig:fase_votacao_2pc_respostas} estão ilustradas as quatro combinações possíveis de resposta que os participantes podem enviar para o coordenador. No item \textbf{a} da figura todos os participante confirmam a efetivação de suas subtransações. O coordenador recolhe todas as respostas e verifica que, como todas foram positivas, a transação pode ser efetivada.
 
-*** TODO página 562 e 643 do gray 
+Os items \textbf{b} e \textbf{c} ilustram os casos em que um dos participantes não podem efetivar a sua respectiva subtransação (devido a violações das invariantes ou outra falha ocorrida), e o item \textbf{d} mostra o caso em que nenhum participante pode efetuar a efetivação. O coordenador recebe as respostas e, como uma delas (ou todas) foram negativas, ele não pode efetivar a transação. Portanto, a única ação a ser tomada é o cancelamento.
+
+Finalizada a fase de votação e decidida a ação a ser efetuada para finalizar a transação, o coordenador inicia a segunda fase do protocolo, de notificação. O cordenador registra a ação escolhida em seu \emph{log}, e garante que esse registro seja gravado em algum meio de armazenamento não volátil. Isso ocorre por que o coordenador é a autoridade final para dizer se a transação foi efetivada ou cancelada. 
+
+Uma vez que o coordenador tenha registrado em seu \emph{log} que a transação foi efetivada ou cancelada, qualquer falha posterior, tanto no coordenador quanto nos participantes, não pode mudar essa decisão. Após a informação sobre o cancelamento ou efetivação da transação ser armazenada definitivamente, o coordenador notifica os participantes do resultado da votação, e retorna à aplicação esse resultado.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{fase_notificacao_2pc} 
+  \caption{Fase de notificação do 2PC}
+  \label{fig:fase_notificacao_2pc} 
+\end{figure}
+
+A figura \ref{fig:fase_notificacao_2pc} apresenta uma ilustração da execução da segunda fase do protocolo no caso de efetivação (o procedimento é análogo para o cancelamento). O item \textbf{a} da figura mostra o registro da efetivação da transação no \emph{log} do coordenador. O coordenador precisa garantir que essa informação foi salva permanentemente antes de prosseguir para a notificação dos participantes, no item \textbf{b}. Após notificar os participantes, o coordenador retorna para a aplicação, informando que a transação foi efetivada (item \textbf{c}). 
+
+%A idéia desse protocolo é simples e utilizada a bastante tempo \cite{2pc}: verificar se todos os gerenciadores de recurso envolvidos em uma transação estão aptos a efetivar suas respectivas sub-transações. Se estiverem, a transação será efetivada. Se algum gerenciador não puder efetivar, por qualquer motivo, a transação será abortada. O \emph{2PC} necessita de um gerenciador que atue como o \textbf{coordenador} da transação, responsável por gerenciar a execução do protocolo e tomar a decisão sobre efetivar ou abortar a transação comunicando-se com os outros \textbf{participantes}, que executam as sub-transações associadas à transação. O coordenador pode ser um participante da transação também.
+
+%O protocolo é dividido em duas fases. Na primeira fase o coordenador solicita que os participantes enviem seus votos, indicando se estão aptos a efetivar a sub-transação executada. Os votos são coletados e o coordenador decide se a transação pode ser efetivada (caso todos os participantes tenham votado de acordo) ou se deve ser abortada (caso algum participante tenha votado para não efetivar a transação). Decidido o resultado da votação, o coordenador efetua a segunda fase, em que os participantes são notificados do resultado da votação. 
+
+%De forma mais detalhada, o \emph{2PC} pode ser descrito pelos algoritmos \ref{alg:2pc_coordenador}, \ref{alg:2pc_participante1} e  \ref{alg:2pc_participante2}. O Algoritmo \ref{alg:2pc_coordenador} descreve as ações do coordenador ao ser notificado que o protocolo deve  iniciar. Os algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} descrevem as ações executadas pelos participantes ao receberem uma solicitação de votação (primeira fase) e o resultado da votação (segunda fase), respectivamente. 
+
+%Uma estrutura de dados essencial na execução do \emph{2PC} é o registro de operações, ou \emph{log}. Ele é responsável por registrar as decisões do coordenador e dos participantes, e é gravado localmente em cada gerenciador de recursos envolvido na transação para evitar que essas informações sejam perdidas caso ocorra alguma falha. No Algoritmo \ref{alg:2pc_coordenador} $log_c$ representa o \emph{log} do coordenador e nos algoritmos \ref{alg:2pc_participante1} e \ref{alg:2pc_participante2} $log_i$ é o \emph{log} do participante $p_i$ executando o algoritmo em questão.
+
+%A função $Adicionar$ representa a operação de adicionar um elemento ao final do \emph{log}. A função $Enviar(d, m)$ representa o envio de uma mensagem $m$ para um destinatário $d$ pela rede de comunicação, e a função $Receber(r)$ representa o recebimento de uma mensagem de um remetente $r$. Uma simulação da execução do algoritmo pode ser vista nas figuras \ref{fig:2PC_1fase} e \ref{fig:2PC_2fase}.
+
+%\begin{algorithm}
+%\caption{Coordenador 2PC}
+%\label{alg:2pc_coordenador}
+%\Inicio{
+%    $Adicionar(log_c, (PREPARAR, T))$\;
+%    \ParaTodo{$p_i \in Participantes$}
+%    {
+%    	$Enviar(p_i, (PREPARAR, T))$\;
+%    }
+%    $d \gets EFETIVAR$\;
+%    \ParaTodo{$p_i \in Participantes$}
+%    {    
+%        $v \gets Receber(p_i)$\;
+%        \Se{$v = ABORTAR$}
+%        {
+%            $d \gets ABORTAR$\;
+%        }
+%    }
+%    $Adicionar(log_c, (d, T))$\;
+%    \ParaTodo{$p_i \in Participantes$}
+%    {
+%    	$Enviar(p_i, (d, T))$\;
+%    }
+%}
+%\end{algorithm}
+
+%\begin{algorithm}
+%\caption{Votação 2PC - $p_i$ recebe $(PREPARAR, T)$ de $c$}
+%\label{alg:2pc_participante1}
+%\Inicio{
+%    $v \gets Decidir(T)$\;
+%    $Adicionar(log_i, (v, T))$\;
+%    $Enviar(c, v)$\;
+%}
+%\end{algorithm}
+
+%\begin{algorithm}
+%\caption{Notificação 2PC - $p_i$ recebe $(d, T)$ de $c$}
+%\label{alg:2pc_participante2}
+%\Inicio{
+%    \eSe{$d = EFETIVAR$}
+%    {
+%        $Efetivar(T)$\;
+%        $Adicionar(log_i, (EFETIVAR, T))$\;
+%    }
+%    {
+%    	$Abortar(T)$\;
+%    	$Adicionar(log_i, (ABORTAR, T))$\;
+%    }
+%}
+%\end{algorithm}
+
+%A premissa que norteia o protocolo é que qualquer gerenciador envolvido na transação pode decidir abortá-la de forma unilateral, ou falhar em executar uma sub-transação, exigindo assim unanimidade na decisão pela efetivação da transação. As mensagens enviadas durante a execução do protocolo indicam uma decisão do remetente, e para garantir que essa decisão sobreviva a falhas no gerenciador que enviou a mensagem, os dados do \emph{log} são gravados em um meio de armazenamento estável, como um disco rígido, antes da  mensagem ser enviada. A transação $T$ é considerada oficialmente efetivada (ou abortada) no momento que o registro de $(EFETIVAR, T)$ (ou $(ABORTAR, T)$) do \emph{log} do coordenador for escrito para a área de armazenamento estável da máquina. Falhas posteriores não podem mudar a decisão do coordenador registrada em seu \emph{log} e gravada em disco.
+
+%\begin{figure}
+%  \centering
+%  \includegraphics[width=.40\textwidth]{2PC_1fase} 
+%  \caption{Primeira fase 2PC - O coordenador inicia a votação e os participantes respondem com seus votos $V_i$}
+%  \label{fig:2PC_1fase} 
+%\end{figure}
+
+%\begin{figure}
+%  \centering
+%  \includegraphics[width=.40\textwidth]{2PC_2fase} 
+%  \caption{Segunda fase 2PC- O coordenador apura os votos e notifica os participantes. Em (a) os participantes são notificados de uma efetivação. Em (b), a transação foi abortada.}
+%  \label{fig:2PC_2fase} 
+%\end{figure}
+
+%É importante notar que esse protocolo não define como as operações da transação devem ser executadas nas máquinas participantes, mas sim como a efetivação da transação deve proceder. As sub-transações ocorrem em cada participante antes que o protocolo de efetivação inicie. Portanto, a utilização desse protocolo aumenta o número de mensagens e consequentemente o tempo e o esforço necessários para que uma transação seja executada. Algumas otimizações podem ocorrer, como no caso de transações que efetuam somente operações de leitura ou de transações que envolvam dados em somente uma máquina do sistema mas, de forma geral, a execução do \emph{2PC} é custosa \cite{gray-lamport}.
+
+%*** TODO página 562 e 643 do gray 
 
 \subsection{Otimização do 2PC}
 \label{subsec:otimizacao_2pc}
