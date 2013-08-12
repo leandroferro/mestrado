@@ -264,7 +264,17 @@ Por último, \emph{Hazelcast} \cite{hazelcast} e \emph{Akka} \cite{akka} são fe
 distribuídas ou memória transacional. \emph{Hazelcast} oferece a programas rodando na \emph{JVM Java} implementações distribuídas das coleções da biblioteca padrão (\emph{Collection, Set, List e Map}). \emph{Akka} permite a utilização de memória transacional por \emph{software} (\emph{software transactional memory} ou \emph{STM} \cite{stm}), uma abordagem que emprega o conceito de transação discutido 
 neste trabalho em operações de leitura e escrita na memória principal do computador.
 
-\chapter{Evolução dos sistemas computacionais}
+\chapter{Paradigma transacional}
+\label{chap:transacao}
+Este capítulo apresenta o paradigma transacional como uma alternativa para o desenvolvimento de software. Esse paradigma utiliza o conceito de transação para definir unidades de execução de grupos de operações sobre o estado do sistema.
+
+A seção \ref{sec:tolerancia_a_falhas} apresenta uma idéia da necessidade e da origem da utilização de transações.
+
+Na seção \ref{sec:transacao} veremos as propriedades que essas transações devem possui para oferecer uma ferramenta de desenvolvimento efetiva ao desenvolvedor.
+
+Por último, a seção \ref{sec:extensoes} apresenta algumas extensões do modelo de transações descrito neste capítulo.
+
+\section{Evolução dos sistemas computacionais}
 \label{chap:evolucao}
 Este capítulo apresenta uma breve descrição da evolução dos sistemas computacionais e da maneira como foram e são construídos. O tamanho e a complexidade desses sistemas evoluiram acompanhando, e muitas vezes incentivando, a evolução das plataformas de \emph{hardware} em que executam. Essa descrição não é completa e nem exaustiva, uma vez que o intuito é apresentar os tipos mais representativos de sistemas e as técnicas e arquiteturas utilizadas em seu desenvolvimento.
 
@@ -314,16 +324,6 @@ Como máquinas podem ser adicionadas ou removidas durante a execução do sistem
 
 *** TODO ver se dá pra pegar aquela parte do booch que ele explica a evolução das linguagens...
 
-\chapter{Paradigma transacional}
-\label{chap:transacao}
-Este capítulo apresenta o paradigma transacional como uma alternativa para o desenvolvimento de software. Esse paradigma utiliza o conceito de transação para definir unidades de execução de grupos de operações sobre o estado do sistema.
-
-A seção \ref{sec:tolerancia_a_falhas} apresenta uma idéia da necessidade e da origem da utilização de transações.
-
-Na seção \ref{sec:transacao} veremos as propriedades que essas transações devem possui para oferecer uma ferramenta de desenvolvimento efetiva ao desenvolvedor.
-
-Por último, a seção \ref{sec:extensoes} apresenta algumas extensões do modelo de transações descrito neste capítulo.
-
 \section{Tolerância a Falhas}
 \label{sec:tolerancia_a_falhas}
 O estado de uma aplicação é definido como um conjunto de dados relacionados de alguma maneira. Esses relacionamentos podem ser vistos como invariantes em relação aos dados e em relação a como esses dados são alterados. Quando todas essas invariantes definidas estiverem satisfeitas, o estado da aplicação é dito consistente.
@@ -350,11 +350,16 @@ Ao longo do tempo foram identificadas quatro propriedades que definem uma transa
 
 A descrição de transação apresentada neste capítulo pode ser considerada como convencional. Hoje em dia existem diversas extensões desse modelo convencional, criadas para adequar ou otimizar a execução das transações a um determinado cenário. Essas extensões são apresentadas resumidamente na seção \ref{subsec:extensoes}.
 
+\subsection{Outros modelos de execução atômica}
+\label{subsec:outros_modelos_execucao_atomica}
+
+Falar sobre semáforo, mutex, etc...
+
 \subsection{ACID}
 \label{subsec:acid}
 Transações apresentam um conjunto de propriedades que as tornam uma base simples e sólida na qual se pode basear o desenvolvimento de aplicações. Essas propriedades são chamadas conjuntamente de \emph{ACID} (\emph{Atomicity, Consistency, Isolation e Durability}, ou Atomicidade, Consistência, Isolamento e Durabilidade). 
 
-\textbf{Atomicidade} se refere ao fato que a execução da transação é atômica, ou seja, a execução da transação significa que todas as operações que a compõem foram executadas com sucesso. A atomicidade diz respeito a qualquer observador externo, que não deve ser capaz acessar nenhum estado intermediário criado pela transação durante sua execução. Os únicos dois estados que um observador externo pode acessar é o estado final, após a transação ser finalizada, ou o estado inicial, após a transação ser cancelada.
+\textbf{Atomicidade} se refere ao fato que a execução da transação é atômica, ou seja, a execução da transação significa que todas as operações que a compõem foram executadas com sucesso. A atomicidade diz respeito a qualquer observador externo, que não deve ser capaz de acessar nenhum estado intermediário criado pela transação durante sua execução. Os únicos dois estados que um observador externo pode acessar é o estado final, após a transação ser finalizada, ou o estado inicial, após a transação ser cancelada.
 
 \textbf{Consistência} é a propriedade que diz que o resultado da execução de uma transação é um estado consistente. Seja esse novo estado o resultado de transformações aplicadas ao estado inicial, ou o próprio estado inicial no caso de cancelamento, o ponto principal sobre essa propriedade é que o novo estado é consistente.
 
@@ -974,8 +979,8 @@ Essa maneira de executar as operações de uma transação de uma só vez na pri
 
 Como veremos também, as minitransações oferecidas pelo Sinfonia possuem um escopo de utilização limitado devido ao tipo de comparação que conseguem efetuar. O escopo dessas comparações atende ao requisitos do Sinfonia mas, como veremos, ele é muito limitante. A definição e a implementação apresentadas neste trabalho aumentam esse escopo e, portanto, a abrangência do uso de minitransações.
 
-\subsubsection*{Sinfonia}
-Sinfonia é um serviço distribuído que permite o armazenamento de dados em um ambiente tolerante a falhas, escalável e consistente. O foco do sinfonia é prover a execução transacional de operações sobre esses dados para o que os autores chamam de aplicações de infraestrutura de centrais de dados (\emph{data center infraestructure applications}) como sistemas de arquivos distribuídos, gerenciadores de travas e serviços de comunicação de grupos de aplicações. Essas aplicações precisam ser tolerantes a falha e escaláveis, além de quase sempre precisarem oferecer consistência aos seus usuários e performance em um nível razoável.
+\subsection{Sinfonia}
+Sinfonia é um serviço distribuído que permite o armazenamento de dados em um ambiente tolerante a falhas, escalável e consistente. O foco do sinfonia é prover a execução transacional de operações sobre esses dados para o que os autores chamam de aplicações de infraestrutura de centrais de dados (\emph{data center infrastructure applications}) como sistemas de arquivos distribuídos, gerenciadores de travas e serviços de comunicação de grupos de aplicações. Essas aplicações precisam ser tolerantes a falha e escaláveis, além de quase sempre precisarem oferecer consistência aos seus usuários e performance em um nível razoável.
 
 Esse serviço procura oferecer um balanceamento entre funcionalidade e escalabilidade. A chave para alcançar escalabilidade é separar operações executadas por diferentes nós o máximo possível, de tal forma que essas operações possam ser executadas de maneira independente. Para oferecer essa escalabilidade, o Sinfonia oferece um espaço de endereçamento bem granularizado para acessar os dados armazenados, sem impor nenhum tipo de estrutura, ficando a cargo da aplicação organizar os dados da maneira mais conveniente.
 
@@ -996,12 +1001,13 @@ Esses bytes são organizados como um espaço de endereçamento linear sem nenhum
 
 O formato das minitransações utilizadas para acessar e modificar os dados e a maneira como elas são executadas no Sinfonia estão descritos a seguir.
 
-\subsubsection*{Minitransações no sinfonia}
+\subsection{Minitransações no sinfonia}
+\label{subsec:minitransacoes_sinfonia}
 As minitransações oferecidas pelo Sinfonia possuem uma estrutura composta por três tipos de operações, como ilustrado na figura \ref{fig:minitransacao_sinfonia}.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.7\textwidth]{minitransacao_sinfonia} 
+  \includegraphics[width=0.4\textwidth]{minitransacao_sinfonia} 
   \caption{Estrutura das minitransações do Sinfonia}
   \label{fig:minitransacao_sinfonia} 
 \end{figure}
@@ -1009,17 +1015,17 @@ As minitransações oferecidas pelo Sinfonia possuem uma estrutura composta por 
 Os campos do comando de comparação estão descritos a seguir:
 
 \begin{itemize}
-	\item[Id-Nó] identificador do nó de memória
-	\item[Endereço] número do byte no espaço de endereçamento do nó identificado por \textbf{Id-Nó}
-	\item[Tamanho] especifica quantos bytes, a partir de \textbf{Endereço}, devem ser comparados
-	\item[Dados] é uma sequência de \textbf{Tamanho} bytes com a qual o conteúdo do nó será comparado
+	\item \textbf{Id-Nó}: identificador do nó de memória
+	\item \textbf{Endereço}: número do byte no espaço de endereçamento do nó identificado por \textbf{Id-Nó}
+	\item \textbf{Tamanho}: especifica quantos bytes, a partir de \textbf{Endereço}, devem ser comparados
+	\item \textbf{Dados}: é uma sequência de \textbf{Tamanho} bytes com a qual o conteúdo do nó será comparado
 \end{itemize}
 
 Nos campos do comando de escrita e leitura os campos \textbf{Id-Nó} e \textbf{Endereço} possuem a mesmo significado que os do comando de comparação. O significado de \textbf{Tamanho} e \textbf{Dados} nos comandos de leitura e escrita está apresentado a seguir:
 
 \begin{itemize}
-	\item[Tamanho] identifica quantos bytes devem ser lidos, no caso de leitura, ou modificados, no caso de escrita
-	\item[Dados] é uma sequência de \textbf{Tamanho} bytes que deve ser gravado a partir do byte identificado por \textbf{Endereço}. Esse campo é sempre vazio nos comandos de leitura
+	\item \textbf{Tamanho} identifica quantos bytes devem ser lidos, no caso de leitura, ou modificados, no caso de escrita
+	\item \textbf{Dados} é uma sequência de \textbf{Tamanho} bytes que deve ser gravado a partir do byte identificado por \textbf{Endereço}. Esse campo é sempre vazio nos comandos de leitura
 \end{itemize}
 
 A comparação efetuada pelo Sinfonia e da igualdade byte a byte, ou seja, o conteúdo armazenado no nó será comparado byte a byte com o valor especificado em \textbf{Dados}. O comando de leitura especifica um bloco de dados a ser retornado e o comando de escrita especifica um bloco de dados a ser modificado.
@@ -1090,10 +1096,56 @@ Todos os mecanismos descritos anteriormente são utilizados, como o \emph{log} p
 
 \section{Formalização}
 \label{sec:formalizacao}
-Uma minitransação é composta por três conjuntos: itens de comparação, itens de leitura e itens de escrita, como pode ser visto na figura \ref{fig:estrutura_minitransacao}. Todos os itens possuem uma referência a qual dado deve ser utilizado ($ID_{A...D}$), e os itens de comparação e escrita incluem também os dados ($DADO_{1...4}$) que serão comparados com ou substituirão os dados armazenados \cite{sinfonia}. 
+A definição de minitransação encontrada em \cite{sinfonia} é específica para a implementação no ambiente oferecido pelo Sinfonia, onde uma minitransação é exposta como uma primitva implementada pelo Sinfonia para executar operações atomicamente.
+
+%Essa definição original, apresentada na seção \ref{subsec:minitransacoes_sinfonia}, está intimamente relacionada com o protocolo de execução, de maneira que a separação entre a minitransação e esse protocolo de confundem.
+
+Na seção \ref{subsec:definicao} formalizamos e generalizamos esse conceito de forma que possa ser implementado e utilizado em outros ambientes, independente do protocolo de execução e efetivação.
+
+A seção \ref{subsec:vantagens_e_desvantagens} apresenta uma comparação com o modelo convencional de transação e as vantagens e desvantagens da minitransação, assim como cenários em que podem ser utilizadas.
+
+\subsection{Definição}
+\label{subsec:definicao}
+Um minitransação é um modelo de representação de uma transação em que os componentes semânticos dessa transação são indicados explicitamente. Esse modelo expõe diretamente os componentes semânticos, que definem condições sob as quais uma transação deve ser cancelada.
+
+Assim, uma minitransação $M$ é um par formado por:
+
+\begin{itemize}
+	\item $S$: conjunto de componentes semânticos da transação
+	\item $O$: conjunto de componentes operacionais da transação
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{mapeamento_minitransacao} 
+  \caption{Modelo de uma minitransação e seu mapeamento para a implementação do Sinfonia}
+  \label{fig:mapeamento_minitransacao} 
+\end{figure}
+
+A figura \ref{fig:mapeamento_minitransacao} ilustra o modelo de uma minitransação e como esse modelo é mapeado para a implementação de minitransações oferecida pelo Sinfonia. Os componentes operacionais são todos aqueles que não influenciam na decisão da aplicação em efetivar ou não a transação. No caso do Sinfonia, os comandos de leitura e escrita possuem essa característica.
+
+Os componentes semânticos são aqueles que influenciam a aplicação em relação a efetivar ou cancelar a transação. Os comandos de comparação são portanto semânticos, pois é por meio deles que o Sinfonia decide se a transação pode ser efetivada ou não.
+
+\subsection{Vantagens e Desvantagens}
+\label{subsec:vantagens_e_desvantagens}
+A principal vantagem na utilização de uma minitransação é a separação clara entre os aspectos semânticos e operacionais de uma transação. Essa separação deixa explícita na estrutura da transação quais os componentes que influenciam o resultado de sua execução.
+
+Isso aumenta o grau de manutenibilidade do código da aplicação, uma vez que os componentes semânticos estão agrupados e organizados, e não espalhados pelo código em estruturas condicionais, por exemplo.
+
+Essa separação também permite análises estáticas da aplicação em relação à transação, pois é simples identificar as condições sob as quais a transação será cancelada. Ferramentas de análise de código fonte podem ser utilizadas para obter estatísticas e até mesmo ajudar a otimizar a construção das transações.
+
+Otimizações também são possíveis ao efetuar essa separação, como ocorre com o protocolo 2PC modificado utilizado pelo Sinfonia. 
+
+As desvantagens do modelo de minitransações estão relacionadas ao poder de expressão dos componentes semânticos. Por exemplo, no Sinfonia, o único componente semântico permitido é a operação de comparação de igualdade.
+
+A expressividade desses componentes está relacionada à implementação utilizada. A infraestrutura descrita no capítulo \ref{chap:implementacao}, por exemplo, permite que outras comparações sejam feita, como maior, menor, etc. Mesmo assim, o poder de expressão dessas construções não pode ser igualado ao de uma expressão que pode ser construída por uma linguagem de programação de alto-nível.
+
+Por esse motivo, condições de cancelamento que precisem analisar dados e informações externas ao ambiente de execução não podem ser utilizadas. Assim, o modelo de minitransações não pode ser aplicado a esses cenários.
+
+%Uma minitransação é composta por três conjuntos: itens de comparação, itens de leitura e itens de escrita, como pode ser visto na figura \ref{fig:estrutura_minitransacao}. Todos os itens possuem uma referência a qual dado deve ser utilizado ($ID_{A...D}$), e os itens de comparação e escrita incluem também os dados ($DADO_{1...4}$) que serão comparados com ou substituirão os dados armazenados \cite{sinfonia}. 
 
 
-Formalmente, uma minitransação pode ser vista como uma tupla na forma $(I, C, L, E)$. $I$ é o identificador da minitransação, gerado pelo criador da minitransação. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((Id, Dado)\), em que \(Id\) é o identificador do dado e \(Dado\) é o valor para se comparar com o valor identificado por $Id$ ou para substituí-lo.
+%Formalmente, uma minitransação pode ser vista como uma tupla na forma $(I, C, L, E)$. $I$ é o identificador da minitransação, gerado pelo criador da minitransação. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((Id, Dado)\), em que \(Id\) é o identificador do dado e \(Dado\) é o valor para se comparar com o valor identificado por $Id$ ou para substituí-lo.
 
 
 
@@ -1144,7 +1196,7 @@ Formalmente, uma minitransação pode ser vista como uma tupla na forma $(I, C, 
 
 %Formalmente, uma minitransação pode ser vista como uma tupla na forma $(I, C, L, E)$. $I$ é o identificador da minitransação, gerado pelo criador da minitransação. \(C\) é o conjunto de itens de comparação, \(L\) é o conjunto de itens para leitura e \(E\) é o conjunto de itens para escrita. Os elementos de \(L\) são identificadores de dados, e o domínio de seus valores é o conjunto de identificadores armazenados na máquina participante. \(C\) e \(E\) possuem elementos que podem ser representados como tuplas no formato \((Id, Dado)\), em que \(Id\) é o identificador do dado e \(Dado\) é o valor para se comparar com o valor identificado por $Id$ ou para substituí-lo.
 
-\chapter{A infraestrutura}
+\chapter{Implementação}
 \label{chap:implementacao}
 Na seção \ref{sec:infinispan} apresenta o Infinispan, detalhando os pontos importantes de sua arquitetura e parte central de sua implementação. 
 
@@ -1751,6 +1803,8 @@ Uma segunda oportunidade de desenvolvimento é a validação e execução dos te
 De forma mais realista, a documentação do infinispan descreve como configurar e otimizar para agrupamentos de até 128 máquinas. Executar e analisar o comportamento das minitransações, uma vez que seus problemas de performance sejam corrigidos, em um ambiente com essas configurações seria muito interessante. 
 
 Por fim, a separação de uma definição de minitransação de suas implementações parece uma proposta promissora, nos moldes do que acontece com as transações convencionais e o JTA. Como visto na seção \ref{sec:resultados}, o uso de uma minitransação permite uma representação mais direta das intenções da transação, o que pode torná-las uma ferramenta para auxiliar no desenvolvimento de um código mais claro e coeso, independente do sistema ser distribuído ou não.
+
+Uma outra opção é a implementação de um adaptador de minitransações para sistemas transacionais já existentes. Por exemplo, esse adaptador poderia oferecer um mecanismo de execução de minitransações que fosse traduzido em tempo de execução para a linguagem do sistema sendo adaptado. Assim seria possível executar minitransações em bancos de dados ou filas de mensagens.
 
 % cabeçalho para os apêndices
 %\newpage
