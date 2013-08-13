@@ -261,23 +261,16 @@ permitem que diferentes máquinas possam ter versões diferentes de uma mesma in
 \emph{PNUTS} é o serviço de armazenamento de dados do \emph{Yahoo!} que garante que todas as réplicas de um determinado dado armazenado executam as mesmas alterações, na mesma ordem. PNUTS permite a existência de várias versões de um dado, e oferece uma primitiva \emph{test-and-set-write}, que efetua uma escrita de dados somente se uma determinada versão do dado for encontrada, semelhante ao mecanismo de comparação das minitransações.
 
 Por último, \emph{Hazelcast} \cite{hazelcast} e \emph{Akka} \cite{akka} são ferramentas para o desenvolvimento de sistemas distribuídos que visam eliminar a necessidade de comunicação explícita entre os participantes do sistema, oferecendo abstrações como estruturas de dados
-distribuídas ou memória transacional. \emph{Hazelcast} oferece a programas rodando na \emph{JVM Java} implementações distribuídas das coleções da biblioteca padrão (\emph{Collection, Set, List e Map}). \emph{Akka} permite a utilização de memória transacional por \emph{software} (\emph{software transactional memory} ou \emph{STM} \cite{stm}), uma abordagem que emprega o conceito de transação discutido 
-neste trabalho em operações de leitura e escrita na memória principal do computador.
+distribuídas ou memória transacional. \emph{Hazelcast} oferece a programas rodando na \emph{JVM Java} implementações distribuídas das coleções da biblioteca padrão (\emph{Collection, Set, List e Map}). \emph{Akka} permite a utilização de memória transacional por \emph{software} (\emph{software transactional memory} ou \emph{STM} \cite{stm}), uma abordagem que emprega o conceito de transação discutido neste trabalho em operações de leitura e escrita na memória principal do computador.
 
-\chapter{Paradigma transacional}
-\label{chap:transacao}
-Este capítulo apresenta o paradigma transacional como uma alternativa para o desenvolvimento de software. Esse paradigma utiliza o conceito de transação para definir unidades de execução de grupos de operações sobre o estado do sistema.
-
-A seção \ref{sec:tolerancia_a_falhas} apresenta uma idéia da necessidade e da origem da utilização de transações.
-
-Na seção \ref{sec:transacao} veremos as propriedades que essas transações devem possui para oferecer uma ferramenta de desenvolvimento efetiva ao desenvolvedor.
-
-Por último, a seção \ref{sec:extensoes} apresenta algumas extensões do modelo de transações descrito neste capítulo.
-
-\section{Evolução dos sistemas computacionais}
+\chapter{Evolução dos sistemas computacionais}
 \label{chap:evolucao}
+*** TODO talvez chamar esse capítulo de abstrações
+
 Este capítulo apresenta uma breve descrição da evolução dos sistemas computacionais e da maneira como foram e são construídos. O tamanho e a complexidade desses sistemas evoluiram acompanhando, e muitas vezes incentivando, a evolução das plataformas de \emph{hardware} em que executam. Essa descrição não é completa e nem exaustiva, uma vez que o intuito é apresentar os tipos mais representativos de sistemas e as técnicas e arquiteturas utilizadas em seu desenvolvimento.
 
+\section{Visão geral}
+\label{sec:visao_geral}
 Os primeiros computadores foram criados com o intuito de resolver mais rapidamente cálculos matemáticos. Essas máquinas ocupavam salas inteiras e eram programadas por meio de alterações diretas nas ligações entre os componentes físicos da máquina. 
 
 *** TODO colocar foto do eniac - fonte: http://ds.haverford.edu/bitbybit/bit-by-bit-contents/chapter-four/4-8-project-px-and-the-eniac/
@@ -322,7 +315,77 @@ Essa crescente demanda de aplicações espalhadas pela \emph{Internet} e disposi
 
 Como máquinas podem ser adicionadas ou removidas durante a execução do sistema, esse deve estar preparado para lidar e tratar requisiçoes duplicadas, tentativas de reconexão e redistribuição de carga. O sistema deve ser capaz de manter seu estado global consistente e válido, e fazer isso face a mudanças bruscas na configuração do sistema não é uma tarefa trivial. Como veremos no capítulo seguinte, transações são uma ferramenta de grande utilidade para realizar essa tarefa de manter o estado do sistema consistente. 
 
+
+\section{Evolução do hardware e dos sistemas operacionais}
+\label{sec:evolucao_sistemas_operacionais}
+Um sistema operacional é um software que efetua duas funções básicas para o funcionamento e utilização de um computador: oferecer um conjunto abstrato e coerente de recursos, ao contrário das complexas interfaces de hardware; e gerenciar esses recursos de hardware. 
+
+Essa abstração dos recursos oferecida faz com que o sistema operacional possa ser visto como um computador estendido, uma máquina que oferece mais serviços e funcionalidades do que os implementados em hardware diretamente e acessíveis por linguagens de máquina.
+
+A \textbf{arquitetura} (conjunto de instruções de máquina, organização de memória, portas de entrada e saída e estrutura do barramento) da maioria dos computadores no nível da linguagem de máquina é primitiva e complexa de programar, especialmente no que tange os dispositivos de entrada e saída. A figura \ref{fig:abstracoes_so} ilustra algumas abstrações oferecidas comumentemente sistemas operacionais modernos.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{abstracoes_so} 
+  \caption{Algumas abstrações oferecidas pelos sistemas operacionais}
+  \label{fig:abstracoes_so} 
+\end{figure}
+
+A abstração criada pelo sistema operacional sobre a arquitetura de um computador é um fator essencial no gerenciamento de complexidade. Por meio de um arquivo um programa pode escrever ou ler informações que estão ou serão armazenadas em gama enorme de dispositivos de armazenamento. Um programa utiliza essa abstração por meio de funções de leitura e escrita, e não precisa se preocupar com questões como número de trilhas ou velocidade de rotação de motores (como ocorre com discos rígidos).
+
+Ao longo do tempo os sistemas operacionais evoluíram, acompanhando de perto o desenvolvimento da arquitetura dos computadores em que rodavam, de forma que podemos traçar um paralelo entre os dois. Assim, os items a seguir ilustram as fases pelo qual o desenvolvimento do hardware passou, em conjunto com as adaptações dos sistemas operacionais para abstrair essas novas arquiteturas para serem utilizadas pelas aplicações.
+
+\subsection*{Primeira geração - válvulas a vácuo}
+ O período da segunda guerra mundial estimulou um grande interesse na construção de computadores digitais. Países como Estados Unidos e Alemanha, por razões óbvias produziram os primeiros computadores, como Z3 (em Berlim, Alemanha), Colossus (em Bletchley Park, Inglaterra), Mark I (Harvard, Estados Unidos) e ENIAC (Pensilvânia, Estados Unidos). Esses computadores eram construídos com válvulas a vácuo, um dispositivo que controla uma corrente elétrica através do vácuo em um compatimento selado.
+
+Esses primeiros computadores não possuíam sistemas operacionais, e a programação era feita totalmente em linguagem de máquina ou fisicamente, efetuando conexões manualmente entre os cabos de controle nos painéis dos computadores. Os programadores precisavam aguardar algumas horas pelo término da execução do programa, enquanto torciam para que nenhum componente queimasse e todo o trabalho fosse perdido. 
+
+*** TODO colocar uma foto de um painel de programação
+
+Praticamente todos os problemas que esses computadores eram programados para resolver envolviam cálculos numéricos, como geração de tabelas de senos, cossenos ou logaritmos. O programadores precisavam acessar e controlar diretamente todos os dispositivos, estando sujeitos à toda complexidade que esses dispositivos apresentavam. 
+
+\subsection*{Segunda geração - transistores e sistemas em lote}
+A criação do transistor, um dispositivo que amplifica e chaveia sinais elétricos, permitiu a fabricação de computadores mais confiáveis, que podiam ser vendidos com a garantia que funcionariam por tempo suficiente para completar qualquer trabalho útil.
+
+Somente disponíveis para as grandes corporações, as mais importantes agências governamentais ou universidades que dispunham de recursos suficientes para bancar computadores que custavam na casa de milhões de dólares. Esses computadores eram mantidos em salas especialmente refrigeradas e protegidas, operados por profissionais especializados. 
+
+Para executar um programa nesses computadores, um programador precisava primeira codificar esse programa em papel (utilizando FORTRAN ou alguma linguagem montadora) e então gravar esse programa em cartões perfurados especificamente para serem lidos pelo computador. Esses programas resolviam basicamente cálculos científicos e de engenharia, como equações diferenciais parciais.
+
+*** TODO colocar um foto de assembly, fortran e cartão perfurado
+
+Esse conjunto de cartões era enviado para os operadores, que preparavam o computador para a execução, que levava bastante tempo. Depois dessa execução, o próximo programador trazia um novo programa, e assim por diante. Esse procedimento dispendioso em termos de tempo evoluiu para a utilização de sistemas em lote, que consistia em armazenar diversos programas, um após o outro, e utilizar cartões especiais para controlar a execução desses programas.
+
+Os sistemas operacionais dessa geração efetuavam a interpretação desses cartões especiais, controlando o carregamento e a execução dos programas, mas faziam pouca coisa no sentido de abstrair as complexidades do hardware, e os programadores ainda estavam sujeitos às especificidades de cada computador.
+
+\subsection*{Terceira geração - circuitos integrados e multiprogramação}
+Os circuitos integrados, um conjunto de circuitos eletrônicos encapsulados em uma pequena placa de material semicondutor, permitiu a fabricação de computadores em grande escala, oferecendo melhor custo/benefício do que as máquinas da segunda geração. Os computadores ficaram mais populares e passaram a ser utilizados tanto para grandes cálculos científicos quanto para o processamento maciço de dados comerciais.
+
+A principal característica dos sistemas operacionais dessa geração foi a multiprogramação, em que a memória do computador era particionada em diversos setores, com um programa diferente em cada um desses setores (nos sistemas em lote, havia somente um programa na memória por vez, que era substituído pelo próximo quando a execução do primeiro terminava). Manter múltiplos programas de maneira segura da memória de uma só vez requer hardware especial para proteger cada programa de erros e fraudes que um outro programa possa efetuar.
+
+Enquanto um programa esperava uma operação de entrada e saída (que levava bem mais tempo do que uma operação de processamento) ser completada, um outro programa poderia utilizar o processador. Se houvesse um número suficiente de programas que pudesse ser mantido na memória de uma só vez, o processador poderia ficar praticamente 100 porcento do tempo ocupado, evitando desperdício de ciclos de processamento do processador.
+
+Os sistemas operacionais dessa geração ofereciam também uma variação da multiprogramação chamada de programação de tempo compartilhado, em que além de armazenar vários programas na memória de uma só vez, o sistema permita o acesso interativo por meio de um terminal conectado ao computador.
+
+\subsection*{Quarta geração - computadores pessoais}
+O desenvolvimento microprocessadores, dispositivos contendo milhares de transistores em uma placa de silício com um centímetro quadrado de área, permitiu uma grande diminuição no tamanho e no preço dos computadores. Essa diminuição possibilitou que pessoas, e não mais somente empresas ou universidades, pudessem adquirir computadores para uso pessoal.
+
+Os sistemas operacionais passaram a oferecer cada vez mais recursos e funcionalidades aos usuários. Inicialmente o uso dos sistemas era feito por meio de telas de linha de comando, em que o usuário digita os comandos para instruir o sistema quais programas executar. Com o tempo, as \emph{GUI} (\emph{Graphical User Interface}, interfaces gráficas de usuário) foram se popularizando, e os conceitos de janela, ícones e menus foram sendo disseminadas.
+
+A popularização das redes de computadores fez surgir os sistemas operacionais de redes e os sistemas operacionais distribuídos. Em um sistema operacional de rede, os usuário estão conscientes da existência de múltiplos computadores e podem se conectar e executar programas nesses computadores remotos. Um sistema operacional distribuído vai no sentido contrário, apresentando para o usuário um sistema tradicional, mesmo que esse esteja sendo executado em processadores e máquinas diferentes.
+
+\section{Evolução das linguagens de programação}
+\label{sec:evolucao_linguagens_programacao}
 *** TODO ver se dá pra pegar aquela parte do booch que ele explica a evolução das linguagens...
+
+\chapter{Paradigma transacional}
+\label{chap:transacao}
+Este capítulo apresenta o paradigma transacional como uma alternativa para o desenvolvimento de software. Esse paradigma utiliza o conceito de transação para definir unidades de execução de grupos de operações sobre o estado do sistema.
+
+A seção \ref{sec:tolerancia_a_falhas} apresenta uma idéia da necessidade e da origem da utilização de transações.
+
+Na seção \ref{sec:transacao} veremos as propriedades que essas transações devem possui para oferecer uma ferramenta de desenvolvimento efetiva ao desenvolvedor.
+
+Por último, a seção \ref{sec:extensoes} apresenta algumas extensões do modelo de transações descrito neste capítulo.
 
 \section{Tolerância a Falhas}
 \label{sec:tolerancia_a_falhas}
@@ -350,10 +413,6 @@ Ao longo do tempo foram identificadas quatro propriedades que definem uma transa
 
 A descrição de transação apresentada neste capítulo pode ser considerada como convencional. Hoje em dia existem diversas extensões desse modelo convencional, criadas para adequar ou otimizar a execução das transações a um determinado cenário. Essas extensões são apresentadas resumidamente na seção \ref{subsec:extensoes}.
 
-\subsection{Outros modelos de execução atômica}
-\label{subsec:outros_modelos_execucao_atomica}
-
-Falar sobre semáforo, mutex, etc...
 
 \subsection{ACID}
 \label{subsec:acid}
@@ -657,6 +716,11 @@ Esse tipo de transação é uma forma mais liberal e genérica de transação an
 Com as transações multinível é possível pré-efetivar uma subtransação, excluíndo a possibilidade de um cancelamento unilateral de atualizações.
 
 Aqui, é assumida a existência de transações compensatórias, que são capazes de reverter semanticamente as alterações efetuadas por uma subtransação/transação no caso de a transação pai ser cancelada. 
+
+\subsection{Outros mecanismos de execução atômica e controle de concorrência}
+\label{subsec:outros_mecanismos}
+
+Falar sobre semáforo, mutex, etc...
 
 \chapter{Minitransação}
 \label{chap:minitransacao}
