@@ -285,7 +285,7 @@ Portanto, o programador precisava se preocupar com o número de registradores di
 
 A tecnologia dos transistores permitiu uma diminuição no tamanho dos computadores e, por consequência, um aumento na escala de fabricação. Esses computadores passaram a ser utilizados por empresas para gerenciar e manipular informações referentes aos seus negócios. Isso passou a representar vantagens competitivas para as empresas e culminou hoje na importância inegável que os sistemas informatizados tem na condução e no desempenho de corporações.
 
-Surgiram linguagens de alto-nível, que permitiam ao programador abstrair detalhes do hardware e da plataforma utilizada, podendo um mesmo código criar programas que rodassem em plataformas diferentes. Na verdade, como descreve Wirth em \cite{alg_ds}, o que essas linguagens passam a oferecer é o conceito de um "computador artificial" que compreende os comandos e as construções que a linguagem possui. Essas linguagens tentam diminuir a impedância semântica entre o domínio do problema a ser resolvido e a codificação da sua solução na forma de uma programa de computador.
+Surgiram linguagens de alto-nível, que permitiam ao programador abstrair detalhes do hardware e da plataforma utilizada, podendo um mesmo código criar programas que rodassem em plataformas diferentes. Na verdade, como descreve Wirth em \cite{alg_ds}, o que essas linguagens passam a oferecer é o conceito de um "computador artificial" que compreende os comandos e as construções que a linguagem possui. Essas linguagens tentam diminuir a impedância semântica entre o domínio do problema a ser resolvido e a codificação da sua solução na forma de um programa de computador.
 
 Assim, ao invés de programar utilizando comandos que instruíam o computador a mover o conteúdo do endereço de memória A para o registrador R, adicionar 1 ao valor contido no registrador R e armazenar esse resultado no registrador S e depois mover o conteúdo do registrador S de volta para o endereço de memória A, o programador podia simplesmente dizer $A = A + 1$.
 
@@ -315,7 +315,6 @@ Essa crescente demanda de aplicações espalhadas pela \emph{Internet} e disposi
 
 Como máquinas podem ser adicionadas ou removidas durante a execução do sistema, esse deve estar preparado para lidar e tratar requisiçoes duplicadas, tentativas de reconexão e redistribuição de carga. O sistema deve ser capaz de manter seu estado global consistente e válido, e fazer isso face a mudanças bruscas na configuração do sistema não é uma tarefa trivial. Como veremos no capítulo seguinte, transações são uma ferramenta de grande utilidade para realizar essa tarefa de manter o estado do sistema consistente. 
 
-
 \section{Evolução do hardware e dos sistemas operacionais}
 \label{sec:evolucao_sistemas_operacionais}
 Um sistema operacional é um software que efetua duas funções básicas para o funcionamento e utilização de um computador: oferecer um conjunto abstrato e coerente de recursos, ao contrário das complexas interfaces de hardware; e gerenciar esses recursos de hardware. 
@@ -335,7 +334,7 @@ A abstração criada pelo sistema operacional sobre a arquitetura de um computad
 
 Ao longo do tempo os sistemas operacionais evoluíram, acompanhando de perto o desenvolvimento da arquitetura dos computadores em que rodavam, de forma que podemos traçar um paralelo entre os dois. Assim, os items a seguir ilustram as fases pelo qual o desenvolvimento do hardware passou, em conjunto com as adaptações dos sistemas operacionais para abstrair essas novas arquiteturas para serem utilizadas pelas aplicações.
 
-\subsection*{Primeira geração - válvulas a vácuo}
+\subsection*{Válvulas a vácuo}
  O período da segunda guerra mundial estimulou um grande interesse na construção de computadores digitais. Países como Estados Unidos e Alemanha, por razões óbvias produziram os primeiros computadores, como Z3 (em Berlim, Alemanha), Colossus (em Bletchley Park, Inglaterra), Mark I (Harvard, Estados Unidos) e ENIAC (Pensilvânia, Estados Unidos). Esses computadores eram construídos com válvulas a vácuo, um dispositivo que controla uma corrente elétrica através do vácuo em um compatimento selado.
 
 Esses primeiros computadores não possuíam sistemas operacionais, e a programação era feita totalmente em linguagem de máquina ou fisicamente, efetuando conexões manualmente entre os cabos de controle nos painéis dos computadores. Os programadores precisavam aguardar algumas horas pelo término da execução do programa, enquanto torciam para que nenhum componente queimasse e todo o trabalho fosse perdido. 
@@ -344,7 +343,7 @@ Esses primeiros computadores não possuíam sistemas operacionais, e a programa�
 
 Praticamente todos os problemas que esses computadores eram programados para resolver envolviam cálculos numéricos, como geração de tabelas de senos, cossenos ou logaritmos. O programadores precisavam acessar e controlar diretamente todos os dispositivos, estando sujeitos à toda complexidade que esses dispositivos apresentavam. 
 
-\subsection*{Segunda geração - transistores e sistemas em lote}
+\subsection*{Transistores e sistemas em lote}
 A criação do transistor, um dispositivo que amplifica e chaveia sinais elétricos, permitiu a fabricação de computadores mais confiáveis, que podiam ser vendidos com a garantia que funcionariam por tempo suficiente para completar qualquer trabalho útil.
 
 Somente disponíveis para as grandes corporações, as mais importantes agências governamentais ou universidades que dispunham de recursos suficientes para bancar computadores que custavam na casa de milhões de dólares. Esses computadores eram mantidos em salas especialmente refrigeradas e protegidas, operados por profissionais especializados. 
@@ -357,7 +356,7 @@ Esse conjunto de cartões era enviado para os operadores, que preparavam o compu
 
 Os sistemas operacionais dessa geração efetuavam a interpretação desses cartões especiais, controlando o carregamento e a execução dos programas, mas faziam pouca coisa no sentido de abstrair as complexidades do hardware, e os programadores ainda estavam sujeitos às especificidades de cada computador.
 
-\subsection*{Terceira geração - circuitos integrados e multiprogramação}
+\subsection*{Circuitos integrados e multiprogramação}
 Os circuitos integrados, um conjunto de circuitos eletrônicos encapsulados em uma pequena placa de material semicondutor, permitiu a fabricação de computadores em grande escala, oferecendo melhor custo/benefício do que as máquinas da segunda geração. Os computadores ficaram mais populares e passaram a ser utilizados tanto para grandes cálculos científicos quanto para o processamento maciço de dados comerciais.
 
 A principal característica dos sistemas operacionais dessa geração foi a multiprogramação, em que a memória do computador era particionada em diversos setores, com um programa diferente em cada um desses setores (nos sistemas em lote, havia somente um programa na memória por vez, que era substituído pelo próximo quando a execução do primeiro terminava). Manter múltiplos programas de maneira segura da memória de uma só vez requer hardware especial para proteger cada programa de erros e fraudes que um outro programa possa efetuar.
@@ -366,16 +365,57 @@ Enquanto um programa esperava uma operação de entrada e saída (que levava bem
 
 Os sistemas operacionais dessa geração ofereciam também uma variação da multiprogramação chamada de programação de tempo compartilhado, em que além de armazenar vários programas na memória de uma só vez, o sistema permita o acesso interativo por meio de um terminal conectado ao computador.
 
-\subsection*{Quarta geração - computadores pessoais}
-O desenvolvimento microprocessadores, dispositivos contendo milhares de transistores em uma placa de silício com um centímetro quadrado de área, permitiu uma grande diminuição no tamanho e no preço dos computadores. Essa diminuição possibilitou que pessoas, e não mais somente empresas ou universidades, pudessem adquirir computadores para uso pessoal.
+\subsection*{Computadores pessoais}
+O desenvolvimento dos microprocessadores, dispositivos contendo milhares de transistores em uma placa de silício com um centímetro quadrado de área, permitiu uma grande diminuição no tamanho e no preço dos computadores. Essa diminuição possibilitou que pessoas, e não mais somente empresas ou universidades, pudessem adquirir computadores para uso pessoal.
 
 Os sistemas operacionais passaram a oferecer cada vez mais recursos e funcionalidades aos usuários. Inicialmente o uso dos sistemas era feito por meio de telas de linha de comando, em que o usuário digita os comandos para instruir o sistema quais programas executar. Com o tempo, as \emph{GUI} (\emph{Graphical User Interface}, interfaces gráficas de usuário) foram se popularizando, e os conceitos de janela, ícones e menus foram sendo disseminadas.
 
 A popularização das redes de computadores fez surgir os sistemas operacionais de redes e os sistemas operacionais distribuídos. Em um sistema operacional de rede, os usuário estão conscientes da existência de múltiplos computadores e podem se conectar e executar programas nesses computadores remotos. Um sistema operacional distribuído vai no sentido contrário, apresentando para o usuário um sistema tradicional, mesmo que esse esteja sendo executado em processadores e máquinas diferentes.
 
+\subsection*{Computação ubíqua}
+*** TODO verificar se vale a pena...
+
 \section{Evolução das linguagens de programação}
 \label{sec:evolucao_linguagens_programacao}
-*** TODO ver se dá pra pegar aquela parte do booch que ele explica a evolução das linguagens...
+Assim como os sistemas operacionais, as linguagens de programação também evoluíram paralelamente ao hardware, oferecendo mecanismos de abstração que possibilitaram ao programador expressar conceitos do domínio da aplicação de maneira cada vez mais natural.
+
+Inicialmente simples e oferecendo poucos recursos, cada nova linguagem criada introduzia novos conceitos e maneiras de se projetar e codificar o software. Em sucessivas gerações, o tipo de mecanismo de abstração suportado por cada linguagem evoluiu. 
+
+As linguagens de máquina e suas simplificações, as linguagens montadoras, são representações diretas das intruções que o processador sabe interpretar. Não há nenhuma abstração oferecida por essas linguagens, de forma que elas podem ser consideradas como pertencentes a um geração zero, de baixo-nível, precedendo as chamadas linguagens de alto-nível.
+
+As seções a seguir descrevem rapidamente cada geração e os principais mecanismos de abstrações oferecidos pelas linguagens  de alto-nível mais representativas de cada geração. A classificação das linguagens e a categorização de suas abstrações foram baseadas em \cite{booch}.
+
+\subsection*{Primeira geração}
+Essa geração agrupa linguagens cujas abstrações eram voltadas primariamente para resolver problemas matemáticos. Linguagens como \emph{FORTRAN I}, \emph{ALGOL 58}, \emph{Flowmatic} e \emph{IPL V} foram desenvolvidas para permitir que o programador escrevesse fórmulas matemáticas, liberando o programador das longas e complicadas construções das linguagens de baixo-nível.
+
+O bloco básico de construção de um programa dessa geração é o subprograma, um mecanismo da linguagem que permite agrupar comandos, nomeando esse grupo e invocando-o pelo nome. Esses subprogramas eram utilizados basicamente para evitar que trechos de código fossem duplicados.
+
+Todos os subprogramas possuem acesso a todos os dados do programa. Embora logicamente o programador pudesse efetuar algum tipo de separação entre esses dados, as linguagens não ofereciam nenhum mecanismo para garantir essa separação. Um erro em um subprograma poderia causar uma sucessão de efeitos negativos no resto do sistema, uma vez que essa estrutura de dados global era exposta a todos os subprogramas.
+
+As linguagens dessa geração também são classificadas como não-estruturadas, uma vez que não dispunham de estruturas de controle do fluxo de execução. Seus mecanismos de controle eram baseados em condições e desvios no fluxo da execução para um determinado ponto do programa.
+
+\subsection*{Segunda geração}
+As linguagens dessa geração possuem em comum a ênfase em abstrações algorítmicas. Embora amplamente utilizado na primeira geração, o subprograma só foi reconhecido como um mecanismo de abstração das funcionalidades do programa com o aparecimento dessa segunda geração de linguagens.
+
+Isso levou à criação do paradigma procedural de programação, em que o foco era agrupar funcionalidades do software e utilizar esses agrupamentos para dizer à máquina o que deveria ser feito. 
+
+O reconhecimento dos subprogramas como mecanismo de abstração teve três consequências importantes:
+
+\begin{enumerate}
+	\item Foram criados diversos mecanismos de passagem de parâmetro para os subprogramas (como passagem por valor, passagem por referência, etc).
+	\item As sementes da programação estruturada foram plantadas, com a introdução de estruturas de controle de fluxo como \emph{if} e \emph{while}.
+	\item Surgiram métodos de projeto estruturado, que funcionavam como guias para o desenvolvimento do software.
+\end{enumerate}
+
+Linguagens como \emph{FORTRAN II}, \emph{ALGOL 60}, \emph{COBOL} e \emph{Lisp} surgiram nesse período e ofereciam mecanismos como estrutura de blocos, tipos de dados, descrição de dados e gerenciamento de arquivos.
+
+\subsection*{Terceira geração}
+O aumento no poder de processamento dos computadores permitiu a criação de sistemas cada vez maiores e complexos. Esses sistemas resolviam problemas cada vez maiores, o que demandava a manipulação de novos tipos de dados.
+
+\emph{Pascal} e \emph{Simula} são exemplos de linguagens que permitiam a definição explícita de abstrações de dados. O programador poderia descrever o significado de novos tipos de dados e deixar que a linguagem garantisse que os elementos de um determinado tipo estavam de acordo com a definição desse tipo.
+
+\subsection*{Quarta geração}
+*** TODO parei aqui...
 
 \chapter{Paradigma transacional}
 \label{chap:transacao}
