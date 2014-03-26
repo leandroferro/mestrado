@@ -200,7 +200,7 @@ O uso da Internet e a possibilidade de acessá-la de praticamente qualquer lugar
 
 Esses dados apresentam um relacionamento entre si e a execução de operações sobre um determinado item em geral demanda que outros itens relacionados sejam envolvidos nessas operações. Dessa forma, cuidados devem ser tomados para que esses itens relacionados permaneçam consistentes entre si após a execução dessas operações.
 
-A chave para manter a consistência de dados é identificar sequências de operações que acessam ou modificam items de dados relacionados. Tais sequências de operações são chamadas de transações \cite{gray}, e os ambientes que permitem a execução de transações garantem que cada transação é executada em sua totalidade e que transações executadas ao mesmo tempo se comportem como se estivessem sendo executadas isoladamente, uma após a outra.
+A chave para manter a consistência de dados é identificar sequências de operações que acessam ou modificam items de dados relacionados e garantir que ou todas essas operações sejam executadas com sucesso ou a sequência como um todo seja cancelada. Tais sequências de operações são chamadas de transações \cite{gray},  e os ambientes que permitem a execução de transações garantem que cada transação é executada em sua totalidade e que transações executadas ao mesmo tempo se comportem como se estivessem sendo executadas isoladamente, uma após a outra.
 
 A execução de uma transação pode ser cancelada explicitamente caso determinadas condições específicas do domínio do sistema não sejam atendidas. A verificação dessas condições é de responsabilidade do próprio sistema e fica implícita em seu código-fonte.
 
@@ -210,6 +210,7 @@ Modularização do código ou o uso de técnicas como orientação a objetos \ci
 
 Sistemas gerenciadores de bancos de dados atuais oferecem a possibilidade de verificar restrições e executar procedimentos armazenados no próprio banco de dados \cite{vaca}, permitindo a implementação de condições que levam ao cancelamento ou efetivação da transação no próprio banco de dados, mas isso também pode dificultar o entendimento uma vez que será necessário analisar tanto o código quanto a estrutura do banco de dados para entender os requisitos. 
 
+O entendimento ou compreensão do código-fonte de um sistema é um processo cognitivo particular de cada desenvolvedor que não pode ser medido diretamente \cite{program_comprehension}
 Não existem métricas específicas para medir o esforço de compreensão de códigos-fonte, mas essa complexidade conceitual é uma importante consideração na avaliação e comparação entre projetos de sistemas \cite{software_measurement}.
 
 O objetivo deste trabalho é apresentar uma maneira de diminuir essa complexidade por meio da utilização de minitransações, que tornam explícitas as condições que podem levar uma transação a ser cancelada. Uma minitransação é uma maneira de representar uma transação de forma que seus aspectos semânticos sejam declarados explicitamente, ou seja, as condições que permitem que uma transação seja efetivada são agrupadas e classificadas como tal, expondo claramente o contexto em que a transação pode ser efetivada.
